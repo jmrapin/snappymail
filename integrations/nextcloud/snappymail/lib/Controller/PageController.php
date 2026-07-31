@@ -28,7 +28,6 @@ class PageController extends Controller
 		}
 
 		if (!$bAdmin && $config->getAppValue('snappymail', 'snappymail-no-embed')) {
-			\OC::$server->getNavigationManager()->setActiveEntry('snappymail');
 			\OCP\Util::addScript('snappymail', 'snappymail');
 			\OCP\Util::addStyle('snappymail', 'style');
 			SnappyMailHelper::startApp();
@@ -42,8 +41,6 @@ class PageController extends Controller
 			$response->setContentSecurityPolicy($csp);
 			return $response;
 		}
-
-		\OC::$server->getNavigationManager()->setActiveEntry('snappymail');
 
 		\OCP\Util::addStyle('snappymail', 'embed');
 
