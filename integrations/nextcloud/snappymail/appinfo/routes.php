@@ -23,6 +23,11 @@ return [
 			'verb' => 'POST'
 		],
 		[
+			'name' => 'page#avatar',
+			'url' => '/Avatar/{bimi}/{encodedEmail}',
+			'verb' => 'GET'
+		],
+		[
 			'name' => 'fetch#setPersonal',
 			'url' => '/fetch/personal.php',
 			'verb' => 'POST'

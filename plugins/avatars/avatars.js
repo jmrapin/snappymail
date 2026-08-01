@@ -54,7 +54,7 @@
 		getAvatar = msg => ncAvatars.get(email(msg)) || avatars.get(getAvatarUid(msg)),
 		getAvatarUri = msg => {
 			if ('remote' === msg.avatar) {
-				msg.avatar = `?Avatar/${getBimiId(msg)}/${b64url(email(msg))}`;
+				msg.avatar = `Avatar/${getBimiId(msg)}/${b64url(email(msg))}`;
 			}
 /*
 			else if (!msg.avatar.startsWith('data:')) {

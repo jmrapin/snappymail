@@ -111,4 +111,19 @@ class PageController extends Controller
 	{
 		return SnappyMailHelper::startApp(true);
 	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 */
+	public function avatar(string $bimi, string $encodedEmail)
+	{
+		SnappyMailHelper::loadApp();
+		$oActions = \RainLoop\Api::Actions();
+		// Call the plugin's ServiceAvatar method
+		if (!$oActions->Plugins()->RunAdditionalPart('Avatar', ['Avatar', $bimi, $encodedEmail])) {
+			\MailSo\Base\Http::StatusHeader(404);
+		}
+		exit;
+	}
 }
