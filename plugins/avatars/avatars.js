@@ -137,7 +137,7 @@
 		const messageItemHeader = getEl(templateId).content.querySelector('.messageItemHeader');
 		if (messageItemHeader) {
 			messageItemHeader.prepend(Element.fromHTML(
-				`<img class="fromPic" data-bind="visible: viewUserPicVisible, attr: {'src': viewUserPic() }" loading="lazy">`
+				`<img class="fromPic" data-bind="visible: viewUserPicVisible, viewUserPicSrc: viewUserPic" loading="lazy">`
 			));
 		}
 
@@ -258,5 +258,24 @@
 			});
 		}
 	});
+
+	// Custom binding for message view avatar - sets src and falls back to identicon on error
+	ko.bindingHandlers.viewUserPicSrc = {
+		init: (element, valueAccessor, allBindings, viewModel) => {
+			element.onerror = () => {
+				element.onerror = null;
+				const msg = viewModel?.message?.();
+				if (msg?.from?.[0]) {
+					setIdenticon(msg, uri => { element.src = uri; });
+				}
+			};
+		},
+		update: (element, valueAccessor) => {
+			const url = ko.unwrap(valueAccessor());
+			if (url) {
+				element.src = url;
+			}
+		}
+	};
 
 })(window.rl);
