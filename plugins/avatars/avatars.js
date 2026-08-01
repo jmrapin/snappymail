@@ -153,7 +153,7 @@
 				getElementsByTagName = (parent, namespace, localName) => parent.getElementsByTagNameNS(namespace, localName),
 				getElementValue = (parent, namespace, localName) =>
 					getElementsByTagName(parent, namespace, localName)?.item(0)?.textContent;
-			fetch(`${OC.webroot}/remote.php/dav/addressbooks/users/${OC.currentUser}/contacts/`, {
+			fetch(`${OC.webroot}/remote.php/dav/addressbooks/users/${OC.currentUser}/${rl.pluginSettingsGet('avatars', 'nextcloud_addressbook') || 'contacts'}/`, {
 				mode: 'same-origin',
 				cache: 'no-cache',
 				redirect: 'error',
@@ -166,8 +166,15 @@
 				},
 				body: '<x4:addressbook-query xmlns:x4="urn:ietf:params:xml:ns:carddav"><x0:prop xmlns:x0="DAV:"><x4:address-data><x4:prop name="EMAIL"/></x4:address-data><x3:has-photo xmlns:x3="http://nextcloud.com/ns"/></x0:prop></x4:addressbook-query>'
 			})
-			.then(response => (response.status < 400) ? response.text() : Promise.reject(new Error({ response })))
+			.then(response => {
+				if (response.status === 404) {
+					// Addressbook doesn't exist, skip Nextcloud avatar lookup
+					return null;
+				}
+				return (response.status < 400) ? response.text() : Promise.reject(new Error({ response }));
+			})
 			.then(text => {
+				if (!text) return; // 404 was handled
 				const
 					xmlParser = new DOMParser(),
 					responseList = getElementsByTagName(
@@ -186,6 +193,9 @@
 						});
 					}
 				}
+			})
+			.catch(() => {
+				// Ignore errors (e.g., no contacts app, no addressbook, permission denied)
 			});
 		}
 //	});

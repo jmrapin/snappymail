@@ -172,6 +172,11 @@ class AvatarsPlugin extends \RainLoop\Plugins\AbstractPlugin
 				->SetAllowedInJs(true)
 				->SetDefaultValue(true)
 				->SetDescription('DKIM header must be valid and icon is found in avatars/images/services directory'),
+			\RainLoop\Plugins\Property::NewInstance('nextcloud_addressbook')->SetLabel('Nextcloud Addressbook Name')
+				->SetType(\RainLoop\Enumerations\PluginPropertyType::STRING)
+				->SetAllowedInJs(true)
+				->SetDefaultValue('contacts')
+				->SetDescription('Name of the Nextcloud addressbook to fetch avatars from (e.g., contacts, phone)'),
 			$group
 		);
 /*
