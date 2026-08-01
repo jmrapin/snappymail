@@ -1,5 +1,6 @@
 import { AppUserStore } from 'Stores/User/App';
 import { AccountUserStore } from 'Stores/User/Account';
+import { IdentityUserStore } from 'Stores/User/Identity';
 //import { FolderUserStore } from 'Stores/User/Folder';
 
 import { ScopeMessageList, ScopeMessageView, ScopeSettings } from 'Common/Enums';
@@ -88,6 +89,12 @@ export class SystemDropDownUserView extends AbstractViewRight {
 
 	accountName() {
 		const email = AccountUserStore.email();
+		// Check for identity with matching email first
+		const identity = IdentityUserStore.find(item => item && item.email === email);
+		if (identity) {
+			return identity.label() || identity.name || IDN.toUnicode(email);
+		}
+		// Fall back to account label
 		return AccountUserStore.find(account => account.email == email)?.label() || IDN.toUnicode(email);
 	}
 
