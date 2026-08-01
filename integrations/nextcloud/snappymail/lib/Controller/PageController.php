@@ -16,7 +16,7 @@ class PageController extends Controller
 	 */
 	public function index()
 	{
-		$config = \OC::$server->getConfig();
+		$config = \OC::$server->get(\OCP\IConfig::class);
 
 		$bAdmin = false;
 		if (!empty($_SERVER['QUERY_STRING'])) {

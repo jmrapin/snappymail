@@ -30,12 +30,12 @@ class AdminSettings implements ISettings
 			$v = $this->config->getAppValue('snappymail', $k);
 			$parameters[$k] = $v;
 		}
-		$uid = \OC::$server->getUserSession()->getUser()->getUID();
+		$uid = \OC::$server->get(\OCP\IUserSession::class)->getUser()->getUID();
 		if (\OC_User::isAdminUser($uid)) {
 //			$parameters['snappymail-admin-panel-link'] = SnappyMailHelper::getAppUrl().'?admin';
 			SnappyMailHelper::loadApp();
 			$parameters['snappymail-admin-panel-link'] =
-				\OC::$server->getURLGenerator()->linkToRoute('snappymail.page.index')
+				\OC::$server->get(\OCP\IURLGenerator::class)->linkToRoute('snappymail.page.index')
 				. '?' . \RainLoop\Api::Config()->Get('security', 'admin_panel_key', 'admin');
 		}
 
@@ -49,7 +49,7 @@ class AdminSettings implements ISettings
 		$parameters['snappymail-admin-password'] = $sPassword;
 
 		$parameters['can-import-rainloop'] = $sPassword && \is_dir(
-			\rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/')
+			\rtrim(\trim(\OC::$server->get(\OCP\IConfig::class)->getSystemValue('datadirectory', '')), '\\/')
 			. '/rainloop-storage'
 		);
 
@@ -65,7 +65,7 @@ class AdminSettings implements ISettings
 		// Prevent "Failed loading /nextcloud/snappymail/v/2.N.N/static/js/min/libs.min.js"
 		$app_path = $oConfig->Get('webmail', 'app_path');
 		if (!$app_path) {
-			$app_path = \OC::$server->getAppManager()->getAppWebPath('snappymail') . '/app/';
+			$app_path = \OC::$server->get(\OCP\App\IAppManager::class)->getAppWebPath('snappymail') . '/app/';
 			$oConfig->Set('webmail', 'app_path', $app_path);
 			$oConfig->Set('webmail', 'theme', 'NextcloudV25+');
 			$oConfig->Save();

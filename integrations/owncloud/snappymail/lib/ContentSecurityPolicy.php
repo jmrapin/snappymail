@@ -6,8 +6,6 @@ class ContentSecurityPolicy extends \OCP\AppFramework\Http\ContentSecurityPolicy
 
 	/** @var bool Whether inline JS snippets are allowed */
 	protected $inlineScriptAllowed = false;
-	/** @var bool Whether eval in JS scripts is allowed */
-	protected $evalScriptAllowed = true;
 	/** @var bool Whether strict-dynamic should be set */
 //	protected $strictDynamicAllowed = true; // NC24+
 	/** @var bool Whether inline CSS is allowed */

@@ -222,7 +222,7 @@ class SnappyMailHelper
 	{
 		$result = [];
 
-		$dir = \rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/');
+		$dir = \rtrim(\trim(\OC::$server->get(\OCP\IConfig::class)->getSystemValue('datadirectory', '')), '\\/');
 		$dir_snappy = $dir . '/appdata_snappymail/';
 		$dir_rainloop = $dir . '/rainloop-storage';
 		$rainloop_plugins = [];

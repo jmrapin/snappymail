@@ -48,7 +48,7 @@ class AdminSettings implements ISettings
 		$parameters['snappymail-admin-password'] = $sPassword;
 
 		$parameters['can-import-rainloop'] = $sPassword && \is_dir(
-			\rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/')
+			\rtrim(\trim(\OC::$server->get(\OCP\IConfig::class)->getSystemValue('datadirectory', '')), '\\/')
 			. '/rainloop-storage'
 		);
 

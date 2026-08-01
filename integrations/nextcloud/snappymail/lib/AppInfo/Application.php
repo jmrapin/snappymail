@@ -72,7 +72,7 @@ class Application extends App implements IBootstrap
 
 	public function boot(IBootContext $context): void
 	{
-		if (!\is_dir(\rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/') . '/appdata_snappymail')) {
+		if (!\is_dir(\rtrim(\trim(\OC::$server->get(\OCP\IConfig::class)->getSystemValue('datadirectory', '')), '\\/') . '/appdata_snappymail')) {
 			return;
 		}
 
@@ -86,16 +86,17 @@ class Application extends App implements IBootstrap
 			 || $config->getAppValue('snappymail', 'snappymail-autologin-with-email', false)) {
 */
 				$sUID = $Event->getUser()->getUID();
-				\OC::$server->getSession()['snappymail-nc-uid'] = $sUID;
-				\OC::$server->getSession()['snappymail-passphrase'] = SnappyMailHelper::encodePassword($Event->getPassword(), $sUID);
+				\OC::$server->get(\OCP\ISession::class)['snappymail-nc-uid'] = $sUID;
+				\OC::$server->get(\OCP\ISession::class)['snappymail-passphrase'] = SnappyMailHelper::encodePassword($Event->getPassword(), $sUID);
 /*
 			}
 */
+
 		});
 
 		$dispatcher->addListener(BeforeUserLoggedOutEvent::class, function (BeforeUserLoggedOutEvent $Event) {
 			// https://github.com/nextcloud/server/issues/36083#issuecomment-1387370634
-//			\OC::$server->getSession()['snappymail-passphrase'] = '';
+//			\OC::$server->get(\OCP\ISession::class)['snappymail-passphrase'] = '';
 			SnappyMailHelper::loadApp();
 //			\RainLoop\Api::Actions()->Logout(true);
 			\RainLoop\Api::Actions()->DoLogout();
@@ -106,12 +107,12 @@ class Application extends App implements IBootstrap
 		$class = 'OCA\Impersonate\Events\BeginImpersonateEvent';
 		if (\class_exists($class)) {
 			$dispatcher->addListener($class, function ($Event) {
-				\OC::$server->getSession()['snappymail-passphrase'] = '';
+				\OC::$server->get(\OCP\ISession::class)['snappymail-passphrase'] = '';
 				SnappyMailHelper::loadApp();
 				\RainLoop\Api::Actions()->Logout(true);
 			});
 			$dispatcher->addListener('OCA\Impersonate\Events\EndImpersonateEvent', function ($Event) {
-				\OC::$server->getSession()['snappymail-passphrase'] = '';
+				\OC::$server->get(\OCP\ISession::class)['snappymail-passphrase'] = '';
 				SnappyMailHelper::loadApp();
 				\RainLoop\Api::Actions()->Logout(true);
 			});

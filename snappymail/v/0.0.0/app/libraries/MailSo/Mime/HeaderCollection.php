@@ -191,11 +191,35 @@ class HeaderCollection extends \MailSo\Base\Collection
 		];
 		$aHeaders = $this->ValuesByName(Enumerations\Header::AUTHENTICATION_RESULTS);
 		if (\count($aHeaders)) {
+			// Only use the FIRST Authentication-Results header (from receiving server)
+			// Subsequent headers are from intermediate/internal processing and may have "none" results
+			$aHeaders = [$aHeaders[0]];
+			
 			$aHeaders = \implode(';', $aHeaders);
 			$aHeaders = \preg_replace('/[\\r\\n\\t\\s]+/', ' ', $aHeaders);
 			$aHeaders = \str_replace('-bit key;', '-bit key,', $aHeaders);
-			$aHeaders = \explode(';', $aHeaders);
-			foreach ($aHeaders as $sLine) {
+			
+			// Split by semicolon but respect quoted strings
+			$aParts = [];
+			$sCurrent = '';
+			$bInQuotes = false;
+			for ($i = 0; $i < \strlen($aHeaders); $i++) {
+				$c = $aHeaders[$i];
+				if ($c === '"' && ($i === 0 || $aHeaders[$i-1] !== '\\')) {
+					$bInQuotes = !$bInQuotes;
+				}
+				if ($c === ';' && !$bInQuotes) {
+					$aParts[] = \trim($sCurrent);
+					$sCurrent = '';
+				} else {
+					$sCurrent .= $c;
+				}
+			}
+			if ($sCurrent) {
+				$aParts[] = \trim($sCurrent);
+			}
+			
+			foreach ($aParts as $sLine) {
 				$aStatus = array();
 				$aHeader = array();
 				if (\preg_match("/(dkim|dmarc|spf)=([a-z0-9]+).*?(;|$)/Di", $sLine, $aStatus)
