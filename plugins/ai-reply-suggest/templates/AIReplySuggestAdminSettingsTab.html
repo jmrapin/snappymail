@@ -1,0 +1,62 @@
+<div class="control-group" data-bind="visible: !loading()">
+	<div class="form-horizontal">
+		<div class="control-group">
+			<label class="control-label">AI API Endpoint URL</label>
+			<div class="controls">
+				<input type="text" class="input-xlarge" data-bind="value: $root.pluginSettingsGet('ai-reply-suggest', 'api_endpoint')" placeholder="https://api.openai.com/v1/chat/completions" />
+				<span class="help-block">The URL of your AI service API endpoint (e.g., OpenAI, local LLM server)</span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">API Key</label>
+			<div class="controls">
+				<input type="password" class="input-xlarge" data-bind="value: $root.pluginSettingsGet('ai-reply-suggest', 'api_key')" placeholder="sk-..." />
+				<span class="help-block">Your API key for authenticating with the AI service</span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">Model</label>
+			<div class="controls">
+				<input type="text" class="input-xlarge" data-bind="value: $root.pluginSettingsGet('ai-reply-suggest', 'model')" placeholder="gpt-3.5-turbo" />
+				<span class="help-block">The AI model to use (e.g., gpt-3.5-turbo, gpt-4, llama2)</span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">Max Tokens</label>
+			<div class="controls">
+				<input type="number" class="input-mini" data-bind="value: $root.pluginSettingsGet('ai-reply-suggest', 'max_tokens')" min="100" max="2000" />
+				<span class="help-block">Maximum number of tokens for the generated reply</span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">Temperature</label>
+			<div class="controls">
+				<input type="text" class="input-mini" data-bind="value: $root.pluginSettingsGet('ai-reply-suggest', 'temperature')" placeholder="0.7" />
+				<span class="help-block">Creativity of the response (0.0 = focused, 1.0 = creative)</span>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="control-group" data-bind="visible: loading()">
+	<div class="alert alert-info">Loading...</div>
+</div>
+    $('#ai-save-settings').click(function() {
+        const endpoint = $('#ai-api-endpoint').val().trim();
+        const apiKey = $('#ai-api-key').val().trim();
+        const model = $('#ai-model').val().trim();
+        
+        if (endpoint === '' || apiKey === '') {
+            alert('{$LANG.AIReplySuggestPleaseConfigure}');
+            return;
+        }
+        
+        // In a real implementation, this would save to the plugin's settings via AJAX
+        // For now, we'll just show a success message
+        alert('{$LANG.SettingsSaved}');
+        
+        // Store in localStorage as a temporary solution for demo purposes
+        localStorage.setItem('ai_reply_suggest_endpoint', endpoint);
+        localStorage.setItem('ai_reply_suggest_apikey', apiKey);
+        localStorage.setItem('ai_reply_suggest_model', model);
+    });
+</script>

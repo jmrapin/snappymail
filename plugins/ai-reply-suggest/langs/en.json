@@ -1,0 +1,20 @@
+{
+    "AIReplySuggest": "AI Reply Suggest",
+    "AIReplySuggestAPIEndpoint": "AI API Endpoint",
+    "AIReplySuggestAPIEndpointPlaceholder": "https://api.example.com/v1/chat/completions",
+    "AIReplySuggestAPIEndpointHelp": "The URL of your AI service endpoint (e.g., OpenAI API, local LLM server)",
+    "AIReplySuggestAPIKey": "API Key",
+    "AIReplySuggestAPIKeyPlaceholder": "sk-...",
+    "AIReplySuggestAPIKeyHelp": "Your API key for the AI service",
+    "AIReplySuggestModel": "Model",
+    "AIReplySuggestModelPlaceholder": "gpt-3.5-turbo",
+    "AIReplySuggestModelHelp": "The AI model to use for generating suggestions",
+    "AIReplySuggestPleaseConfigure": "Please configure the AI API endpoint and key first.",
+    "GenerateSuggestion": "Generate Suggestion",
+    "EnterInstructions": "Enter instructions for the AI:",
+    "EnterInstructionsPlaceholder": "e.g., 'Make it polite and professional' or 'Keep it short and friendly'",
+    "Generating": "Generating...",
+    "FailedToGenerate": "Failed to generate suggestion",
+    "PleaseEnterInstructions": "Please enter instructions for the AI",
+    "SettingsSaved": "Settings saved successfully."
+}
