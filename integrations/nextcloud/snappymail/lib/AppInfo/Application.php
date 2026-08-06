@@ -13,6 +13,7 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\IConfig;
 use OCP\IL10N;
 use OCP\IUser;
 use OCP\User\Events\PostLoginEvent;
@@ -47,8 +48,8 @@ class Application extends App implements IBootstrap
 				return new FetchController(
 					$c->query('AppName'),
 					$c->query('Request'),
-					$c->getServer()->getAppManager(),
-					$c->query('ServerContainer')->getConfig(),
+					$c->query(\OCP\App\IAppManager::class),
+					$c->query(IConfig::class),
 					$c->query(IL10N::class)
 				);
 			}
