@@ -138,24 +138,22 @@
 				let suggestion = oData?.Result?.suggestion || '';
 				console.log('AI Reply Suggest: suggestion', suggestion);
 				if (suggestion) {
-					// For now, just display the suggestion in the dialog so we can verify it works
-					let resultDiv = dialog.querySelector('.ai-result');
-					if (!resultDiv) {
-						resultDiv = document.createElement('div');
-						resultDiv.className = 'ai-result';
-						resultDiv.style.cssText = 'margin-top:15px;padding:10px;background:var(--bg-clr,#f5f5f5);border:1px solid var(--border-color,#ddd);border-radius:4px;white-space:pre-wrap;max-height:200px;overflow:auto;font-size:13px;';
-						dialog.querySelector('.modal-body').appendChild(resultDiv);
-					}
-					resultDiv.textContent = suggestion;
 					// Insert at the TOP of the compose window (prepend)
-					view.editor(editor => {
-						let current = editor.getData() || '';
-						if (editor.isPlain && editor.isPlain()) {
-							editor.setPlain(suggestion + '\n\n' + current);
-						} else {
-							editor.setHtml(suggestion.replace(/\n/g, '<br>') + '<br><br>' + current);
-						}
-					});
+					try {
+						view.editor(editor => {
+							let current = editor.getData() || '';
+							if (editor.isPlain && editor.isPlain()) {
+								editor.setPlain(suggestion + '\n\n' + current);
+							} else {
+								editor.setHtml(suggestion.replace(/\n/g, '<br>') + '<br><br>' + current);
+							}
+						});
+					} catch (e) {
+						console.error('AI Reply Suggest: editor insert error', e);
+					}
+					// Always close the dialog once we have a suggestion, even if insert failed
+					dialog.close();
+					dialog.parentNode?.removeChild(dialog);
 				} else {
 					errorDiv.textContent = 'No suggestion received. Response: ' + JSON.stringify(oData);
 					errorDiv.style.display = 'block';
