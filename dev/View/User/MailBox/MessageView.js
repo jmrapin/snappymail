@@ -132,6 +132,7 @@ export class MailMessageView extends AbstractViewRight {
 			dkimData: ['none', '', ''],
 			spfData: ['none', '', ''],
 			dmarcData: ['none', '', ''],
+			localDelivery: false,
 			nowTracking: false
 		});
 
@@ -241,6 +242,8 @@ export class MailMessageView extends AbstractViewRight {
 				return dmarc[0] ? dmarc[2] || 'DMARC: ' + dmarc[0] : '';
 			},
 
+			localDeliveryTitle: () => i18n('MESSAGE/LOCAL_DELIVERY_TITLE'),
+
 			showWhitelistOptions: () => 'match' === SettingsUserStore.viewImages(),
 
 			firstUnsubsribeLink: () => currentMessage()?.unsubsribeLinks()[0] || '',
@@ -265,6 +268,7 @@ export class MailMessageView extends AbstractViewRight {
 					this.dkimData(message.dkim[0] || ['none', '', '']);
 					this.spfData(message.spf[0] || ['none', '', '']);
 					this.dmarcData(message.dmarc[0] || ['none', '', '']);
+					this.localDelivery(!!message.localDelivery);
 					this.nowTracking(false);
 				} else {
 					MessagelistUserStore.selectedMessage(null);
