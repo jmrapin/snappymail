@@ -778,7 +778,8 @@ class Actions
 			|| $this->oConfig->Get('debug', 'enable', false);
 
 		$aResult['StaticLibsJs'] = Utils::WebStaticPath('js/' . ($bAppJsDebug ? '' : 'min/') .
-			'libs' . ($bAppJsDebug ? '' : '.min') . '.js');
+			'libs' . ($bAppJsDebug ? '' : '.min') . '.js')
+			. '?' . \rawurlencode((string) $this->oConfig->Get('cache', 'index', 'v1'));
 
 		$this->oPlugins->InitAppData($bAdmin, $aResult, $oAccount);
 
