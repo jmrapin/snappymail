@@ -726,8 +726,9 @@ abstract class Utils
 	public static function mkdir(string $directory) : void
 	{
 		if (!\is_dir($directory)) {
-			if (!\mkdir($directory, 0700, true)) {
-				throw new \RuntimeException("Failed to create directory {$directory}");
+			// Another request may create it concurrently, so only fail when it still doesn't exist
+			if (!@\mkdir($directory, 0700, true) && !\is_dir($directory)) {
+				throw new \RuntimeException("Failed to create directory {$directory}: " . (\error_get_last()['message'] ?? ''));
 			}
 			\clearstatcache();
 		}

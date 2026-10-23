@@ -156,7 +156,9 @@ class AiReplySuggestPlugin extends \RainLoop\Plugins\AbstractPlugin
 		$iHttpCode = \curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$sError = \curl_error($ch);
 		$iErrno = \curl_errno($ch);
-		\curl_close($ch);
+		if (\PHP_VERSION_ID < 80500) {
+			\curl_close($ch);
+		}
 
 		if ($sError) {
 			return ['error' => 'cURL error (' . $iErrno . '): ' . $sError];

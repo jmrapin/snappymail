@@ -59,7 +59,8 @@ class FileStorage implements \RainLoop\Providers\Storage\IStorage
 	public function Clear($mAccount, int $iStorageType, string $sKey) : bool
 	{
 		$sFileName = $this->generateFileName($mAccount, $iStorageType, $sKey);
-		return $sFileName && \file_exists($sFileName) && \unlink($sFileName);
+		// @ because a concurrent request may have removed it after file_exists()
+		return $sFileName && \file_exists($sFileName) && @\unlink($sFileName);
 	}
 
 	/**

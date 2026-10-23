@@ -62,15 +62,17 @@ abstract class Base
 
 		$options = [];
 		if ('mysql' === $oSettings->driver) {
+			// PHP 8.5 deprecates PDO::MYSQL_ATTR_* in favour of Pdo\Mysql::ATTR_* (PHP 8.4+)
+			$sAttr = \class_exists('Pdo\\Mysql', false) ? 'Pdo\\Mysql::ATTR_' : 'PDO::MYSQL_ATTR_';
 			if ($oSettings->sslCa) {
-				$options[\PDO::MYSQL_ATTR_SSL_CA] = $oSettings->sslCa;
+				$options[\constant($sAttr . 'SSL_CA')] = $oSettings->sslCa;
 			}
 			// PHP 8.0 https://github.com/the-djmaze/snappymail/issues/1205
-			if (\defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
-				$options[\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = $oSettings->sslVerify;
+			if (\defined($sAttr . 'SSL_VERIFY_SERVER_CERT')) {
+				$options[\constant($sAttr . 'SSL_VERIFY_SERVER_CERT')] = $oSettings->sslVerify;
 			}
 			if ($oSettings->sslCiphers) {
-				$options[\PDO::MYSQL_ATTR_SSL_CIPHER] = $oSettings->sslCiphers;
+				$options[\constant($sAttr . 'SSL_CIPHER')] = $oSettings->sslCiphers;
 			}
 /*
 			$options[\PDO::MYSQL_ATTR_SSL_CAPATH] = '';

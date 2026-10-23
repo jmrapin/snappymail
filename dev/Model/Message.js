@@ -571,7 +571,8 @@ export class MessageModel extends AbstractModel {
 				src, useProxy = !!SettingsGet('proxyExternalImages');
 			body.querySelectorAll('img[' + attr + ']').forEach(node => {
 				src = node.getAttribute(attr);
-				if (isValid(src)) {
+				// cid: is kept in data-x-src for Compose, it is not an external image
+				if (!src.startsWith('cid:') && isValid(src)) {
 					node.src = useProxy ? proxy(src) : src;
 				}
 			});
