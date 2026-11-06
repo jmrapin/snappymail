@@ -39,7 +39,7 @@ class SSLContext implements \JsonSerializable
 
 	public function __construct()
 	{
-		$oConfig = \RainLoop\API::Config();
+		$oConfig = \RainLoop\Api::Config();
 		$this->verify_peer = !!$oConfig->Get('ssl', 'verify_certificate', true);
 		$this->verify_peer_name = !!$oConfig->Get('ssl', 'verify_certificate', true);
 		$this->allow_self_signed = !!$oConfig->Get('ssl', 'allow_self_signed', false);
@@ -50,7 +50,7 @@ class SSLContext implements \JsonSerializable
 		$this->local_cert = \trim($oConfig->Get('ssl', 'local_cert', ''));
 	}
 
-	public static function fromArray(array $settings) : self
+	public static function fromArray(array $settings): self
 	{
 		$object = new static;
 		foreach ($settings as $key => $value) {
@@ -59,8 +59,8 @@ class SSLContext implements \JsonSerializable
 		return $object;
 	}
 
-	#[\ReturnTypeWillChange]
-	public function jsonSerialize()
+//	public function jsonSerialize(): array
+	public function jsonSerialize(): mixed
 	{
 		$aResult = \get_object_vars($this);
 //		$aResult['@Object'] = 'Object/SSLContext';

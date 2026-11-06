@@ -10,27 +10,31 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\IRequest;
+//use OCP\IUserSession;
 
-class FetchController extends Controller {
+class FetchController extends Controller
+{
 	private IConfig $config;
-	private IAppManager $appManager;
-	private IL10N $l;
+	private IL10N $l10n;
+//	private IUserSession $userSession;
 
-	public function __construct(string $appName, IRequest $request, IAppManager $appManager, IConfig $config, IL10N $l) {
+	public function __construct(string $appName, IRequest $request, \Psr\Container\ContainerInterface $container)
+	{
 		parent::__construct($appName, $request);
-		$this->config = $config;
-		$this->appManager = $appManager;
-		$this->l = $l;
+		$this->config = $container->query(IConfig::class);
+		$this->l10n = $container->query(IL10N::class);
+//		$this->userSession = $container->query(IUserSession::class);
 	}
 
-	public function upgrade(): JSONResponse {
+	public function upgrade(): JSONResponse
+	{
 		$error = 'Upgrade failed';
 		try {
 			SnappyMailHelper::loadApp();
 			if (\SnappyMail\Upgrade::core()) {
 				return new JSONResponse([
 					'status' => 'success',
-					'Message' => $this->l->t('Upgraded successfully')
+					'Message' => $this->l10n->t('Upgraded successfully')
 				]);
 			}
 		} catch (\Throwable $e) {
@@ -42,7 +46,8 @@ class FetchController extends Controller {
 		]);
 	}
 
-	public function setAdmin(): JSONResponse {
+	public function setAdmin(): JSONResponse
+	{
 		try {
 			$sUrl = '';
 			$sPath = '';
@@ -57,7 +62,7 @@ class FetchController extends Controller {
 			} else {
 				return new JSONResponse([
 					'status' => 'error',
-					'Message' => $this->l->t('Invalid argument(s)')
+					'Message' => $this->l10n->t('Invalid argument(s)')
 				]);
 			}
 
@@ -87,7 +92,7 @@ class FetchController extends Controller {
 
 			return new JSONResponse([
 				'status' => 'success',
-				'Message' => $this->l->t('Saved successfully')
+				'Message' => $this->l10n->t('Saved successfully')
 			]);
 		} catch (\Throwable $e) {
 			return new JSONResponse([
@@ -100,24 +105,27 @@ class FetchController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function setPersonal(): JSONResponse {
+	public function setPersonal(): JSONResponse
+	{
 		try {
 			$sEmail = '';
 			if (isset($_POST['appname'], $_POST['snappymail-password'], $_POST['snappymail-email']) && 'snappymail' === $_POST['appname']) {
-				$sUser =  \OC::$server->get(\OCP\IUserSession::class)->getUser()->getUID();
+				$sUser = SnappyMailHelper::getUID();
+//				$sUser = $this->userSession->getUser()?->getUID();
+				if ($sUser) {
+					$sEmail = $_POST['snappymail-email'];
+					$this->config->setUserValue($sUser, 'snappymail', 'snappymail-email', $sEmail);
 
-				$sEmail = $_POST['snappymail-email'];
-				$this->config->setUserValue($sUser, 'snappymail', 'snappymail-email', $sEmail);
-
-				$sPass = $_POST['snappymail-password'];
-				if ('******' !== $sPass) {
-					$this->config->setUserValue($sUser, 'snappymail', 'passphrase',
-						$sPass ? SnappyMailHelper::encodePassword($sPass, \md5($sEmail)) : '');
+					$sPass = $_POST['snappymail-password'];
+					if ('******' !== $sPass) {
+						$this->config->setUserValue($sUser, 'snappymail', 'passphrase',
+							$sPass ? SnappyMailHelper::encodePassword($sPass, \md5($sEmail)) : '');
+					}
 				}
 			} else {
 				return new JSONResponse([
 					'status' => 'error',
-					'Message' => $this->l->t('Invalid argument(s)'),
+					'Message' => $this->l10n->t('Invalid argument(s)'),
 					'Email' => $sEmail
 				]);
 			}
@@ -128,7 +136,7 @@ class FetchController extends Controller {
 
 			return new JSONResponse([
 				'status' => 'success',
-				'Message' => $this->l->t('Saved successfully'),
+				'Message' => $this->l10n->t('Saved successfully'),
 				'Email' => $sEmail
 			]);
 		} catch (\Throwable $e) {

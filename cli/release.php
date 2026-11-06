@@ -2,14 +2,15 @@
 <?php
 define('ROOT_DIR', dirname(__DIR__));
 chdir(ROOT_DIR);
+require ROOT_DIR . '/snappymail/v/0.0.0/app/libraries/snappymail/tar.php';
 
-$options = getopt('', ['aur','docker','plugins','skip-gulp','debian','nextcloud','owncloud','cpanel','sign']);
+$options = getopt('', ['aur','docker','plugins','plugins-all','skip-gulp','debian','nextcloud','owncloud','cpanel','sign']);
 
-if (isset($options['plugins'])) {
+if (isset($options['plugins']) || isset($options['plugins-all'])) {
 	require(ROOT_DIR . '/build/plugins.php');
 }
 
-$gulp = trim(`which gulp`);
+$gulp = trim(shell_exec('which gulp'));
 if (!$gulp) {
 	exit('gulp not installed, run as root: npm install --global gulp-cli');
 }
@@ -34,7 +35,7 @@ $options['aur'] = isset($options['aur']);
 
 // Docker build
 $options['docker'] = isset($options['docker']);
-if ($options['docker'] && !($docker = trim(`which docker`))) {
+if ($options['docker'] && !($docker = trim(shell_exec('which docker')))) {
 	exit('docker not found');
 }
 if ($options['docker'] && $options['aur']) {
@@ -46,10 +47,11 @@ is_dir($destPath) || mkdir($destPath, 0777, true);
 
 $zip_destination = "{$destPath}snappymail-{$package->version}.zip";
 $tar_destination = "{$destPath}snappymail-{$package->version}.tar";
+$tgz_destination = "{$tar_destination}.gz";
 
 @unlink($zip_destination);
 @unlink($tar_destination);
-@unlink("{$tar_destination}.gz");
+@unlink($tgz_destination);
 
 if (!isset($options['skip-gulp'])) {
 	echo "\x1b[33;1m === Gulp === \x1b[0m\n";
@@ -60,7 +62,7 @@ if (!isset($options['skip-gulp'])) {
 
 	$cmddir = escapeshellcmd(ROOT_DIR) . '/snappymail/v/0.0.0/static';
 
-	if ($gzip = trim(`which gzip`)) {
+	if ($gzip = trim(shell_exec('which gzip'))) {
 		echo "\x1b[33;1m === Gzip *.js and *.css === \x1b[0m\n";
 		passthru("{$gzip} -k --best {$cmddir}/js/*.js");
 		passthru("{$gzip} -k --best {$cmddir}/js/min/*.js");
@@ -70,7 +72,7 @@ if (!isset($options['skip-gulp'])) {
 		unlink(ROOT_DIR . '/snappymail/v/0.0.0/static/js/min/boot.min.js.gz');
 	}
 
-	if ($brotli = trim(`which brotli`)) {
+	if ($brotli = trim(shell_exec('which brotli'))) {
 		echo "\x1b[33;1m === Brotli *.js and *.css === \x1b[0m\n";
 		passthru("{$brotli} -k --best {$cmddir}/js/*.js");
 		passthru("{$brotli} -k --best {$cmddir}/js/min/*.js");
@@ -98,7 +100,8 @@ if (!$zip->open($zip_destination, ZIPARCHIVE::CREATE)) {
 	exit("Failed to create {$zip_destination}");
 }
 
-$tar = new PharData($tar_destination);
+$tar = new \SnappyMail\TAR($tgz_destination);
+//$tar = new PharData($tar_destination);
 
 $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('snappymail/v'), RecursiveIteratorIterator::SELF_FIRST);
 foreach ($files as $file) {
@@ -158,12 +161,14 @@ $zip->addFile('README.md');
 $tar->addFile('README.md');
 
 $zip->close();
+if ($tar instanceof PharData) {
+	$tar->compress(Phar::GZ);
+	unlink($tar_destination);
+} else {
+	$tar->close();
+}
 
-$tar->compress(Phar::GZ);
-unlink($tar_destination);
-$tar_destination .= '.gz';
-
-echo "{$zip_destination} created\n{$tar_destination} created\n";
+echo "{$zip_destination} created\n{$tgz_destination} created\n";
 
 if (isset($options['nextcloud'])) {
 	require(ROOT_DIR . '/build/nextcloud.php');
@@ -188,7 +193,7 @@ file_put_contents("{$destPath}core.json", '{
 // Arch User Repository
 if ($options['aur']) {
 	// extension_loaded('blake2')
-	if (!function_exists('b2sum') && $b2sum = trim(`which b2sum`)) {
+	if (!function_exists('b2sum') && $b2sum = trim(shell_exec('which b2sum'))) {
 		function b2sum($file) {
 			$file = escapeshellarg($file);
 			exec("b2sum --binary {$file} 2>&1", $output, $exitcode);
@@ -198,7 +203,7 @@ if ($options['aur']) {
 	}
 
 	$b2sums = function_exists('b2sum') ? [
-		b2sum($tar_destination),
+		b2sum($tgz_destination),
 		b2sum(ROOT_DIR . '/build/arch/snappymail.sysusers'),
 		b2sum(ROOT_DIR . '/build/arch/snappymail.tmpfiles')
 	] : [];
@@ -244,7 +249,7 @@ else if ($options['docker']) {
 	$zip_filename = "snappymail-{$package->version}.zip";
 	copy($zip_destination, "./.docker/release/{$zip_filename}");
 	if ($docker) {
-		passthru("{$docker} build --pull " . ROOT_DIR . "/.docker/release/ --build-arg FILES_ZIP={$zip_filename} -t snappymail:{$package->version}");
+		passthru("{$docker} build --pull -f " . ROOT_DIR . '/.docker/release/Dockerfile ' . ROOT_DIR . " --build-arg FILES_ZIP={$zip_filename} -t snappymail:{$package->version}");
 	} else {
 		echo "Docker not installed!\n";
 	}
@@ -252,28 +257,27 @@ else if ($options['docker']) {
 
 if (isset($options['sign'])) {
 	echo "\x1b[33;1m === PGP Sign === \x1b[0m\n";
-	passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '.escapeshellarg($tar_destination), $return_var);
-	passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '.escapeshellarg($zip_destination), $return_var);
+	$gpg = 'gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB ';
+	$gpg_sign = $gpg . '--armor --detach-sign ';
+	passthru($gpg_sign . escapeshellarg($tgz_destination), $return_var);
+	passthru($gpg_sign . escapeshellarg($zip_destination), $return_var);
 	if (isset($options['nextcloud'])) {
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
-			.escapeshellarg("{$destPath}snappymail-{$package->version}-nextcloud.tar.gz"), $return_var);
+		passthru($gpg_sign . escapeshellarg("{$destPath}snappymail-{$package->version}-nextcloud.tar.gz"), $return_var);
 	}
 	if (isset($options['owncloud'])) {
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
-			.escapeshellarg("{$destPath}snappymail-{$package->version}-owncloud.tar.gz"), $return_var);
+		passthru($gpg_sign . escapeshellarg("{$destPath}snappymail-{$package->version}-owncloud.tar.gz"), $return_var);
 	}
 	if (isset($options['cpanel'])) {
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
-			.escapeshellarg("{$destPath}snappymail-{$package->version}-cpanel.tar.gz"), $return_var);
+		passthru($gpg_sign . escapeshellarg("{$destPath}snappymail-{$package->version}-cpanel.tar.gz"), $return_var);
 	}
 	if (isset($options['debian'])) {
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '
+		passthru($gpg_sign
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/" . basename(DEB_DEST_DIR.'.deb')), $return_var);
 		// https://github.com/the-djmaze/snappymail/issues/185#issuecomment-1059420588
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --digest-algo SHA512 --clearsign --output '
+		passthru($gpg . '--digest-algo SHA512 --clearsign --output '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/InRelease") . ' '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/Release"), $return_var);
-		passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --digest-algo SHA512 -abs --output '
+		passthru($gpg . '--digest-algo SHA512 -abs --output '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/Release.gpg") . ' '
 			. escapeshellarg(ROOT_DIR . "/build/dist/releases/webmail/{$package->version}/Release"), $return_var);
 	}

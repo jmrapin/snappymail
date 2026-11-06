@@ -27,30 +27,30 @@ class HeaderCollection extends \MailSo\Base\Collection
 		}
 	}
 
-	public function append($oHeader, bool $bToTop = false) : void
+	public function append($oHeader, bool $bToTop = false): void
 	{
 		assert($oHeader instanceof Header);
 		parent::append($oHeader, $bToTop);
 	}
 
-	public function AddByName(string $sName, string $sValue, bool $bToTop = false) : self
+	public function AddByName(string $sName, string $sValue, bool $bToTop = false): self
 	{
 		$this->append(new Header($sName, $sValue), $bToTop);
 		return $this;
 	}
 
-	public function SetByName(string $sName, string $sValue, bool $bToTop = false) : self
+	public function SetByName(string $sName, string $sValue, bool $bToTop = false): self
 	{
 		return $this->RemoveByName($sName)->Add(new Header($sName, $sValue), $bToTop);
 	}
 
-	public function ValueByName(string $sHeaderName, bool $bCharsetAutoDetect = false) : string
+	public function ValueByName(string $sHeaderName, bool $bCharsetAutoDetect = false): string
 	{
 		$oHeader = $this->GetByName($sHeaderName);
 		return $oHeader ? ($bCharsetAutoDetect ? $oHeader->ValueWithCharsetAutoDetect() : $oHeader->Value()) : '';
 	}
 
-	public function ValuesByName(string $sHeaderName) : array
+	public function ValuesByName(string $sHeaderName): array
 	{
 		$aResult = array();
 		$sHeaderNameLower = \strtolower($sHeaderName);
@@ -62,16 +62,16 @@ class HeaderCollection extends \MailSo\Base\Collection
 		return $aResult;
 	}
 
-	public function RemoveByName(string $sHeaderName) : self
+	public function RemoveByName(string $sHeaderName): self
 	{
 		$sHeaderName = \strtolower($sHeaderName);
-		$this->exchangeArray(array_filter($this->getArrayCopy(), function ($oHeader) use ($sHeaderName) {
+		$this->exchangeArray(\array_filter($this->getArrayCopy(), function ($oHeader) use ($sHeaderName) {
 			return $oHeader && \strtolower($oHeader->Name()) !== $sHeaderName;
 		}));
 		return $this;
 	}
 
-	public function GetAsEmailCollection(string $sHeaderName) : ?EmailCollection
+	public function GetAsEmailCollection(string $sHeaderName): ?EmailCollection
 	{
 		if ($oHeader = $this->GetByName($sHeaderName)) {
 			return new EmailCollection($oHeader->EncodedValue());
@@ -79,14 +79,14 @@ class HeaderCollection extends \MailSo\Base\Collection
 		return new EmailCollection();
 	}
 
-	public function ParameterValue(string $sHeaderName, string $sParamName) : string
+	public function ParameterValue(string $sHeaderName, string $sParamName): string
 	{
 		$oHeader = $this->GetByName($sHeaderName);
 		$oParameters = $oHeader ? $oHeader->Parameters() : null;
 		return (null !== $oParameters) ? $oParameters->ParameterValueByName($sParamName) : '';
 	}
 
-	public function GetByName(string $sHeaderName) : ?Header
+	public function GetByName(string $sHeaderName): ?Header
 	{
 		$sHeaderNameLower = \strtolower($sHeaderName);
 		foreach ($this as $oHeader) {
@@ -97,7 +97,7 @@ class HeaderCollection extends \MailSo\Base\Collection
 		return null;
 	}
 
-	public function SetParentCharset(string $sParentCharset) : self
+	public function SetParentCharset(string $sParentCharset): self
 	{
 		if (\strlen($sParentCharset) && $this->sParentCharset !== $sParentCharset) {
 			foreach ($this as $oHeader) {
@@ -108,7 +108,7 @@ class HeaderCollection extends \MailSo\Base\Collection
 		return $this;
 	}
 
-	public function Parse(string $sRawHeaders, string $sParentCharset = '') : self
+	public function Parse(string $sRawHeaders, string $sParentCharset = ''): self
 	{
 		$this->Clear();
 
@@ -136,14 +136,12 @@ class HeaderCollection extends \MailSo\Base\Collection
 					$sHeadersValue = \rtrim($sHeadersValue);
 				}
 
-				if ('=?' === \substr(\ltrim($sHeadersValue), 0, 2)) {
-					$sHeadersValue = \ltrim($sHeadersValue);
-				}
-
-				if ('=?' === \substr($sHeadersValue, 0, 2)) {
-					$sValue .= $sHeadersValue;
+				// RFC 5322 unfolding removes the line break and keeps the folding
+				// whitespace; RFC 2047 6.2 drops it only between two encoded words.
+				if ('=?' === \substr(\ltrim($sHeadersValue), 0, 2) && '?=' === \substr($sValue, -2)) {
+					$sValue .= \ltrim($sHeadersValue);
 				} else {
-					$sValue .= "\n".$sHeadersValue;
+					$sValue .= ' '.\ltrim($sHeadersValue);
 				}
 			} else {
 				if (null !== $sName) {
@@ -216,7 +214,7 @@ class HeaderCollection extends \MailSo\Base\Collection
 	 * spf=pass (ORIGINATING: domain of "snappymail@domain.tld" designates 0.0.0.0 as permitted sender) smtp.mailfrom="snappymail@domain.tld";
 	 * dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=domain.tld (policy=none)
 	 */
-	public function AuthStatuses() : array
+	public function AuthStatuses(string $sTrustedIds = ''): array
 	{
 		$aResult = [
 			'dkim' => [],
@@ -224,6 +222,27 @@ class HeaderCollection extends \MailSo\Base\Collection
 			'spf' => []
 		];
 		$aHeaders = $this->ValuesByName(Enumerations\Header::AUTHENTICATION_RESULTS);
+
+		/**
+		 * A sender can add this header itself, so a result is only worth reading when the
+		 * server that wrote it handled the message. $sTrustedIds names those servers by
+		 * authserv-id; with none given, the authserv-id of the topmost header is taken as
+		 * the local one, which keeps the separate headers an opendkim and an opendmarc
+		 * each add. See RFC 8601 section 7.1.
+		 */
+		$aTrusted = \array_filter(\preg_split('/[\\s,;]+/', \strtolower(\trim($sTrustedIds))));
+		$bConfigured = !!\count($aTrusted);
+		if (\count($aHeaders)) {
+			// The authserv-id is the first field, before the first ";". A version number
+			// may follow it, and a comment may sit anywhere.
+			$fAuthservId = function (string $sValue) : string {
+				$sId = \preg_replace('/\\([^)]*\\)/', ' ', \explode(';', $sValue, 2)[0]);
+				return \strtolower(\trim(\preg_replace('/\\s+\\d+$/', '', \trim($sId)), " \t\""));
+			};
+			$aTrusted = $aTrusted ?: array($fAuthservId($aHeaders[0]));
+			$aHeaders = \array_filter($aHeaders, fn($sValue) => \in_array($fAuthservId($sValue), $aTrusted, true));
+		}
+
 		if (\count($aHeaders)) {
 			// Only use the FIRST Authentication-Results header (from receiving server)
 			// Subsequent headers are from intermediate/internal processing and may have "none" results
@@ -264,8 +283,10 @@ class HeaderCollection extends \MailSo\Base\Collection
 				}
 			}
 		}
-		if (!\count($aResult['dkim'])) {
+		if (!\count($aResult['dkim']) && !$bConfigured) {
 			// X-DKIM-Authentication-Results: signer="hostinger.com" status="pass"
+			// This one carries no authserv-id, so there is nothing to tie it to: only the
+			// topmost is read, and an install that names its trusted ids skips it.
 			$aHeaders = $this->ValuesByName(Enumerations\Header::X_DKIM_AUTHENTICATION_RESULTS);
 			foreach ($aHeaders as $sHeaderValue) {
 				$aStatus = array();
@@ -276,19 +297,20 @@ class HeaderCollection extends \MailSo\Base\Collection
 				) {
 					$aResult['dkim'][] = array($aStatus[1], \trim($aHeader[1]), $sHeaderValue);
 				}
+				break;
 			}
 		}
 
 		return $aResult;
 	}
 
-	public function __toString() : string
+	public function __toString(): string
 	{
 		return \implode("\r\n", $this->getArrayCopy());
 	}
 
-	#[\ReturnTypeWillChange]
-	public function jsonSerialize()
+//	public function jsonSerialize(): array
+	public function jsonSerialize(): mixed
 	{
 		return array(
 			'@Object' => 'Collection/MimeHeaderCollection',

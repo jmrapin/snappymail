@@ -19,18 +19,19 @@ class OpenSSL
 	// Used for sign and decrypt
 	private $certificate; // OpenSSLCertificate|array|string
 	private $privateKey; // OpenSSLAsymmetricKey|OpenSSLCertificate|array|string
+	private ?string $certificateChain = null;
 
 	function __construct(string $homedir)
 	{
 		$this->homedir = $homedir;
 	}
 
-	public function getCertificate(string $filename)/* : string*/
+	public function getCertificate(string $filename): string|false
 	{
 		return \file_get_contents("{$this->homedir}/{$filename}");
 	}
 
-	public function storeCertificate(string $certificate) : bool
+	public function storeCertificate(string $certificate): bool
 	{
 		$data = \openssl_x509_parse(\openssl_x509_read($certificate));
 		if (!$data) {
@@ -50,7 +51,7 @@ class OpenSSL
 		return true;
 	}
 
-	public function certificates(bool $force = false) : array
+	public function certificates(bool $force = false): array
 	{
 		$cacheFile = "{$this->homedir}/certificates.json";
 		$result = (!$force && \file_exists($cacheFile))
@@ -110,17 +111,17 @@ class OpenSSL
 		return $result;
 	}
 
-	public function privateKeys() : array
+	public function privateKeys(): array
 	{
 //		\glob("{$this->homedir}/*.key");
 	}
 
-	public static function isSupported() : bool
+	public static function isSupported(): bool
 	{
 		return \defined('PKCS7_DETACHED');
 	}
 
-	public function setCertificate(/*OpenSSLCertificate|string*/$certificate)
+	public function setCertificate(OpenSSLCertificate|string $certificate): void
 	{
 		$this->certificate = \openssl_x509_read($certificate);
 		if (!$this->certificate) {
@@ -131,9 +132,18 @@ class OpenSSL
 		}
 	}
 
-	public function setPrivateKey(/*OpenSSLAsymmetricKey|string*/$privateKey,
+	public function setCertificateChain(?string $certificateChain): void
+	{
+		if ($certificateChain === "") {
+			$this->certificateChain = null;
+		} else {
+			$this->certificateChain = $certificateChain;
+		}
+	}
+
+	public function setPrivateKey(OpenSSLAsymmetricKey|string $privateKey,
 		?\SnappyMail\SensitiveString $passphrase = null
-	) : void
+	): void
 	{
 		$this->privateKey = \openssl_pkey_get_private($privateKey, $passphrase);
 		if (!$this->privateKey) {
@@ -161,7 +171,7 @@ class OpenSSL
 	}
 
 /*
-	public function asn1parse(/*string|Temporary* / $input) : ?string
+	public function asn1parse(string|Temporary $input): ?string
 	{
 		if (\is_string($input)) {
 			$tmp = new Temporary('smimein-');
@@ -170,10 +180,10 @@ class OpenSSL
 			}
 			$input = $tmp;
 		}
-		`openssl asn1parse -in $input->filename()`
+		\shell_exec('openssl asn1parse -in $input->filename()');
 	}
 */
-	public function decrypt(/*string|Temporary*/ $input) : ?string
+	public function decrypt(string|Temporary $input): ?string
 	{
 		if (\is_string($input)) {
 			$tmp = new Temporary('smimein-');
@@ -194,7 +204,7 @@ class OpenSSL
 		return $output->getContents();
 	}
 
-	public function encrypt(/*string|Temporary*/$input, array $certificates) : ?string
+	public function encrypt(string|Temporary $input, array $certificates): ?string
 	{
 		if (\is_string($input)) {
 			$tmp = new Temporary('smimein-');
@@ -235,7 +245,7 @@ class OpenSSL
 		return $data;
 	}
 
-	public function sign(/*string|Temporary*/$input, bool $detached = true)
+	public function sign(string|Temporary $input, bool $detached = true): ?string
 	{
 		if (\is_string($input)) {
 			$tmp = new Temporary('smimein-');
@@ -243,6 +253,13 @@ class OpenSSL
 				return null;
 			}
 			$input = $tmp;
+		}
+		if (\is_string($this->certificateChain)) {
+			$tmp = new Temporary('smimechain-');
+			if (!$tmp->putContents($this->certificateChain)) {
+				return null;
+			}
+			$certificateChain = $tmp;
 		}
 		$output = new Temporary('smimeout-');
 		if (!\openssl_pkcs7_sign(
@@ -252,7 +269,7 @@ class OpenSSL
 			$this->privateKey,
 			$this->headers,
 			$detached ? \PKCS7_DETACHED | \PKCS7_BINARY : 0, // | PKCS7_NOCERTS | PKCS7_NOATTR
-			$this->untrusted_certificates_filename
+			$certificateChain ?? null
 		)) {
 			throw new \RuntimeException('OpenSSL sign: ' . \openssl_error_string());
 		}
@@ -297,7 +314,7 @@ class OpenSSL
 	/**
 	 * $opaque = true, when the message is not detached
 	 */
-	public function verify(/*string|Temporary*/$input, ?string $signers_certificates_filename = null, bool $opaque = false)
+	public function verify(string|Temporary $input, ?string $signers_certificates_filename = null, bool $opaque = false): ?array
 	{
 		if (\is_string($input)) {
 			$tmp = new Temporary('smimein-');
@@ -307,10 +324,11 @@ class OpenSSL
 			$opaque |= \str_contains($input, 'application/pkcs7-mime') || \str_contains($input, 'application/x-pkcs7-mime');
 			$input = $tmp;
 		}
+		// First pass extracts the content and nothing else: PKCS7_NOSIGS skips the
+		// signature check, so a message with a broken signature can still be read.
 		$output = $opaque ? new Temporary('smimeout-') : null;
 		if (true !== \openssl_pkcs7_verify(
 			$input->filename(),
-//			$flags = 0, // \PKCS7_NOVERIFY | \PKCS7_NOCHAIN | \PKCS7_NOSIGS
 			\PKCS7_NOVERIFY | \PKCS7_NOCHAIN | \PKCS7_NOSIGS,
 			$signers_certificates_filename ?: null,
 			$ca_info = [],
@@ -320,9 +338,23 @@ class OpenSSL
 		)) {
 			throw new \RuntimeException('OpenSSL verify: ' . \openssl_error_string());
 		}
+		// Second pass is the verdict. It used to be the first pass returning true,
+		// which with PKCS7_NOSIGS it does for any well-formed message, so altered
+		// or forged content was reported as validly signed. This checks the
+		// signature against the signer certificate in the message. PKCS7_NOVERIFY
+		// stays: the signer's chain is not checked against any CA, so 'success'
+		// means the content is what the certificate holder signed, not that the
+		// certificate itself is trusted.
+		$verified = \openssl_pkcs7_verify(
+			$input->filename(),
+			\PKCS7_NOVERIFY,
+			null,
+			[],
+			$this->untrusted_certificates_filename
+		);
 		return [
 			'body' => $output ? $output->getContents() : null,
-			'success' => true
+			'success' => true === $verified
 		];
 	}
 }

@@ -28,7 +28,15 @@
  * Custom 'data' folder path
  */
 if (class_exists('OC')) {
-	define('APP_DATA_FOLDER_PATH', \rtrim(\trim(\OC::$server->get(\OCP\IConfig::class)->getSystemValue('datadirectory', '')), '\\/').'/appdata_snappymail/');
+	define('APP_DATA_FOLDER_PATH', \OCA\SnappyMail\Util\SnappyMailHelper::getAppDataFolder());
+/*
+	define('APP_DATA_FOLDER_PATH', \rtrim(\trim(
+		\method_exists(\OC::$server, 'getSystemConfig')
+			? \OC::$server->getSystemConfig()->getValue('datadirectory', '')
+			// Nextcloud 34+
+			: \OC::$server->get(\OCP\IConfig::class)->getSystemValue('datadirectory', '')
+	), '\\/') . '/appdata_snappymail/');
+*/
 } else {
 	http_response_code(400);
 	header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request', true, 400);

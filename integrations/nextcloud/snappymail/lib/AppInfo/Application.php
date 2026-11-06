@@ -5,7 +5,6 @@ namespace OCA\SnappyMail\AppInfo;
 use OCA\SnappyMail\Util\SnappyMailHelper;
 use OCA\SnappyMail\Controller\FetchController;
 use OCA\SnappyMail\Controller\PageController;
-use OCA\SnappyMail\Dashboard\UnreadMailWidget;
 use OCA\SnappyMail\Search\Provider;
 use OCA\SnappyMail\Listeners\AccessTokenUpdatedListener;
 
@@ -13,12 +12,12 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\Bootstrap\IBootContext;
-use OCP\IConfig;
-use OCP\IL10N;
-use OCP\IUser;
 use OCP\User\Events\PostLoginEvent;
 use OCP\User\Events\BeforeUserLoggedOutEvent;
+
 use OCA\OIDCLogin\Events\AccessTokenUpdatedEvent;
+
+use Psr\Container\ContainerInterface;
 
 class Application extends App implements IBootstrap
 {
@@ -31,26 +30,27 @@ class Application extends App implements IBootstrap
 
 	public function register(IRegistrationContext $context): void
 	{
+//		SnappyMailHelper::$server = $c->query('ServerContainer');
+
 		/**
 		 * Controllers
 		 */
 		$context->registerService(
-			'PageController', function($c) {
+			'PageController', function(ContainerInterface $c) {
 				return new PageController(
 					$c->query('AppName'),
-					$c->query('Request')
+					$c->query('Request'),
+					$c
 				);
 			}
 		);
 
 		$context->registerService(
-			'FetchController', function($c) {
+			'FetchController', function(ContainerInterface $c) {
 				return new FetchController(
 					$c->query('AppName'),
 					$c->query('Request'),
-					$c->query(\OCP\App\IAppManager::class),
-					$c->query(IConfig::class),
-					$c->query(IL10N::class)
+					$c
 				);
 			}
 		);
@@ -68,36 +68,36 @@ class Application extends App implements IBootstrap
 		$context->registerEventListener(AccessTokenUpdatedEvent::class, AccessTokenUpdatedListener::class);
 
 		// TODO: Not working yet, needs a Vue UI
-//		$context->registerDashboardWidget(UnreadMailWidget::class);
+//		$context->registerDashboardWidget(\OCA\SnappyMail\Dashboard\UnreadMailWidget::class);
 	}
 
 	public function boot(IBootContext $context): void
 	{
-		if (!\is_dir(\rtrim(\trim(\OC::$server->get(\OCP\IConfig::class)->getSystemValue('datadirectory', '')), '\\/') . '/appdata_snappymail')) {
+//		SnappyMailHelper::$server = $context->getServerContainer();
+
+		if (!\is_dir(SnappyMailHelper::getAppDataFolder())) {
 			return;
 		}
 
-		$dispatcher = $context->getAppContainer()->query('OCP\EventDispatcher\IEventDispatcher');
+		$dispatcher = $context->getAppContainer()->query(\OCP\EventDispatcher\IEventDispatcher::class);
 		$dispatcher->addListener(PostLoginEvent::class, function (PostLoginEvent $Event) {
 /*
-			$config = \OC::$server->getConfig();
 			// Only store the user's password in the current session if they have
 			// enabled auto-login using Nextcloud username or email address.
-			if ($config->getAppValue('snappymail', 'snappymail-autologin', false)
-			 || $config->getAppValue('snappymail', 'snappymail-autologin-with-email', false)) {
+			if (SnappyMailHelper::getAppConfigValue('snappymail-autologin', false)
+			 || SnappyMailHelper::getAppConfigValue('snappymail-autologin-with-email', false)) {
 */
 				$sUID = $Event->getUser()->getUID();
-				\OC::$server->get(\OCP\ISession::class)['snappymail-nc-uid'] = $sUID;
-				\OC::$server->get(\OCP\ISession::class)['snappymail-passphrase'] = SnappyMailHelper::encodePassword($Event->getPassword(), $sUID);
+				SnappyMailHelper::setSessionValue('snappymail-nc-uid', $sUID);
+				SnappyMailHelper::setSessionValue('snappymail-passphrase', SnappyMailHelper::encodePassword($Event->getPassword(), $sUID));
 /*
 			}
 */
-
 		});
 
 		$dispatcher->addListener(BeforeUserLoggedOutEvent::class, function (BeforeUserLoggedOutEvent $Event) {
 			// https://github.com/nextcloud/server/issues/36083#issuecomment-1387370634
-//			\OC::$server->get(\OCP\ISession::class)['snappymail-passphrase'] = '';
+//			SnappyMailHelper::setSessionValue('snappymail-passphrase', '');
 			SnappyMailHelper::loadApp();
 //			\RainLoop\Api::Actions()->Logout(true);
 			\RainLoop\Api::Actions()->DoLogout();
@@ -108,12 +108,12 @@ class Application extends App implements IBootstrap
 		$class = 'OCA\Impersonate\Events\BeginImpersonateEvent';
 		if (\class_exists($class)) {
 			$dispatcher->addListener($class, function ($Event) {
-				\OC::$server->get(\OCP\ISession::class)['snappymail-passphrase'] = '';
+				SnappyMailHelper::setSessionValue('snappymail-passphrase', '');
 				SnappyMailHelper::loadApp();
 				\RainLoop\Api::Actions()->Logout(true);
 			});
 			$dispatcher->addListener('OCA\Impersonate\Events\EndImpersonateEvent', function ($Event) {
-				\OC::$server->get(\OCP\ISession::class)['snappymail-passphrase'] = '';
+				SnappyMailHelper::setSessionValue('snappymail-passphrase', '');
 				SnappyMailHelper::loadApp();
 				\RainLoop\Api::Actions()->Logout(true);
 			});

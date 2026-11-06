@@ -13,7 +13,7 @@ import { OpenPgpKeyPopupView } from 'View/Popup/OpenPgpKey';
 
 import { Passphrases } from 'Storage/Passphrases';
 
-import { baseCollator } from 'Common/Translator';
+import { baseCollator, getNotification } from 'Common/Translator';
 
 const
 	loaded = () => !!window.openpgp,
@@ -58,10 +58,9 @@ const
 	 */
 	publicKeysItem = 'openpgp-public-keys',
 	privateKeysItem = 'openpgp-private-keys',
-	storage = window.localStorage,
 	loadOpenPgpKeys = async itemname => {
 		let keys = [], key,
-			armoredKeys = JSON.parse(storage.getItem(itemname)),
+			armoredKeys = JSON.parse(localStorage.getItem(itemname)),
 			i = arrayLength(armoredKeys);
 		while (i--) try {
 			key = await openpgp.readKey({armoredKey:armoredKeys[i]});
@@ -74,9 +73,9 @@ const
 	storeOpenPgpKeys = (keys, section) => {
 		let armoredKeys = keys.map(item => item.armor);
 		if (armoredKeys.length) {
-			storage.setItem(section, JSON.stringify(armoredKeys));
+			localStorage.setItem(section, JSON.stringify(armoredKeys));
 		} else {
-			storage.removeItem(section);
+			localStorage.removeItem(section);
 		}
 	};
 
@@ -91,6 +90,9 @@ class OpenPgpKeyModel {
 		this.armor = armor;
 		this.askDelete = ko.observable(false);
 		this.openForDeletion = ko.observable(null).askDeleteHelper();
+		this.hasStoredPass = ko.observable(Passphrases.hasInLocalStorage(this));
+		this.askForgetPass = ko.observable(false);
+		this.openForPassForget = ko.observable(null).askDeleteHelper('askForgetPass');
 //		key.getUserIDs()
 //		key.getPrimaryUser()
 	}
@@ -116,11 +118,28 @@ class OpenPgpKeyModel {
 			if (this.key.isPrivate()) {
 				OpenPGPUserStore.privateKeys.remove(this);
 				storeOpenPgpKeys(OpenPGPUserStore.privateKeys, privateKeysItem);
+				this.forgetPass()
 			} else {
 				OpenPGPUserStore.publicKeys.remove(this);
 				storeOpenPgpKeys(OpenPGPUserStore.publicKeys, publicKeysItem);
 			}
+			Remote.request('DeletePGPKey',
+				(iError, oData) => {
+					if (oData) {
+						if (iError || oData.Result === false) {
+							alert(oData.message || getNotification(iError));
+						}
+					}
+				}, {
+					key: this.armor
+				}
+			);
 		}
+	}
+
+	forgetPass() {
+		Passphrases.delete(this);
+		this.hasStoredPass(false);
 	}
 /*
 	toJSON() {
@@ -249,13 +268,28 @@ export const OpenPGPUserStore = new class {
 			const decryptedKey = await decryptKey(privateKey, 'DECRYPT');
 			if (decryptedKey) {
 				const publicKey = findOpenPGPKey(this.publicKeys, sender/*, sign*/);
-				return await openpgp.decrypt({
+				// 'binary', not the default 'utf8'. What comes out is a MIME
+				// entity whose parts declare their own charset, and the MIME
+				// parser decodes each one. Letting openpgp decode to a string
+				// first meant every non ASCII character was decoded twice and
+				// arrived as U+FFFD: "Verschlüsselter" became "Verschl?sselter".
+				const result = await openpgp.decrypt({
 					message,
 					verificationKeys: publicKey?.key,
 //					expectSigned: true,
 //					signature: '', // Detached signature
-					decryptionKeys: decryptedKey
+					decryptionKeys: decryptedKey,
+					format: 'binary'
 				});
+				// One character per byte, which is what Mime/Encoding decodeText
+				// reads with charCodeAt. Chunked so a large message does not blow
+				// the argument limit of String.fromCharCode.
+				let text = '';
+				for (let j = 0; j < result.data.length; j += 0x8000) {
+					text += String.fromCharCode.apply(null, result.data.subarray(j, j + 0x8000));
+				}
+				result.data = text;
+				return result;
 			}
 		} catch (err) {
 			alert(err);

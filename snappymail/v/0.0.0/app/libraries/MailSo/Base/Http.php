@@ -20,7 +20,7 @@ class Http
 	/**
 	 * @staticvar \MailSo\Base\Http $oInstance;
 	 */
-	public static function SingletonInstance() : self
+	public static function SingletonInstance(): self
 	{
 		static $oInstance = null;
 		if (null === $oInstance) {
@@ -30,48 +30,27 @@ class Http
 		return $oInstance;
 	}
 
-	/**
-	 * @param mixed $mDefault = null
-	 *
-	 * @return mixed
-	 */
-	public static function GetServer(string $sKey, $mDefault = null)
+	public static function GetServer(string $sKey, mixed $mDefault = null): mixed
 	{
 		return isset($_SERVER[$sKey]) ? $_SERVER[$sKey] : $mDefault;
 	}
 
-	public function GetMethod() : string
+	public function GetMethod(): string
 	{
 		return static::GetServer('REQUEST_METHOD', '');
 	}
 
-	public function IsPost() : bool
+	public function IsPost(): bool
 	{
 		return ('POST' === $this->GetMethod());
 	}
 
-	public function IsGet() : bool
+	public function IsGet(): bool
 	{
 		return ('GET' === $this->GetMethod());
 	}
 
-	public function CheckLocalhost(string $sServer) : bool
-	{
-		return \in_array(\strtolower(\trim($sServer)), array(
-			'localhost', '127.0.0.1', '::1'
-		));
-	}
-
-	public function IsLocalhost(string $sValueToCheck = '') : bool
-	{
-		if (empty($sValueToCheck)) {
-			$sValueToCheck = static::GetServer('REMOTE_ADDR', '');
-		}
-
-		return $this->CheckLocalhost($sValueToCheck);
-	}
-
-	public function GetRawBody() : string
+	public function GetRawBody(): string
 	{
 		static $sRawBody = null;
 		if (null === $sRawBody) {
@@ -81,11 +60,11 @@ class Http
 		return $sRawBody;
 	}
 
-	public static function GetHeader(string $sHeader) : string
+	public static function GetHeader(string $sHeader): string
 	{
 		$sServerKey = 'HTTP_'.\strtoupper(\str_replace('-', '_', $sHeader));
 		$sResultHeader = static::GetServer($sServerKey, '');
-		if (!\strlen($sResultHeader) && Utils::FunctionCallable('apache_request_headers')) {
+		if (!\strlen($sResultHeader) && \function_exists('apache_request_headers')) {
 			$sHeaders = \apache_request_headers();
 			if (isset($sHeaders[$sHeader])) {
 				$sResultHeader = $sHeaders[$sHeader];
@@ -94,22 +73,17 @@ class Http
 		return $sResultHeader;
 	}
 
-	public function GetScheme(bool $bCheckProxy = true) : string
+	public function GetScheme(): string
 	{
-		return $this->IsSecure($bCheckProxy) ? 'https' : 'http';
+		return $this->IsSecure(true) ? 'https' : 'http';
 	}
 
-	public function IsSecure(bool $bCheckProxy = true) : bool
+	public function IsSecure(): bool
 	{
-		$sHttps = \strtolower(static::GetServer('HTTPS', ''));
-		return ('on' === $sHttps || ('' === $sHttps && '443' === (string) static::GetServer('SERVER_PORT', '')))
-		 || ($bCheckProxy && (
-			('https' === \strtolower(static::GetServer('HTTP_X_FORWARDED_PROTO', ''))) ||
-			('on' === \strtolower(static::GetServer('HTTP_X_FORWARDED_SSL', '')))
-		   ));
+		return 'on' === \strtolower(static::GetServer('HTTPS', ''));
 	}
 
-	public function GetHost(bool $bWithoutWWW = true, bool $bWithoutPort = false) : string
+	public function GetHost(bool $bWithoutWWW = true, bool $bWithoutPort = false): string
 	{
 		$sHost = static::GetServer('HTTP_HOST', '');
 		if (!\strlen($sHost)) {
@@ -125,18 +99,12 @@ class Http
 		return $bWithoutPort ? \preg_replace('/:\d+$/', '', $sHost) : $sHost;
 	}
 
-	public function GetClientIp(bool $bCheckProxy = false) : string
+	public function GetClientIp(): string
 	{
-		if ($bCheckProxy && null !== static::GetServer('HTTP_CLIENT_IP', null)) {
-			return static::GetServer('HTTP_CLIENT_IP', '');
-		}
-		if ($bCheckProxy && null !== static::GetServer('HTTP_X_FORWARDED_FOR', null)) {
-			return static::GetServer('HTTP_X_FORWARDED_FOR', '');
-		}
 		return static::GetServer('REMOTE_ADDR', '');
 	}
 
-	public static function checkETag(string $ETag) : void
+	public static function checkETag(string $ETag): void
 	{
 		// $ETag . APP_VERSION
 		$sIfNoneMatch = static::GetHeader('If-None-Match');
@@ -151,14 +119,14 @@ class Http
 		}
 	}
 
-	public static function setETag(string $ETag) : void
+	public static function setETag(string $ETag): void
 	{
 		// $ETag . APP_VERSION
 		static::checkETag($ETag);
 		\header("ETag: \"{$ETag}\"");
 	}
 
-	public static function checkLastModified(int $mtime) : void
+	public static function checkLastModified(int $mtime): void
 	{
 		$sIfModifiedSince = static::GetHeader('If-Modified-Since');
 		if ($sIfModifiedSince && $mtime <= \strtotime($sIfModifiedSince)) {
@@ -172,7 +140,7 @@ class Http
 		}
 	}
 
-	public static function setLastModified(int $mtime) : void
+	public static function setLastModified(int $mtime): void
 	{
 		static::checkLastModified($mtime);
 		\header('Last-Modified: '.\gmdate('D, d M Y H:i:s \G\M\T', $mtime)); # DATE_RFC1123
@@ -191,7 +159,7 @@ class Http
 		}
 	}
 
-	public static function ServerUseCache(string $sEtag = '', int $iLastModified = 0, int $iExpires = 0) : void
+	public static function ServerUseCache(string $sEtag = '', int $iLastModified = 0, int $iExpires = 0): void
 	{
 		if (!static::$bCache) {
 			static::$bCache = true;
@@ -202,7 +170,7 @@ class Http
 		}
 	}
 
-	public static function StatusHeader(int $iStatus, string $sCustomStatusText = '') : void
+	public static function StatusHeader(int $iStatus, string $sCustomStatusText = ''): void
 	{
 		if (99 < $iStatus) {
 			$aStatus = array(
@@ -258,18 +226,18 @@ class Http
 		\header('Content-Disposition: ' . \implode('; ', $parms));
 	}
 
-	public function GetPath() : string
+	public function GetPath(): string
 	{
 		$sUrl = \ltrim(\substr(static::GetServer('SCRIPT_NAME', ''), 0, \strrpos(static::GetServer('SCRIPT_NAME', ''), '/')), '/');
 		return '' === $sUrl ? '/' : '/'.$sUrl.'/';
 	}
 
-	public function GetUrl() : string
+	public function GetUrl(): string
 	{
 		return $_SERVER['REQUEST_URI'] ?? '';
 	}
 
-	public function GetFullUrl() : string
+	public function GetFullUrl(): string
 	{
 		return $this->GetScheme().'://'.$this->GetHost(false).$this->GetPath();
 	}

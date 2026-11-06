@@ -9,7 +9,7 @@ class CURL extends \SnappyMail\HTTP\Request
 	private array $response_headers = array();
 	private string $response_body = '';
 
-	public function supportsSSL() : bool
+	public function supportsSSL(): bool
 	{
 		$v = \curl_version();
 		if (\is_array($v)) {
@@ -18,7 +18,7 @@ class CURL extends \SnappyMail\HTTP\Request
 		return \is_string($v) ? !!\preg_match('/OpenSSL/i', $v) : false;
 	}
 
-	protected function __doRequest(string &$method, string &$request_url, &$body, array $extra_headers) : Response
+	protected function __doRequest(string &$method, string &$request_url, &$body, array $extra_headers): Response
 	{
 		$c = \curl_init();
 		if (false === $c) {
@@ -93,15 +93,12 @@ class CURL extends \SnappyMail\HTTP\Request
 			}
 			return new Response($request_url, $code, $this->response_headers, $this->response_body);
 		} finally {
-			if (\PHP_VERSION_ID < 80500) {
-				\curl_close($c);
-			}
 			$this->response_headers = array();
 			$this->response_body = '';
 		}
 	}
 
-	protected function fetchHeader($ch, $header)
+	protected function fetchHeader($ch, string $header): int
 	{
 		static $headers = [];
 		if (!\strlen(\rtrim($header))) {
@@ -113,7 +110,7 @@ class CURL extends \SnappyMail\HTTP\Request
 		return \strlen($header);
 	}
 
-	protected function fetchData($ch, $data)
+	protected function fetchData($ch, string $data): int
 	{
 		if ($this->max_response_kb) {
 			$data = \substr($data, 0, \min(\strlen($data), ($this->max_response_kb*1024) - \strlen($this->response_body)));
@@ -122,7 +119,7 @@ class CURL extends \SnappyMail\HTTP\Request
 		return \strlen($data);
 	}
 
-	protected function streamData($ch, $data)
+	protected function streamData($ch, string $data): int
 	{
 		return \fwrite($this->stream, $data);
 	}

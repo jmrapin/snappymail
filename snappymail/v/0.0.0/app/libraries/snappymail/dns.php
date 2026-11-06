@@ -2,6 +2,11 @@
 
 namespace SnappyMail;
 
+// Sockets extension not loaded?
+if (!\defined('AF_INET6')) {
+	\define('AF_INET6', true);
+}
+
 abstract class DNS
 {
 	/**
@@ -32,7 +37,7 @@ abstract class DNS
 						$BIMI = \preg_replace('/^.+l=([^;]+)(;.*)?$/D', '$1', $value['txt']);
 						$oCache->Set($sCacheKey, \json_encode([
 							$BIMI,
-							time() + $value['ttl']
+							\time() + $value['ttl']
 						]));
 						break;
 					}
@@ -42,7 +47,7 @@ abstract class DNS
 				// Don't lookup for 24 hours
 				$oCache->Set($sCacheKey, \json_encode([
 					$BIMI,
-					time() + 86400
+					\time() + 86400
 				]));
 			}
 		}
@@ -52,11 +57,8 @@ abstract class DNS
 	public static function MX(string $domain) : array
 	{
 		$mxhosts = array();
-		$values = \dns_get_record($domain, \DNS_MX);
-		if ($values) {
-			foreach ($values as $record) {
-				$mxhosts[$record['pri']] = $record['target'];
-			}
+		foreach (\dns_get_record($host, \DNS_MX) ?: array() as $record) {
+			$mxhosts[$record['pri']] = $record['target'];
 		}
 		if (!$mxhosts) {
 			\getmxrr($domain, $mxhosts);
@@ -68,13 +70,27 @@ abstract class DNS
 	public static function SRV(string $domain) : array
 	{
 		$result = array();
-		$values = \dns_get_record($domain, \DNS_SRV);
-		if ($values) {
-			foreach ($values as $record) {
-				$result[$record['pri']] = $record;
-			}
+		foreach (\dns_get_record($host, \DNS_SRV) ?: array() as $record) {
+			$result[$record['pri']] = $record;
 		}
 		\ksort($result);
 		return \array_values($result);
+	}
+
+	public static function IP(string $domain): array
+	{
+		$ips = array();
+		foreach (\dns_get_record($domain, \DNS_A | (\AF_INET6 ? \DNS_AAAA : 0)) ?: array() as $record) {
+			if (!empty($record['ip'])) {
+				$ips[] = $record['ip'];
+			}
+			if (!empty($record['ipv6'])) {
+				$ips[] = $record['ipv6'];
+			}
+		}
+		if (!$ips) {
+			$ips = \gethostbynamel($host);
+		}
+		return $ips ?: array();
 	}
 }

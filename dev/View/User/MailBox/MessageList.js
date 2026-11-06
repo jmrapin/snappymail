@@ -94,8 +94,6 @@ export class MailMessageList extends AbstractViewRight {
 	constructor() {
 		super();
 
-		this.allowDangerousActions = SettingsCapa('DangerousActions');
-
 		this.messageList = MessagelistUserStore;
 		this.archiveAllowed = MessagelistUserStore.archiveAllowed;
 		this.canMarkAsSpam = MessagelistUserStore.canMarkAsSpam;
@@ -147,6 +145,8 @@ export class MailMessageList extends AbstractViewRight {
 				read: MessagelistUserStore.mainSearch,
 				write: value => sLastSearchValue = value
 			},
+
+			allowDangerousActions: () => SettingsCapa('DangerousActions') || MessagelistUserStore.isTrashFolder(),
 
 			isIncompleteChecked: () => {
 				const c = MessagelistUserStore.listChecked().length;
@@ -303,14 +303,14 @@ export class MailMessageList extends AbstractViewRight {
 				item => sFolder === item?.folder && iUid == item?.uid
 			);
 
-			if ('INBOX' === sFolder) {
+			if ('INBOX' === sFolder && 'INBOX' !== FolderUserStore.currentFolderFullName()) {
 				hasher.setHash(mailBox(sFolder));
 			}
 
 			if (message) {
 				this.selector.selectMessageItem(message);
 			} else {
-				if ('INBOX' !== sFolder) {
+				if ('INBOX' !== sFolder && sFolder !== FolderUserStore.currentFolderFullName()) {
 					hasher.setHash(mailBox(sFolder));
 				}
 				if (sFolder && iUid) {
@@ -350,17 +350,17 @@ export class MailMessageList extends AbstractViewRight {
 
 	clearListIsVisible() {
 		return (
-			!this.messageListSearchDesc()
+		    this.allowDangerousActions()
+		 && !this.messageListSearchDesc()
 		 && !MessagelistUserStore.error()
 		 && !MessagelistUserStore.endThreadUid()
 		 && MessagelistUserStore().length
 		 && (MessagelistUserStore.isSpamFolder() || MessagelistUserStore.isTrashFolder())
-		 && SettingsCapa('DangerousActions')
 		);
 	}
 
 	clear() {
-		SettingsCapa('DangerousActions')
+		this.allowDangerousActions()
 		&& showScreenPopup(FolderClearPopupView, [FolderUserStore.currentFolder()]);
 	}
 

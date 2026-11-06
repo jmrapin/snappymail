@@ -207,10 +207,13 @@ abstract class Service
 			if ($sResult) {
 				$sResult .= '<!--cached-->';
 			} else {
+				$aSri = $sAppCssMin ? \SnappyMail\Integrity::loadSriHashes() : [];
+				$sCssFile = ($bAdmin ? 'admin' : 'app').$sAppCssMin.'.css';
 				$aTemplateParameters['{{BaseAppBootCss}}'] = \file_get_contents(APP_VERSION_ROOT_PATH.'static/css/boot'.$sAppCssMin.'.css');
 				$aTemplateParameters['{{BaseAppBootScript}}'] = \file_get_contents(APP_VERSION_ROOT_PATH.'static/js'.($sAppJsMin ? '/min' : '').'/boot'.$sAppJsMin.'.js');
-				$aTemplateParameters['{{BaseAppMainCssLink}}'] = Utils::WebStaticPath('css/'.($bAdmin ? 'admin' : 'app').$sAppCssMin.'.css')
+				$aTemplateParameters['{{BaseAppMainCssLink}}'] = Utils::WebStaticPath('css/'.$sCssFile)
 					. '?' . \rawurlencode((string) $oConfig->Get('cache', 'index', 'v1'));
+				$aTemplateParameters['{{BaseAppMainCssSri}}'] = empty($aSri[$sCssFile]) ? '' : ' integrity="'.$aSri[$sCssFile].'"';
 				$aTemplateParameters['{{BaseAppThemeCss}}'] = \preg_replace('/\\s*([:;{},]+)\\s*/s', '$1', $oActions->compileCss($sThemeName, $bAdmin));
 				$aTemplateParameters['{{BaseLanguage}}'] = $oActions->compileLanguage($sLanguage, $bAdmin);
 				$aTemplateParameters['{{BaseTemplates}}'] = Utils::ClearHtmlOutput($oServiceActions->compileTemplates($bAdmin));

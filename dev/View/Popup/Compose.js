@@ -1413,7 +1413,8 @@ export class ComposePopupView extends AbstractViewPopup {
 		key && options.push(['OpenPGP', key]);
 		key = GnuPGUserStore.getPrivateKeyFor(email, 1);
 		key && options.push(['GnuPG', key]);
-		identity.smimeKeyValid() && identity.smimeCertificateValid() && identity.email === email
+		identity.smimeKeyValid() && identity.smimeCertificateValid()
+			&& identity.smimeCertificateChainValid() && identity.email === email
 			&& options.push(['S/MIME']);
 		console.dir({signOptions: options});
 		this.signOptions(options);
@@ -1593,6 +1594,7 @@ export class ComposePopupView extends AbstractViewPopup {
 */
 						break;
 					} catch (e) {
+						Passphrases.delete(signOptions[i][1])
 						console.error(e);
 					}
 				} else if ('GnuPG' == signOptions[i][0]) {
@@ -1610,6 +1612,7 @@ export class ComposePopupView extends AbstractViewPopup {
 					// TODO: sign in PHP fails
 					params.sign = 'S/MIME';
 //					params.signCertificate = identity.smimeCertificate();
+//					params.signCertificateChain = identity.smimeCertificateChain();
 //					params.signPrivateKey = identity.smimeKey();
 //					params.attachCertificate = false;
 					if (identity.smimeKeyEncrypted()) {
@@ -1634,7 +1637,9 @@ export class ComposePopupView extends AbstractViewPopup {
 					Object.entries(PgpUserStore.getPublicKeyOfEmails(recipients) || {}).forEach(([k,v]) =>
 						params.autocrypt.push({
 							addr: k,
-							keydata: v.replace(/-----(BEGIN|END) PGP PUBLIC KEY BLOCK-----/g, '').trim()
+							keydata: v
+								.replace(/-----(BEGIN|END) PGP PUBLIC KEY BLOCK-----/g, '')
+								.replace(/\s+/g, '') // Single base64 string, let the server do compliance formatting
 						})
 					);
 				for (let i = 0; i < encryptOptions.length; ++i) {

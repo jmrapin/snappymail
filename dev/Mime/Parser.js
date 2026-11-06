@@ -75,6 +75,19 @@ export function ParseMime(text)
 		get raw() {
 			return text.slice(this.start, this.end);
 		}
+/*
+		get headRaw() {
+			return this.hasHeader ? text.slice(this.start, this.bodyStart) : '';
+		}
+*/
+		get hasHeader() {
+			for (const prop in this.headers) {
+				if (Object.hasOwn(this.headers, prop)) {
+					return true;
+				}
+			}
+			return false;
+		}
 
 		get bodyRaw() {
 			return text.slice(this.bodyStart, this.bodyEnd);
@@ -127,6 +140,16 @@ export function ParseMime(text)
 	// mailbox-list or address-list
 	const lists = ['from','reply-to','to','cc','bcc'];
 
+	const isHead = (candidate) =>
+	{
+		// Unfold potential header lines: join lines that start with whitespace with previous line
+		let lines = candidate.replace(/\r?\n([ \t])/g, '$1');
+		lines = lines.split(/\r?\n/).filter(line => line.trim() !== '');
+		const headerLines = lines.filter(line => /^[\w-]+:\s*.+/.test(line));
+		// Heuristic: if more than 50% of lines look like headers, we consider it a header section
+		return (headerLines.length > 0 && headerLines.length / lines.length > 0.5);
+	}
+
 	const ParsePart = (mimePart, start_pos = 0, id = '') =>
 	{
 		let part = new MimePart,
@@ -140,7 +163,7 @@ export function ParseMime(text)
 		part.parts = [];
 
 		// get headers
-		if (head) {
+		if (isHead(head)) {
 			head.replace(/\r?\n\s+/g, ' ').split(/\r?\n/).forEach(header => {
 				let match = header.match(/^([^:]+):\s*([^;]+)/),
 					params = {};
@@ -191,9 +214,8 @@ export function ParseMime(text)
 					}
 				});
 			}
-
-			part.headers = headers;
 		}
+		part.headers = headers;
 
 		return part;
 	};

@@ -971,7 +971,7 @@ var computedFn = {
     haveDependenciesChanged() {
         var id, dependency, dependencyTracking = this[computedState].dependencyTracking;
         for (id in dependencyTracking) {
-            if (Object.prototype.hasOwnProperty.call(dependencyTracking, id)) {
+            if (Object.hasOwn(dependencyTracking, id)) {
                 dependency = dependencyTracking[id];
                 if ((this._evalDelayed && dependency._target._notificationIsPending) || dependency._target.hasChanged(dependency._version)) {
                     return true;
@@ -1624,11 +1624,11 @@ ko.bindingProvider = new class
                     // Deprecated: with is no longer recommended
                     var rewrittenBindings = ko.expressionRewriting.preProcessBindings(bindingsString),
                         functionBody = "with($data){return{" + rewrittenBindings + "}}";
-                    bindingFunction = new Function("$context", "$root", "$parent", "$data", "$element", functionBody);
+                    bindingFunction = new Function("$context", "$root", "$parent", "$data", functionBody);
                     bindingCache.set(cacheKey, bindingFunction);
                 }
                 return bindingFunction(bindingContext,
-                    bindingContext["$root"], bindingContext["$parent"], bindingContext["$data"] || {}, node
+                    bindingContext["$root"], bindingContext["$parent"], bindingContext["$data"] || {}
                 );
 */
                 if (!bindingFunction) {
@@ -1643,7 +1643,8 @@ ko.bindingProvider = new class
                     bindingContext,
                     {
                         has: () => true,
-                        get: (target, key) => target[key] || target['$data'][key]
+//                        get: (target, key) => target['$data'][key] || target[key]
+                        get: (target, key) => Reflect.has(target['$data'], key) ? target['$data'][key] : target[key]
                     }
                 );
                 return bindingFunction(bindingContext);

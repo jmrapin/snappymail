@@ -137,8 +137,8 @@ class Actions
 
 			$this->logWrite(
 				'[SM:' . APP_VERSION . '][IP:'
-				. $oHttp->GetClientIp($this->oConfig->Get('labs', 'http_client_ip_check_proxy', false))
-				. '][PID:' . (\MailSo\Base\Utils::FunctionCallable('getmypid') ? \getmypid() : 'unknown')
+				. $oHttp->GetClientIp()
+				. '][PID:' . (\function_exists('getmypid') ? \getmypid() : 'unknown')
 				. '][' . \MailSo\Base\Http::GetServer('SERVER_SOFTWARE', '~')
 				. '][' . \PHP_SAPI
 				. '][Streams:' . \implode(',', \stream_get_transports())
@@ -167,10 +167,7 @@ class Actions
 		return $this->oConfig;
 	}
 
-	/**
-	 * @return mixed
-	 */
-	protected function fabrica(string $sName, ?Model\Account $oAccount = null)
+	protected function fabrica(string $sName, ?Model\Account $oAccount = null): mixed
 	{
 		$mResult = null;
 		$this->oPlugins->RunHook('main.fabrica', array($sName, &$mResult), false);
@@ -289,7 +286,7 @@ class Actions
 		if (false !== \strpos($sLine, '{request:')) {
 			if (false !== \strpos($sLine, '{request:ip}')) {
 				$sLine = \str_replace('{request:ip}',
-					$this->Http()->GetClientIp($this->oConfig->Get('labs', 'http_client_ip_check_proxy', false)),
+					$this->Http()->GetClientIp(),
 					$sLine);
 			}
 
@@ -316,7 +313,7 @@ class Actions
 
 			if (false !== \strpos($sLine, '{user:ip}')) {
 				$sLine = \str_replace('{user:ip}',
-					$this->Http()->GetClientIp($this->oConfig->Get('labs', 'http_client_ip_check_proxy', false)),
+					$this->Http()->GetClientIp(),
 					$sLine);
 			}
 
@@ -591,6 +588,7 @@ class Actions
 						'ListInlineAttachments' => false,
 						'CollapseBlockquotes' => $oConfig->Get('defaults', 'collapse_blockquotes', true),
 						'MaxBlockquotesLevel' => 0,
+						'minFontSize' => 5,
 						'simpleAttachmentsList' => false,
 						'listGrouped' => $oConfig->Get('defaults', 'mail_list_grouped', false),
 						'MessagesPerPage' => \max(10, \intval($oConfig->Get('webmail', 'messages_per_page', 25)) ?: 25),
@@ -602,7 +600,7 @@ class Actions
 						'SoundNotification' => true,
 						'NotificationSound' => 'new-mail',
 						'DesktopNotifications' => true,
-						'Layout' => (int) $oConfig->Get('defaults', 'view_layout', Enumerations\Layout::SIDE_PREVIEW),
+						'Layout' => (int) $oConfig->Get('defaults', 'view_layout', Enumerations\Layout::SIDE_PREVIEW->value),
 						'EditorDefaultType' => \str_replace('Forced', '', $oConfig->Get('defaults', 'view_editor_type', '')),
 						'editorWysiwyg' => 'Squire',
 						'UseCheckboxesInList' => (bool) $oConfig->Get('defaults', 'view_use_checkboxes', true),
@@ -687,6 +685,7 @@ class Actions
 					$aResult['ListInlineAttachments'] = (bool)$oSettings->GetConf('ListInlineAttachments', $aResult['ListInlineAttachments']);
 					$aResult['CollapseBlockquotes'] = (bool)$oSettings->GetConf('CollapseBlockquotes', $aResult['CollapseBlockquotes']);
 					$aResult['MaxBlockquotesLevel'] = (int)$oSettings->GetConf('MaxBlockquotesLevel', $aResult['MaxBlockquotesLevel']);
+					$aResult['minFontSize'] = (int)$oSettings->GetConf('minFontSize', $aResult['minFontSize']);
 					$aResult['simpleAttachmentsList'] = (bool)$oSettings->GetConf('simpleAttachmentsList', $aResult['simpleAttachmentsList']);
 					$aResult['listGrouped'] = (bool)$oSettings->GetConf('listGrouped', $aResult['listGrouped']);
 					$aResult['ContactsAutosave'] = (bool)$oSettings->GetConf('ContactsAutosave', $aResult['ContactsAutosave']);
@@ -736,11 +735,7 @@ class Actions
 					$aResult['DevPassword'] = '';
 				}
 
-				$aResult['signMe'] = [
-					SignMeType::DefaultOff => 0,
-					SignMeType::DefaultOn => 1,
-					SignMeType::Unused => 2
-				][(string) $oConfig->Get('login', 'sign_me_auto', SignMeType::DefaultOff)];
+				$aResult['signMe'] = (SignMeType::tryFrom($oConfig->Get('login', 'sign_me_auto', '')) ?: SignMeType::DefaultOff)->toInt();
 			}
 		}
 
@@ -780,6 +775,12 @@ class Actions
 		$aResult['StaticLibsJs'] = Utils::WebStaticPath('js/' . ($bAppJsDebug ? '' : 'min/') .
 			'libs' . ($bAppJsDebug ? '' : '.min') . '.js')
 			. '?' . \rawurlencode((string) $this->oConfig->Get('cache', 'index', 'v1'));
+
+		if (!$bAppJsDebug) {
+			$aSri = \SnappyMail\Integrity::loadSriHashes();
+			$aResult['StaticLibsJsSri'] = $aSri['libs.min.js'] ?? '';
+			$aResult['StaticAppJsSri'] = $aSri[($bAdmin ? 'admin' : 'app') . '.min.js'] ?? '';
+		}
 
 		$this->oPlugins->InitAppData($bAdmin, $aResult, $oAccount);
 
@@ -957,12 +958,7 @@ class Actions
 		return $this;
 	}
 
-	/**
-	 * @param mixed $mDefault = null
-	 *
-	 * @return mixed
-	 */
-	public function GetActionParam(string $sKey, $mDefault = null)
+	public function GetActionParam(string $sKey, mixed $mDefault = null): mixed
 	{
 		return isset($this->aCurrentActionParams[$sKey]) ?
 			$this->aCurrentActionParams[$sKey] : $mDefault;

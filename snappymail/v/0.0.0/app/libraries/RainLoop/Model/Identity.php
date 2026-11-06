@@ -31,6 +31,7 @@ class Identity implements \JsonSerializable
 
 	private ?SensitiveString $smimeKey = null;
 	private string $smimeCertificate = '';
+	private string $smimeCertificateChain = '';
 
 	function __construct(string $sId = '', string $sEmail = '')
 	{
@@ -48,7 +49,7 @@ class Identity implements \JsonSerializable
 		}
 	}
 
-	function toMime() : \MailSo\Mime\Email
+	function toMime(): \MailSo\Mime\Email
 	{
 		return new \MailSo\Mime\Email($this->sEmail, $this->sName);
 	}
@@ -114,6 +115,7 @@ class Identity implements \JsonSerializable
 			$this->pgpSign = !empty($aData['pgpSign']);
 			$this->smimeKey = new SensitiveString(isset($aData['smimeKey']) ? $aData['smimeKey'] : '');
 			$this->smimeCertificate = isset($aData['smimeCertificate']) ? $aData['smimeCertificate'] : '';
+			$this->smimeCertificateChain = isset($aData['smimeCertificateChain']) ? $aData['smimeCertificateChain'] : '';
 			return true;
 		}
 
@@ -136,12 +138,13 @@ class Identity implements \JsonSerializable
 			'pgpEncrypt' => $this->pgpEncrypt,
 			'pgpSign' => $this->pgpSign,
 			'smimeKey' => (string) $this->smimeKey,
-			'smimeCertificate' => $this->smimeCertificate
+			'smimeCertificate' => $this->smimeCertificate,
+			'smimeCertificateChain' => $this->smimeCertificateChain
 		);
 	}
 
-	#[\ReturnTypeWillChange]
-	public function jsonSerialize()
+//	public function jsonSerialize(): array
+	public function jsonSerialize(): mixed
 	{
 		return array(
 			'@Object' => 'Object/Identity',
@@ -158,6 +161,7 @@ class Identity implements \JsonSerializable
 			'pgpSign' => $this->pgpSign,
 			'smimeKey' => (string) $this->smimeKey,
 			'smimeCertificate' => $this->smimeCertificate,
+			'smimeCertificateChain' => $this->smimeCertificateChain,
 			'exists' => $this->exists
 		);
 	}

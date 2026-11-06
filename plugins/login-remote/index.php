@@ -6,8 +6,8 @@ class LoginRemotePlugin extends \RainLoop\Plugins\AbstractPlugin
 		NAME     = 'Login Remote',
 		AUTHOR   = 'SnappyMail',
 		URL      = 'https://snappymail.eu/',
-		VERSION  = '1.5',
-		RELEASE  = '2024-09-20',
+		VERSION  = '1.6',
+		RELEASE  = '2026-10-22',
 		REQUIRED = '2.36.1',
 		CATEGORY = 'Login',
 		LICENSE  = 'MIT',
@@ -43,6 +43,7 @@ class LoginRemotePlugin extends \RainLoop\Plugins\AbstractPlugin
 			try
 			{
 				static::$login = true;
+				$sPassword = new \SnappyMail\SensitiveString($sPassword);
 				$oAccount = $oActions->LoginProcess($sEmail, $sPassword);
 			}
 			catch (\Throwable $oException)

@@ -72,11 +72,19 @@ trait Pgp
 			\clearstatcache();
 			// First try a symbolic link
 			$tmpdir = \sys_get_temp_dir() . '/snappymail';
-//			if (\RainLoop\Utils::inOpenBasedir($tmpdir) &&
+//			if (\RainLoop\Utils::inOpenBasedir($tmpdir)) {
 			\is_dir($tmpdir) || \mkdir($tmpdir, 0700);
-			if (\is_dir($tmpdir) && \is_writable($tmpdir)) {
-				$link = $tmpdir . '/' . \md5($homedir);
-				if (\is_link($link) || \symlink($homedir, $link)) {
+//			\sprintf("%06u ", \substr(\decoct(\lstat($tmpdir)['mode']),-3))
+			if (\is_dir($tmpdir) && \is_writable($tmpdir) && \substr(\sprintf('%o', \fileperms($tmpdir)), -4) === "0700") {
+				$link = $tmpdir . '/' . \md5($homedir . APP_SALT);
+				// Make sure the symbolic link points to $homedir
+				if (\is_link($link) && \readlink($link) !== $homedir) {
+					if (!\unlink($link)) {
+						$this->logWrite("unlink('{$link}') failed", \LOG_WARNING, 'GnuPG');
+					}
+				}
+				if ((\is_link($link) && \readlink($link) === $homedir)
+				 || \symlink($homedir, $link)) {
 					$homedir = $link;
 				} else {
 					$this->logWrite("symlink('{$homedir}', '{$link}') failed", \LOG_WARNING, 'GnuPG');
@@ -84,7 +92,8 @@ trait Pgp
 			}
 			// Else try ~/.gnupg/ + hash(email address)
 			if (80 < \strlen($homedir)) {
-				$tmpdir = ($_SERVER['HOME'] ?: \exec('echo ~') ?: \dirname(\getcwd())) . '/.gnupg/';
+				$home = $_SERVER['HOME'] ?: \exec('echo ~');
+				$tmpdir = ('~' !== $home ? $home : \dirname(\getcwd())) . '/.gnupg/';
 				if ($oAccount instanceof \RainLoop\Model\AdditionalAccount) {
 					$tmpdir .= \sha1($oAccount->ParentEmail());
 				} else {
@@ -198,6 +207,7 @@ trait Pgp
 		$sKey = $this->GetActionParam('key', '');
 		$sKeyId = $this->GetActionParam('keyId', '');
 		$sEmail = $this->GetActionParam('email', '');
+//		$sEmail = \SnappyMail\IDN::emailToAscii($this->GetActionParam('email', ''));
 
 		if (!$sKey) {
 			try {
@@ -285,6 +295,14 @@ trait Pgp
 		$key = $this->GetActionParam('key', '');
 		$keyId = $this->GetActionParam('keyId', '');
 		return $this->DefaultResponse(($key && $keyId && Backup::PGPKey($key, $keyId)));
+	}
+
+	public function DoDeletePGPKey(): array
+	{
+		$key = $this->GetActionParam('key', '');
+		$keyId = $this->GetActionParam('keyId', '');
+		$success = $key && Backup::PGPKey($key, $keyId, true);
+		return $this->DefaultResponse($success, ['code' => (int)!$success]);
 	}
 
 	/**

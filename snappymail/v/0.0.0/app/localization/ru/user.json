@@ -27,6 +27,8 @@
 		"USERNAME": "Имя пользователя",
 		"PASSWORD": "Пароль",
 		"REMEMBER": "Запомнить",
+		"REMEMBER_FOR_SESSION": "Запомнить Временное",
+		"REMEMBER_PERMANENT": "Запомнить Навсегда",
 		"REPLY_TO": "Ответить-на",
 		"SAVE": "Сохранить",
 		"SAVE_CHANGES": "Сохранить изменения?",
@@ -458,7 +460,8 @@
 		"LEGEND_SECURITY": "Безопасность",
 		"LABEL_AUTOLOGOUT": "Автоматический выход",
 		"FORGET_KEY_PASS": "Забыть парольную фразу закрытого ключа",
-		"NEVER": "Никогда"
+		"NEVER": "Никогда",
+		"LABEL_STORED_PASS": "Remembered Passphrase"
 	},
 	"SETTINGS_GENERAL": {
 		"LANGUAGE": "Язык",
@@ -495,6 +498,7 @@
 		"CHROME_NOTIFICATION_DESC_DENIED": "(Блокировано браузером)",
 		"COLLAPSE_BLOCKQUOTES": "Сворачивать блок с процитированным текстом",
 		"MAX_QUOTE_LEVEL": "Максимальный уровень отображения процитированного текста",
+		"MIN_FONT_SIZE": "Minimum Font Size",
 		"LIST_INLINE_ATTACHMENTS": "Показывать вложения в списке",
 		"LIST_SIMPLE_ATTACHMENTS": "Простой список вложений",
 		"LIST_MESSAGES_GROUPED": "Группировка списка сообщений (при сортировке по дате или отправителю)",

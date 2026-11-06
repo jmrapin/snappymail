@@ -1,13 +1,14 @@
 <?php
 namespace OCA\SnappyMail\Settings;
 
+use OCA\SnappyMail\Util\SnappyMailHelper;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\Settings\ISettings;
 
 class PersonalSettings implements ISettings
 {
-	private $config;
+	private IConfig $config;
 
 	public function __construct(IConfig $config)
 	{
@@ -16,7 +17,7 @@ class PersonalSettings implements ISettings
 
 	public function getForm()
 	{
-		$uid = \OC::$server->get(\OCP\IUserSession::class)->getUser()->getUID();
+		$uid = SnappyMailHelper::getUID();
 		$sEmail = $this->config->getUserValue($uid, 'snappymail', 'snappymail-email');
 		if ($sPass = $this->config->getUserValue($uid, 'snappymail', 'snappymail-password')) {
 			$this->config->deleteUserValue($uid, 'snappymail', 'snappymail-password');
@@ -32,7 +33,7 @@ class PersonalSettings implements ISettings
 
 	public function getSection()
 	{
-		return 'additional';
+		return 'snappymail';
 	}
 
 	public function getPriority()

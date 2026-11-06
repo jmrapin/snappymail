@@ -245,7 +245,7 @@ export class AppUser extends AbstractApp {
 		if (1 == arrayLength(msg)) {
 			msg = msg[0];
 		}
-		if (msg) {
+		if (msg && msg.decrypt) {
 			msg.decrypt().then((/*success*/)=>showScreenPopup(ComposePopupView, params));
 		} else {
 			showScreenPopup(ComposePopupView, params);
@@ -260,7 +260,8 @@ AskPopupView.password = function(sAskDesc, btnText, ask) {
 			view => resolve({
 				password:view.passphrase(),
 				username:/*ask & 2 ? */view.username(),
-				remember:/*ask & 4 ? */view.remember()
+				remember:/*ask & 4 ? */view.remember(),
+				rememberPermanent: view.rememberPermanent(),
 			}),
 			() => resolve(null),
 			true,

@@ -39,16 +39,7 @@ class Response
 		$this->request_uri = $request_uri;
 		$this->final_uri   = $request_uri;
 		$this->status      = (int) $status;
-		if (\function_exists('gzinflate') && isset($this->headers['content-encoding'])
-		 && (false !== \stripos($this->headers['content-encoding'], 'gzip'))) {
-			$this->body = \gzinflate(\substr($body, 10, -4));
-			if (false === $this->body) {
-				$err = \error_get_last() ?: ['message' => 'gzinflate failed'];
-				throw new \RuntimeException("{$err['message']} for {$request_uri}");
-			}
-		} else {
-			$this->body = $body;
-		}
+		$this->body = $body;
 	}
 
 	function __get($k)
@@ -56,10 +47,21 @@ class Response
 		return \property_exists($this, $k) ? $this->$k : null;
 	}
 
-	/**
-	 * returns string, array or null
-	 */
-	public function getHeader($names)
+	public function decoded(): string|false
+	{
+		$body = $this->body;
+		if (\function_exists('gzinflate') && isset($this->headers['content-encoding'])
+		 && (false !== \stripos($this->headers['content-encoding'], 'gzip'))) {
+			$body = \gzinflate(\substr($body, 10, -4));
+			if (false === $body) {
+				$err = \error_get_last() ?: ['message' => 'gzinflate failed'];
+				throw new \RuntimeException("{$err['message']} for {$request_uri}");
+			}
+		}
+		return $body;
+	}
+
+	public function getHeader(mixed $names): string|array|null
 	{
 		$names = \is_array($names) ? $names : array($names);
 		foreach ($names as $n) {
@@ -71,12 +73,12 @@ class Response
 		return null;
 	}
 
-	public function getHeaders() : array
+	public function getHeaders(): array
 	{
 		return $this->headers;
 	}
 
-	public function getRedirectLocation() : ?string
+	public function getRedirectLocation(): ?string
 	{
 		if ($location = $this->getHeader('location')) {
 			$uri = \is_array($location) ? $location[0] : $location;

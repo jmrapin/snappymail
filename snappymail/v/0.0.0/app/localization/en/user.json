@@ -27,6 +27,8 @@
 		"USERNAME": "Username",
 		"PASSWORD": "Passphrase",
 		"REMEMBER": "Remember",
+		"REMEMBER_FOR_SESSION": "Remember for this Session",
+		"REMEMBER_PERMANENT": "Remember Permanently",
 		"REPLY_TO": "Reply-To",
 		"SAVE": "Save",
 		"SAVE_CHANGES": "Save changes?",
@@ -332,6 +334,7 @@
 	"SMIME": {
 		"POPUP_IMPORT_TITLE": "Import S\/MIME certificate",
 		"CERTIFICATE": "Certificate",
+		"CERTIFICATECHAIN": "Intermediate Certificate(s)",
 		"CERTIFICATES": "S\/MIME Certificates",
 		"SIGNED_MESSAGE": "S\/MIME signed message",
 		"ENCRYPTED_MESSAGE": "S\/MIME encrypted message",
@@ -459,7 +462,8 @@
 		"LEGEND_SECURITY": "Security",
 		"LABEL_AUTOLOGOUT": "Auto Logout",
 		"FORGET_KEY_PASS": "Forget private key passphrase",
-		"NEVER": "Never"
+		"NEVER": "Never",
+		"LABEL_STORED_PASS": "Remembered Passphrase"
 	},
 	"SETTINGS_GENERAL": {
 		"LANGUAGE": "Language",
@@ -496,6 +500,7 @@
 		"CHROME_NOTIFICATION_DESC_DENIED": "(Blocked by the browser)",
 		"COLLAPSE_BLOCKQUOTES": "Collapse quoted text",
 		"MAX_QUOTE_LEVEL": "Maximum visible quoted text levels",
+		"MIN_FONT_SIZE": "Minimum Font Size",
 		"LIST_INLINE_ATTACHMENTS": "Show inline attachments in list",
 		"LIST_SIMPLE_ATTACHMENTS": "Simple attachments list",
 		"LIST_MESSAGES_GROUPED": "List messages grouped (when sorting by date or from)",

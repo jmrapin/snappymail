@@ -12,6 +12,7 @@ abstract class Repository
 		$oHTTP = HTTP\Request::factory(/*'socket' or 'curl'*/);
 		$oHTTP->proxy = \RainLoop\Api::Config()->Get('labs', 'curl_proxy', '');
 		$oHTTP->proxy_auth = \RainLoop\Api::Config()->Get('labs', 'curl_proxy_auth', '');
+		$oHTTP->verify_peer = \RainLoop\Api::Config()->Get('labs', 'curl_verify_peer', true);
 		$oHTTP->max_response_kb = 0;
 		$oHTTP->timeout = 15; // timeout in seconds.
 		$oResponse = $oHTTP->doRequest('GET', static::BASE_URL . $path);
@@ -37,6 +38,7 @@ abstract class Repository
 		$oHTTP = HTTP\Request::factory(/*'socket' or 'curl'*/);
 		$oHTTP->proxy = \RainLoop\Api::Config()->Get('labs', 'curl_proxy', '');
 		$oHTTP->proxy_auth = \RainLoop\Api::Config()->Get('labs', 'curl_proxy_auth', '');
+		$oHTTP->verify_peer = \RainLoop\Api::Config()->Get('labs', 'curl_verify_peer', true);
 		$oHTTP->max_response_kb = 0;
 		$oHTTP->timeout = 15; // timeout in seconds.
 		$oHTTP->streamBodyTo($pDest);
@@ -274,6 +276,35 @@ abstract class Repository
 				if (isset($aList[$sId]) && (!$sFile || $sFile === $aList[$sId]['file'])) {
 					$sRealFile = $aList[$sId]['file'];
 					$sTmp = static::download($aList[$sId]['file']);
+
+					// https://github.com/the-djmaze/snappymail/security/advisories/GHSA-j9c4-gf64-rph2
+					// Verify PGP signature
+					$sTmpSignature = static::download($aList[$sId]['file'] . '.asc');
+					$signature = $sTmpSignature ? \file_get_contents($sTmpSignature) : null;
+					$sTmpSignature && \unlink($sTmpSignature);
+					if (!$signature) {
+						throw new \RuntimeException('Plugin PGP signature is missing');
+					}
+/*
+					if ($aList[$sId]['pgp_sig'] !== \trim(\preg_replace('/-----(BEGIN|END) PGP SIGNATURE-----/', '', $signature))) {
+						throw new \RuntimeException('Plugin PGP signature invalid');
+					}
+*/
+					try {
+						\SnappyMail\Repository\Signature::verifyPGP($sTmp, $signature);
+					} catch (\Throwable $e) {
+						if ($e instanceof \RuntimeException) {
+							throw $e;
+						}
+						// Verify x509 signature
+						$sTmpSignature = static::download($aList[$sId]['file'] . '.sig');
+						$signature = $sTmpSignature ? \file_get_contents($sTmpSignature) : null;
+						$sTmpSignature && \unlink($sTmpSignature);
+						if (!$signature) {
+							throw new \RuntimeException('Plugin x509 signature is missing');
+						}
+						\SnappyMail\Repository\Signature::verifySSL($sTmp, $signature);
+					}
 				}
 			}
 

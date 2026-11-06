@@ -27,6 +27,8 @@
 		"USERNAME": "Gebruikersnaam",
 		"PASSWORD": "Wachtwoord",
 		"REMEMBER": "Onthouden",
+		"REMEMBER_FOR_SESSION": "Onthoud voor deze sessie",
+		"REMEMBER_PERMANENT": "Onthoud permanent",
 		"REPLY_TO": "Antwoordadres",
 		"SAVE": "Opslaan",
 		"SAVE_CHANGES": "Wijzigingen opslaan?",
@@ -458,7 +460,8 @@
 		"LEGEND_SECURITY": "Beveiliging",
 		"LABEL_AUTOLOGOUT": "Automatisch uitloggen",
 		"FORGET_KEY_PASS": "Vergeet privésleutel wachtwoord",
-		"NEVER": "Nooit"
+		"NEVER": "Nooit",
+		"LABEL_STORED_PASS": "Wachtwoordzin opgeslagen"
 	},
 	"SETTINGS_GENERAL": {
 		"LANGUAGE": "Taal",
@@ -495,6 +498,7 @@
 		"CHROME_NOTIFICATION_DESC_DENIED": "(Geblokkeerd door de browser)",
 		"COLLAPSE_BLOCKQUOTES": "Geciteerde tekst inklappen",
 		"MAX_QUOTE_LEVEL": "Maximaal zichtbare geciteerde tekstniveaus",
+		"MIN_FONT_SIZE": "Minimum Font Size",
 		"LIST_INLINE_ATTACHMENTS": "Toon inline bijlagen in lijst",
 		"LIST_SIMPLE_ATTACHMENTS": "Simpele bijlagen lijst",
 		"LIST_MESSAGES_GROUPED": "Toon berichten gegroepeerd (bij sorteren op Datum of Van)",

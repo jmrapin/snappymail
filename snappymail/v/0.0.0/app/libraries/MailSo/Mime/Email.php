@@ -48,7 +48,7 @@ class Email implements \JsonSerializable
 	/**
 	 * @throws \ValueError
 	 */
-	public static function Parse(string $sEmailAddress) : self
+	public static function Parse(string $sEmailAddress): self
 	{
 		$sEmailAddress = Utils::Trim(Utils::DecodeHeaderValue($sEmailAddress));
 		if (!\strlen(\trim($sEmailAddress))) {
@@ -153,36 +153,46 @@ class Email implements \JsonSerializable
 		return new self($sEmail, $sName);
 	}
 
-	public function GetEmail(bool $bUtf8 = false) : string
+	public function GetEmail(bool $bUtf8 = false): string
 	{
-		return $bUtf8 ? \SnappyMail\IDN::emailToUtf8($this->sEmail) : $this->sEmail;
+		return $this->sEmail;
 	}
 
-	public function GetDisplayName() : string
+	public function GetEmailUtf8(): string
+	{
+		return \SnappyMail\IDN::emailToUtf8($this->sEmail);
+	}
+
+	public function GetDisplayName(): string
 	{
 		return $this->sDisplayName;
 	}
 
-	public function getLocalPart() : string
+	public function getLocalPart(): string
 	{
 		return Utils::getEmailAddressLocalPart($this->sEmail);
 	}
 
-	public function GetDomain(bool $bIdn = false) : string
+	public function GetDomain(): string
 	{
-		return Utils::getEmailAddressDomain($this->GetEmail($bIdn));
+		return Utils::getEmailAddressDomain($this->GetEmail());
 	}
 
-	public function SetDkimStatus(string $sDkimStatus)
+	public function GetDomainUtf8(): string
+	{
+		return Utils::getEmailAddressDomain($this->GetEmailUtf8());
+	}
+
+	public function SetDkimStatus(string $sDkimStatus): void
 	{
 		$this->sDkimStatus = Enumerations\DkimStatus::normalizeValue($sDkimStatus);
 	}
 
-	public function ToString(bool $bConvertSpecialsName = false, bool $bUtf8 = false) : string
+	public function ToString(bool $bConvertSpecialsName = false, bool $bUtf8 = false): string
 	{
 		$sReturn = '';
 		if (\strlen($this->sEmail)) {
-			$sReturn = $this->GetEmail($bUtf8);
+			$sReturn = $bUtf8 ? $this->GetEmailUtf8() : $this->GetEmail();
 			$sDisplayName = $this->sDisplayName;
 			if (\strlen($sDisplayName)) {
 				$sDisplayName = \str_replace('"', '\"', $sDisplayName);
@@ -195,18 +205,18 @@ class Email implements \JsonSerializable
 		return $sReturn;
 	}
 
-	public function __toString() : string
+	public function __toString(): string
 	{
 		return $this->ToString();
 	}
 
-	#[\ReturnTypeWillChange]
-	public function jsonSerialize()
+//	public function jsonSerialize(): array
+	public function jsonSerialize(): mixed
 	{
 		return array(
 			'@Object' => 'Object/Email',
 			'name' => Utils::Utf8Clear($this->sDisplayName),
-			'email' => Utils::Utf8Clear($this->GetEmail(true)),
+			'email' => Utils::Utf8Clear($this->GetEmailUtf8()),
 			'dkimStatus' => $this->sDkimStatus
 		);
 	}

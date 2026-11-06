@@ -64,7 +64,7 @@ trait AdminDomains
 	public function DoAdminDomainMatch() : array
 	{
 		$sCredentials = $this->resolveLoginCredentials(
-			$this->GetActionParam('username'),
+			new \MailSo\Mime\Email($this->GetActionParam('username')),
 			new \SnappyMail\SensitiveString('********')
 		);
 		$sEmail = $sCredentials['email'];
@@ -142,7 +142,7 @@ trait AdminDomains
 			}
 
 			if ($oDomain->SmtpSettings()->usePhpMail) {
-				$mSmtpResult = \MailSo\Base\Utils::FunctionCallable('mail');
+				$mSmtpResult = \function_exists('mail');
 				if (!$mSmtpResult) {
 					$sSmtpErrorDesc = 'PHP: mail() function is undefined';
 				}

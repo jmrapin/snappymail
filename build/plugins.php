@@ -1,6 +1,28 @@
 <?php
 define('PLUGINS_DEST_DIR', __DIR__ . '/dist/releases/plugins');
 
+if (isset($options['sign'])) {
+	$pkey_file = $_SERVER['HOME'].'/.snappymail/sign_releases.pem';
+	if (is_file($pkey_file)) {
+		$private_key = openssl_pkey_get_private('file://'.$pkey_file);
+/*
+	} else {
+		$private_key = openssl_pkey_new(array(
+			'digest_alg' => 'sha512',
+			'private_key_bits' => 4096,
+			'private_key_type' => OPENSSL_KEYTYPE_RSA,
+		));
+		openssl_pkey_export($private_key, $private_key_pem);
+		file_put_contents($pkey_file, $private_key_pem);
+		$public_key_pem = openssl_pkey_get_details($private_key)['key'];
+		file_put_contents(str_replace('.pem', '.pub', $pkey_file), $public_key_pem);
+*/
+	}
+	if (!$private_key) {
+		exit("\n{$pkey_file} failed\n");
+	}
+}
+
 is_dir(PLUGINS_DEST_DIR) || mkdir(PLUGINS_DEST_DIR, 0777, true);
 $files = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator(PLUGINS_DEST_DIR, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -28,33 +50,52 @@ $keys = [
 	'url',
 	'version'
 ];
-/*
+
 $released = [
 	'add-x-originating-ip-header',
+	'attachments-force-open',
 	'avatars',
 	'backup',
 	'black-list',
+	'cache-apcu',
+	'cache-memcache',
+	'cache-redis',
 	'change-password',
 	'change-password-froxlor',
 	'change-password-hestia',
 	'change-password-hmailserver',
 	'change-password-ispconfig',
+	'change-password-mailcow',
 	'change-password-poppassd',
+	'compact-composer',
 	'custom-login-mapping',
+	'haveibeenpwned',
+	'ics-viewer',
 	'imap-contacts-suggestions',
 	'kolab',
 	'ldap-contacts-suggestions',
 	'ldap-identities',
 	'ldap-login-mapping',
 	'ldap-mail-accounts',
+	'login-autoconfig',
+	'login-cpanel',
 	'login-external',
 	'login-external-sso',
+	'login-gmail',
+	'login-http',
+	'login-o365',
 	'login-override',
 	'login-register',
 	'login-remote',
+	'login-virtuser',
 	'mailbox-detect',
 	'nextcloud',
 	'override-smtp-credentials',
+	'proxy-auth',
+	'proxy-mapping',
+	'search-filters',
+	'security-mxss',
+	'send-save-in',
 	'set-remote-addr',
 	'smtp-use-from-adr-account',
 	'snowfall-on-login-screen',
@@ -62,12 +103,15 @@ $released = [
 	'view-ics',
 	'white-list'
 ];
-*/
+
 foreach (glob(ROOT_DIR . '/plugins/*', GLOB_NOSORT | GLOB_ONLYDIR) as $dir) {
 	if (is_file("{$dir}/index.php") && !strpos($dir, '.bak')) {
-		require "{$dir}/index.php";
 		$name = basename($dir);
-//		if (!in_array($name, $released)) continue;
+		if (!isset($options['plugins-all']) && !in_array($name, $released)) {
+			echo "s {$name}\n";
+			continue;
+		}
+		require "{$dir}/index.php";
 		$class = new ReflectionClass(str_replace('-', '', $name) . 'Plugin');
 		$manifest_item = [];
 		foreach ($class->getConstants() as $key => $value) {
@@ -101,11 +145,24 @@ foreach (glob(ROOT_DIR . '/plugins/*', GLOB_NOSORT | GLOB_ONLYDIR) as $dir) {
 			$tgz_destination = PLUGINS_DEST_DIR . "/{$name}-{$version}.tgz";
 			@unlink($tgz_destination);
 			@unlink("{$tar_destination}.gz");
-			$tar = new PharData($tar_destination);
+			$tar = new \SnappyMail\TAR($tgz_destination);
+//			$tar = new PharData($tar_destination);
 			$tar->buildFromDirectory('./plugins/', '/' . \preg_quote("./plugins/{$name}/", '/') . '((?!\.bak).)*$/');
-			$tar->compress(Phar::GZ);
-			unlink($tar_destination);
-			rename("{$tar_destination}.gz", $tgz_destination);
+			if ($tar instanceof PharData) {
+/*
+				$private = \openssl_get_privatekey(\file_get_contents('private.pem'));
+				$pkey = '';
+				\openssl_pkey_export($private, $pkey);
+				$tar->setSignatureAlgorithm(Phar::OPENSSL, $pkey);
+				$tar->setSignatureAlgorithm(Phar::Phar::PGP, file_get_contents($private_key));
+				$signature = $tar->getSignature();
+*/
+				$tar->compress(Phar::GZ);
+				unlink($tar_destination);
+				rename("{$tar_destination}.gz", $tgz_destination);
+			} else {
+				$tar->close();
+			}
 /*
 			if (Phar::canWrite()) {
 				$phar_destination = PLUGINS_DEST_DIR . "/{$name}.phar";
@@ -118,17 +175,31 @@ foreach (glob(ROOT_DIR . '/plugins/*', GLOB_NOSORT | GLOB_ONLYDIR) as $dir) {
 			}
 */
 			if (isset($options['sign'])) {
-				passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '.escapeshellarg($tgz_destination), $return_var);
+				$arg = escapeshellarg($tgz_destination);
+				passthru('gpg --local-user 1016E47079145542F8BA133548208BA13290F3EB --armor --detach-sign '.$arg, $return_var);
 				$manifest_item['pgp_sig'] = trim(preg_replace('/-----(BEGIN|END) PGP SIGNATURE-----/', '', file_get_contents($tgz_destination.'.asc')));
+
+				$signature = '';
+				if (true !== openssl_sign(file_get_contents($tgz_destination), $signature, $private_key, \OPENSSL_ALGO_SHA256, 0)) {
+					exit;
+				}
+				file_put_contents($tgz_destination . '.sig', $signature);
+				$manifest_item['ssl_sig'] = base64_encode($signature);
 			}
 			ksort($manifest_item);
 			$manifest[$name] = $manifest_item;
 
+			foreach (glob("{$dir}/*.min.js") as $file) {
+				unlink($file);
+			}
+			foreach (glob("{$dir}/js/*.min.js") as $file) {
+				unlink($file);
+			}
 		} else {
 			echo "- {$name} {$version}\n";
 		}
 	} else {
-		echo "- {$name}\n";
+		echo "x {$name}\n";
 	}
 }
 

@@ -300,7 +300,11 @@ abstract class Utils
 			$sValue = static::ConvertEncoding($sValue, $sMainCharset, Enumerations\Charset::UTF_8);
 		}
 
-		return $sValue;
+		// The strip above runs before decoding, so an encoded-word such as
+		// =?utf-8?b?...?= can still decode to a CR or LF. A decoded header value
+		// is one line; a line break here would be carried into the headers of a
+		// reply (In-Reply-To is copied from Message-ID) and inject new ones.
+		return \preg_replace('/[\r\n\0]+/', ' ', $sValue);
 	}
 
 	public static function RemoveHeaderFromHeaders(string $sIncHeaders, array $aHeadersToRemove = array()) : string
@@ -467,7 +471,7 @@ abstract class Utils
 		if (null === $bValidateAction) {
 			$iResetTimer = 0;
 
-			$bValidateAction = static::FunctionCallable('set_time_limit');
+			$bValidateAction = \function_exists('set_time_limit');
 		}
 
 		if ($bValidateAction && $iTimeToReset < $iTime - $iResetTimer) {
@@ -657,26 +661,11 @@ abstract class Utils
 	public static function FunctionsCallable(array $aFunctionNames) : bool
 	{
 		foreach ($aFunctionNames as $sFunctionName) {
-			if (!static::FunctionCallable($sFunctionName)) {
+			if (!\function_exists($sFunctionName)) {
 				return false;
 			}
 		}
 		return true;
-	}
-
-	private static $disabled_functions = null;
-	public static function FunctionCallable(string $sFunctionName) : bool
-	{
-		if (null === static::$disabled_functions) {
-			static::$disabled_functions = \array_map('trim', \explode(',', \ini_get('disable_functions')));
-		}
-/*
-		$disabled_classes = \explode(',', \ini_get('disable_classes'));
-		\in_array($function, $disabled_classes);
-*/
-		return \function_exists($sFunctionName)
-			&& !\in_array($sFunctionName, static::$disabled_functions);
-//			&& \is_callable($mFunctionNameOrNames);
 	}
 
 	public static function Sha1Rand(string $sAdditionalSalt = '') : string

@@ -14,7 +14,7 @@ class Application extends \RainLoop\Config\AbstractConfig
 			APP_CONFIGURATION_NAME);
 	}
 
-	public function Load() : bool
+	public function Load(): bool
 	{
 		$bResult = parent::Load();
 
@@ -64,17 +64,12 @@ class Application extends \RainLoop\Config\AbstractConfig
 		return $bResult;
 	}
 
-	/**
-	 * @param mixed $mDefault = null
-	 *
-	 * @return mixed
-	 */
-	public function Get(string $sSection, string $sName, $mDefault = null)
+	public function Get(string $sSection, string $sName, mixed $mDefault = null): mixed
 	{
 		$mResult = parent::Get($sSection, $sName, $mDefault);
 		if ($this->aReplaceEnv && \is_string($mResult)) {
 			$sKey = \strtolower($sSection.'.'.$sName);
-			if (\in_array($sKey, $this->aReplaceEnv) && false !== strpos($mResult, '$')) {
+			if (\in_array($sKey, $this->aReplaceEnv) && \str_contains($mResult, '$')) {
 				$mResult = \preg_replace_callback('/\$([^\s]+)/', function($aMatch) {
 					if (!empty($aMatch[0]) && !empty($aMatch[1])) {
 						if (!empty($_ENV[$aMatch[1]])) {
@@ -92,7 +87,7 @@ class Application extends \RainLoop\Config\AbstractConfig
 		return $mResult;
 	}
 
-	public function Set(string $sSectionKey, string $sParamKey, $mParamValue) : void
+	public function Set(string $sSectionKey, string $sParamKey, $mParamValue): void
 	{
 		// Workarounds for the changed application structure
 		if ('webmail' === $sSectionKey) {
@@ -143,17 +138,17 @@ class Application extends \RainLoop\Config\AbstractConfig
 		parent::Set($sSectionKey, $sParamKey, $mParamValue);
 	}
 
-	public function SetPassword(\SnappyMail\SensitiveString $oPassword) : void
+	public function SetPassword(\SnappyMail\SensitiveString $oPassword): void
 	{
 		$this->Set('security', 'admin_password', \password_hash($oPassword, PASSWORD_DEFAULT));
 	}
 
-	public function ValidatePassword(\SnappyMail\SensitiveString $oPassword) : bool
+	public function ValidatePassword(\SnappyMail\SensitiveString $oPassword): bool
 	{
 		return \strlen($oPassword) && \password_verify($oPassword, $this->Get('security', 'admin_password', ''));
 	}
 
-	public function Save() : bool
+	public function Save(): bool
 	{
 		$this->Set('version', 'current', APP_VERSION);
 		$this->Set('version', 'saved', \gmdate('r'));
@@ -161,7 +156,7 @@ class Application extends \RainLoop\Config\AbstractConfig
 		return parent::Save();
 	}
 
-	protected function defaultValues() : array
+	protected function defaultValues(): array
 	{
 		$value = \ini_get('upload_max_filesize');
 		$upload_max_filesize = \intval($value);
@@ -231,6 +226,14 @@ Warning: only enable when server does not do this, else double compression error
 				'openpgp'                 => array(true),
 				'auto_verify_signatures'  => array(false),
 
+				'trusted_authserv_ids'    => array('', 'Which servers\' DKIM, SPF and DMARC results to believe,
+by authserv-id (the first field of an Authentication-Results header), separated by
+spaces or commas. A sender can add that header itself, so a result not tied to a
+server that handled the message says nothing.
+Empty: the authserv-id of the topmost header is taken as the local one. That covers
+the usual case, but a server which adds no results of its own leaves the sender\'s
+header as the topmost, so name your own id here if these results are shown.'),
+
 				'allow_admin_panel'       => array(true, 'Access settings'),
 				'admin_login'             => array('admin', 'Login and password for web admin panel'),
 				'admin_password'          => array(''),
@@ -297,7 +300,7 @@ When this value is gethostname, the gethostname() value is used.
 				'determine_user_language' => array(true, 'Detect language from browser header `Accept-Language`'),
 				'determine_user_domain' => array(false, 'Like default_domain but then HTTP_HOST/SERVER_NAME without www.'),
 
-				'sign_me_auto' => array(\RainLoop\Enumerations\SignMeType::DefaultOff,
+				'sign_me_auto' => array(\RainLoop\Enumerations\SignMeType::DefaultOff->value,
 					'This option allows webmail to remember the logged in user
 once they closed the browser window.
 
@@ -441,9 +444,9 @@ Enables caching in the system'),
 				'folders_spec_limit' => array(50),
 				'curl_proxy' => array(''),
 				'curl_proxy_auth' => array(''),
+				'curl_verify_peer' => array(true),
 				'custom_login_link' => array(''),
 				'custom_logout_link' => array(''),
-				'http_client_ip_check_proxy' => array(false),
 				'use_local_proxy_for_external_images' => array(true),
 				'image_exif_auto_rotate' => array(false),
 				'cookie_default_path' => array(''),

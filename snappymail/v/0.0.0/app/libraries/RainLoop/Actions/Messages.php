@@ -335,7 +335,7 @@ trait Messages
 				$oToCollection = $oMessage->GetTo();
 				if ($oToCollection) {
 					foreach ($oToCollection as /* @var $oEmail \MailSo\Mime\Email */ $oEmail) {
-						$aArrayToFrec[$oEmail->GetEmail(true)] = $oEmail->ToString(false, true);
+						$aArrayToFrec[$oEmail->GetEmailUtf8()] = $oEmail->ToString(false, true);
 					}
 				}
 
@@ -797,7 +797,7 @@ trait Messages
 			$oAccount->SmtpConnectAndLogin($this->Plugins(), $oSmtpClient);
 
 			if ($oSmtpClient->Settings->usePhpMail) {
-				if (!$sFrom || !\MailSo\Base\Utils::FunctionCallable('mail')) {
+				if (!$sFrom || !\function_exists('mail')) {
 					throw new ClientException(Notifications::CantSendMessage);
 				}
 				$oToCollection = $oMessage->GetTo();
@@ -1012,7 +1012,7 @@ trait Messages
 		}
 
 		if (!empty($this->GetActionParam('markAsImportant', 0))) {
-			$oMessage->SetPriority(\MailSo\Mime\Enumerations\MessagePriority::HIGH);
+			$oMessage->SetPriority(\MailSo\Mime\Enumerations\MessagePriority::Highest);
 		}
 
 		$oMessage->SetSubject($this->GetActionParam('subject', ''));
@@ -1143,7 +1143,7 @@ trait Messages
 
 					$oMessage->Attachments()->append(
 						new \MailSo\Mime\Attachment($rResource, $sFileName, $iFileSize, $bIsInline,
-							\in_array(trim(trim($sCID), '<>'), $aFoundCids),
+							\in_array(\trim(\trim($sCID), '<>'), $aFoundCids),
 							$sCID, array(), $sContentLocation, $sMimeType
 						)
 					);
@@ -1255,6 +1255,7 @@ trait Messages
 			$oPart->SubParts->append($oSignaturePart);
 		} else {
 			$sCertificate = $this->GetActionParam('signCertificate', '');
+			$sCertificateChain = $this->GetActionParam('signCertificateChain', '');
 			$sPrivateKey = $this->GetActionParam('signPrivateKey', '');
 			if ('S/MIME' === $this->GetActionParam('sign', '')) {
 				$sID = $this->GetActionParam('identityID', '');
@@ -1263,6 +1264,7 @@ trait Messages
 					 && ($oIdentity->Id() === $sID || $oIdentity->Email() === $oFrom->GetEmail())
 					) {
 						$sCertificate = $oIdentity->smimeCertificate;
+						$sCertificateChain = $oIdentity->smimeCertificateChain;
 						$sPrivateKey = $oIdentity->smimeKey;
 						break;
 					}
@@ -1303,6 +1305,7 @@ trait Messages
 
 				$SMIME = $this->SMIME();
 				$SMIME->setCertificate($sCertificate);
+				$SMIME->setCertificateChain($sCertificateChain);
 				$SMIME->setPrivateKey($sPrivateKey, $oPassphrase);
 				$sSignature = $SMIME->sign($tmp, $detached);
 

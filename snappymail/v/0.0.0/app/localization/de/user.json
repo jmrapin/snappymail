@@ -27,6 +27,8 @@
 		"USERNAME": "Nutzername",
 		"PASSWORD": "Passwort",
 		"REMEMBER": "Zugangsdaten merken",
+		"REMEMBER_FOR_SESSION": "Aktuelle Sitzung merken",
+		"REMEMBER_PERMANENT": "Dauerhaft merken",
 		"REPLY_TO": "Antwort an",
 		"SAVE": "Speichern",
 		"SAVE_CHANGES": "Änderungen speichern?",
@@ -331,6 +333,7 @@
 	"SMIME": {
 		"POPUP_IMPORT_TITLE": "S\/MIME-Zertifikat importieren",
 		"CERTIFICATE": "Zertifikat",
+		"CERTIFICATECHAIN": "Zwischenzertifikat(e)",
 		"CERTIFICATES": "S\/MIME-Zertifikate",
 		"SIGNED_MESSAGE": "S\/MIME-signierte Nachricht",
 		"ENCRYPTED_MESSAGE": "S\/MIME-verschlüsselte Nachricht",
@@ -458,7 +461,8 @@
 		"LEGEND_SECURITY": "Sicherheit",
 		"LABEL_AUTOLOGOUT": "Automatische Abmeldung",
 		"FORGET_KEY_PASS": "Passphrase für privaten Schlüssel vergessen",
-		"NEVER": "Nie"
+		"NEVER": "Nie",
+		"LABEL_STORED_PASS": "Passphrase gespeichert"
 	},
 	"SETTINGS_GENERAL": {
 		"LANGUAGE": "Sprache",
@@ -495,6 +499,7 @@
 		"CHROME_NOTIFICATION_DESC_DENIED": "(Vom Browser blockiert)",
 		"COLLAPSE_BLOCKQUOTES": "zitierten Text ausblenden",
 		"MAX_QUOTE_LEVEL": "Maximal sichtbare Ebenen von zitiertem Text",
+		"MIN_FONT_SIZE": "Minimum Font Size",
 		"LIST_INLINE_ATTACHMENTS": "Inline-Anhänge in der Liste anzeigen",
 		"LIST_SIMPLE_ATTACHMENTS": "Vereinfachte Liste der Anhänge",
 		"LIST_MESSAGES_GROUPED": "Nachrichten bei Sortierung nach Datum oder Absender gruppieren",

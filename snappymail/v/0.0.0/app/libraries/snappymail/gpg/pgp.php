@@ -50,7 +50,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 		// How to use gpgme-json ?
 		$this->binary = static::findBinary('gpg');
 
-		$info = \preg_replace('/\R +/', ' ', (string) \shell_exec("{$this->binary} --with-colons --list-config"));
+		$info = \preg_replace('/\R +/', ' ', \shell_exec(\escapeshellcmd($this->binary) . ' --with-colons --list-config'));
 		if (\preg_match('/cfg:version:([0-9]+\\.[0-9]+\\.[0-9]+)/', $info, $match)) {
 			$this->version = $match[1];
 		}
@@ -71,7 +71,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 		}
 	}
 
-	public static function isSupported() : bool
+	public static function isSupported(): bool
 	{
 		return parent::isSupported() && static::findBinary('gpg');
 	}
@@ -99,7 +99,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Decrypts a given text
 	 */
-	public function decrypt(string $text) /*: string|false */
+	public function decrypt(string $text): string|false
 	{
 		return $this->_decrypt($text);
 	}
@@ -107,7 +107,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Decrypts a given file
 	 */
-	public function decryptFile(string $filename) /*: string|false */
+	public function decryptFile(string $filename): string|false
 	{
 		$fp = \fopen($filename, 'rb');
 		try {
@@ -123,7 +123,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Decrypts a given stream
 	 */
-	public function decryptStream($fp, /*string|resource*/ $output = null) /*: string|false*/
+	public function decryptStream($fp, /*string|resource*/ $output = null): string|false
 	{
 		if (!$fp || !\is_resource($fp)) {
 			throw new \Exception('Invalid stream resource');
@@ -135,7 +135,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Decrypts and verifies a given text
 	 */
-	public function decryptVerify(string $text, string &$plaintext) /*: array|false*/
+	public function decryptVerify(string $text, string &$plaintext): array|false
 	{
 		// TODO: https://github.com/the-djmaze/snappymail/issues/89
 		return false;
@@ -144,7 +144,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Decrypts and verifies a given file
 	 */
-	public function decryptVerifyFile(string $filename, string &$plaintext) /*: array|false*/
+	public function decryptVerifyFile(string $filename, string &$plaintext): array|false
 	{
 		// TODO: https://github.com/the-djmaze/snappymail/issues/89
 		return false;
@@ -175,7 +175,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Encrypts a given text
 	 */
-	public function encrypt(string $plaintext, /*string|resource*/ $output = null) /*: string|false*/
+	public function encrypt(string $plaintext, /*string|resource*/ $output = null): string|false
 	{
 		return $this->_encrypt($plaintext, $output);
 	}
@@ -183,7 +183,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Encrypts a given text
 	 */
-	public function encryptFile(string $filename, /*string|resource*/ $output = null) /*: string|false*/
+	public function encryptFile(string $filename, /*string|resource*/ $output = null): string|false
 	{
 		$fp = \fopen($filename, 'rb');
 		try {
@@ -196,7 +196,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 		}
 	}
 
-	public function encryptStream(/*resource*/ $fp, /*string|resource*/ $output = null) /*: string|false*/
+	public function encryptStream(/*resource*/ $fp, /*string|resource*/ $output = null): string|false
 	{
 		if (!$fp || !\is_resource($fp)) {
 			throw new \Exception('Invalid stream resource');
@@ -208,7 +208,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Encrypts and signs a given text
 	 */
-	public function encryptSign(string $plaintext) /*: string|false*/
+	public function encryptSign(string $plaintext): string|false
 	{
 		return false;
 	}
@@ -216,7 +216,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Encrypts and signs a given text
 	 */
-	public function encryptSignFile(string $filename) /*: string|false*/
+	public function encryptSignFile(string $filename): string|false
 	{
 		return false;
 	}
@@ -224,7 +224,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Exports a public or private key
 	 */
-	public function export(string $fingerprint, ?SensitiveString $passphrase = null) /*: string|false*/
+	public function export(string $fingerprint, ?SensitiveString $passphrase = null): string|false
 	{
 //		\SnappyMail\Log::debug('GnuPG', "export({$fingerprint}, {$passphrase})");
 		$private = null !== $passphrase;
@@ -246,7 +246,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Returns the errortext, if a function fails
 	 */
-	public function getError() /*: string|false*/
+	public function getError(): string|false
 	{
 		return false;
 	}
@@ -254,7 +254,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Returns the error info
 	 */
-	public function getErrorInfo() : array
+	public function getErrorInfo(): array
 	{
 		return [];
 	}
@@ -262,7 +262,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Returns the currently active protocol for all operations
 	 */
-	public function getProtocol() : int
+	public function getProtocol(): int
 	{
 		return 0; // GPGME_PROTOCOL_OpenPGP
 	}
@@ -272,7 +272,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	 * Also saves revocation certificate in {homedir}/openpgp-revocs.d/
 	 * https://www.gnupg.org/documentation/manuals/gnupg/OpenPGP-Key-Management.html
 	 */
-	public function generateKey(string $uid, SensitiveString $passphrase) /*: string|false*/
+	public function generateKey(string $uid, SensitiveString $passphrase): string|false
 	{
 		$settings = new PGPKeySettings;
 		$settings->name = $uid;
@@ -338,7 +338,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 		return $fingerprint;
 	}
 
-	protected function _importKey($input) /*: array|false*/
+	protected function _importKey($input): array|false
 	{
 		$arguments = ['--import'];
 
@@ -374,7 +374,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Imports a key
 	 */
-	public function import(string $keydata) /*: array|false*/
+	public function import(string $keydata): array|false
 	{
 		if (!$keydata) {
 			throw new \Exception('No valid input data found.');
@@ -385,7 +385,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Imports a key
 	 */
-	public function importFile(string $filename) /*: array|false*/
+	public function importFile(string $filename): array|false
 	{
 		$fp = \fopen($filename, 'rb');
 		try {
@@ -398,7 +398,12 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 		}
 	}
 
-	public function deleteKey(string $keyId, bool $private) : bool
+	/**
+	 * Import remote key from WKD
+		gpg --auto-key-locate clear,wkd --locate-keys releases@snappymail.eu
+	 */
+
+	public function deleteKey(string $keyId, bool $private): bool
 	{
 		$key = $this->keyInfo($keyId, $private);
 		if (!$key) {
@@ -425,13 +430,12 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Returns an array with information about all keys that matches the given pattern
 	 */
-	public function keyInfo(string $pattern, bool $private = false) : array
+	public function keyInfo(string $pattern, bool $private = false): array
 	{
 		// According to The file 'doc/DETAILS' in the GnuPG distribution, using
 		// double '--with-fingerprint' also prints the fingerprint for subkeys.
 		$arguments = [
 			'--with-colons',
-			'--with-fingerprint',
 			'--with-fingerprint',
 			'--fixed-list-mode',
 			$private ? '--list-secret-keys' : '--list-public-keys'
@@ -441,7 +445,14 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 			$arguments[] = \escapeshellarg($pattern);
 		}
 
-		$result = $this->exec($arguments);
+		$result = null;
+		try {
+			$result = $this->exec($arguments);
+		} catch (\RuntimeException $e) {
+			if (!\str_contains($e->getMessage(), 'No public key')) {
+				throw $e;
+			}
+		}
 
 		$keys   = [];
 		if ($result) {
@@ -554,20 +565,20 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Returns an array with information about all keys that matches the given pattern
 	 */
-	public function allKeysInfo(string $pattern) : array
+	public function allKeysInfo(string $pattern): array
 	{
 		$keys = [
 			'public' => [],
 			'private' => []
 		];
 		// Public
-		foreach (($this->keyinfo($pattern) ?: []) as $key) {
+		foreach (($this->keyInfo($pattern) ?: []) as $key) {
 			$key['can_verify'] = $key['can_sign'];
 			unset($key['can_sign']);
 			$keys['public'][] = $key;
 		}
 		// Private, read https://github.com/php-gnupg/php-gnupg/issues/5
-		foreach (($this->keyinfo($pattern, 1) ?: []) as $key) {
+		foreach (($this->keyInfo($pattern, 1) ?: []) as $key) {
 			$key['can_decrypt'] = $key['can_encrypt'];
 			unset($key['can_encrypt']);
 			$keys['private'][] = $key;
@@ -580,7 +591,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	 * GNUPG_ERROR_WARNING, GNUPG_ERROR_EXCEPTION and GNUPG_ERROR_SILENT.
 	 * By default GNUPG_ERROR_SILENT is used.
 	 */
-	public function setErrorMode(int $errormode) : void
+	public function setErrorMode(int $errormode): void
 	{
 	}
 
@@ -589,13 +600,13 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	 * GNUPG_SIG_MODE_NORMAL, GNUPG_SIG_MODE_DETACH, GNUPG_SIG_MODE_CLEAR
 	 * By default GNUPG_SIG_MODE_CLEAR
 	 */
-	public function setSignMode(int $signmode) : bool
+	public function setSignMode(int $signmode): bool
 	{
 		$this->signmode = $signmode;
 		return true;
 	}
 
-	protected function _sign(/*string|resource*/ $input, /*string|resource*/ $output = null, bool $textmode = true) /*: string|false*/
+	protected function _sign(/*string|resource*/ $input, /*string|resource*/ $output = null, bool $textmode = true): string|false
 	{
 		if (empty($this->pinentries)) {
 			throw new \Exception('No signing keys specified.');
@@ -639,7 +650,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Signs a given text
 	 */
-	public function sign(string $plaintext, /*string|resource*/ $output = null) /*: string|false*/
+	public function sign(string $plaintext, /*string|resource*/ $output = null): string|false
 	{
 		return $this->_sign($plaintext, $output);
 	}
@@ -647,7 +658,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Signs a given file
 	 */
-	public function signFile(string $filename, /*string|resource*/ $output = null) /*: string|false*/
+	public function signFile(string $filename, /*string|resource*/ $output = null): string|false
 	{
 		$fp = \fopen($filename, 'rb');
 		try {
@@ -663,7 +674,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Signs a given file
 	 */
-	public function signStream($fp, /*string|resource*/ $output = null) /*: string|false*/
+	public function signStream($fp, /*string|resource*/ $output = null): string|false
 	{
 		if (!$fp || !\is_resource($fp)) {
 			throw new \Exception('Invalid stream resource');
@@ -672,7 +683,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 		return $this->_sign($fp, $output);
 	}
 
-	protected function _verify($input, string $signature) /*: array|false*/
+	protected function _verify($input, string $signature): array|false
 	{
 		$arguments = ['--verify'];
 		if ($signature) {
@@ -739,7 +750,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Verifies a signed text
 	 */
-	public function verify(string $signed_text, string $signature, ?string &$plaintext = null) /*: array|false*/
+	public function verify(string $signed_text, string $signature, ?string &$plaintext = null): array|false
 	{
 		return $this->_verify($signed_text, $signature);
 	}
@@ -747,7 +758,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Verifies a signed file
 	 */
-	public function verifyFile(string $filename, string $signature, ?string &$plaintext = null) /*: array|false*/
+	public function verifyFile(string $filename, string $signature, ?string &$plaintext = null): array|false
 	{
 		$fp = \fopen($filename, 'rb');
 		try {
@@ -763,7 +774,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Verifies a signed file
 	 */
-	public function verifyStream($fp, string $signature, ?string &$plaintext = null) /*: array|false*/
+	public function verifyStream($fp, string $signature, ?string &$plaintext = null): array|false
 	{
 		if (!$fp || !\is_resource($fp)) {
 			throw new \Exception('Invalid stream resource');
@@ -772,7 +783,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 		return $this->_verify($fp, $signature);
 	}
 
-	public function getEncryptedMessageKeys(/*string|resource*/ $data) : array
+	public function getEncryptedMessageKeys(/*string|resource*/ $data): array
 	{
 		$this->_debug('BEGIN DETECT MESSAGE KEY IDs');
 		$this->setInput($data);
@@ -803,7 +814,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 		return $output ? true : ($result ? $result['output'] : false);
 	}
 
-	private function exec(array $arguments, bool $throw = true) /*: array|false*/
+	private function exec(array $arguments, bool $throw = true): array|false
 	{
 		if (\version_compare($this->version, '2.2.5', '<')) {
 			\SnappyMail\Log::error('GPG', "{$this->version} too old");

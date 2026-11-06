@@ -34,7 +34,9 @@ class Certificate
 	 * A string having the format file://path/to/cert.pem; the named file must contain a PEM encoded certificate
 	 * A string containing the content of a certificate, PEM encoded, may start with -----BEGIN CERTIFICATE-----
 	 */
-	function __construct($x509cert = null, $privateKey = null)
+	function __construct(\OpenSSLCertificate|string $x509cert = null,
+		#[\SensitiveParameter]
+		\OpenSSLAsymmetricKey|\OpenSSLCertificate|array|string $privateKey = null)
 	{
 		if ($x509cert) {
 			$x509cert = \openssl_x509_read($x509cert);
@@ -55,7 +57,7 @@ class Certificate
 	/**
 	 * Verifies if a certificate can be used for a particular purpose
 	 */
-	public function checkPurpose(int $purpose, array $cainfo = array(), ?string $untrustedfile = null)/*: bool|int*/
+	public function checkPurpose(int $purpose, array $cainfo = array(), ?string $untrustedfile = null): bool|int
 	{
 		if ($this->x509) {
 			return \openssl_x509_checkpurpose($this->x509, $purpose, $cainfo, $untrustedfile);
@@ -63,14 +65,14 @@ class Certificate
 		return false;
 	}
 
-	public function canSign() : bool
+	public function canSign(): bool
 	{
 		return $this->x509
 			? true === \openssl_x509_checkpurpose($this->x509, \X509_PURPOSE_SMIME_SIGN)
 			: false;
 	}
 
-	public function canEncrypt() : bool
+	public function canEncrypt(): bool
 	{
 		return $this->x509
 			? true === \openssl_x509_checkpurpose($this->x509, \X509_PURPOSE_SMIME_ENCRYPT)
@@ -80,7 +82,7 @@ class Certificate
 	/**
 	 * Returns the certificate in a PEM encoded format string
 	 */
-	public function export(bool $notext = true) : ?string
+	public function export(bool $notext = true): ?string
 	{
 		if ($this->x509) {
 			$output = '';
@@ -94,7 +96,7 @@ class Certificate
 	/**
 	 * Returns the fingerprint or digest of the certificate
 	 */
-	public function fingerprint(string $hash_algorithm = 'sha1', bool $raw_output = false)/*: string|bool*/
+	public function fingerprint(string $hash_algorithm = 'sha1', bool $raw_output = false): string|bool
 	{
 		return $this->x509 ? \openssl_x509_fingerprint($this->x509, $hash_algorithm, $raw_output) : false;
 	}
@@ -102,17 +104,17 @@ class Certificate
 	/**
 	 * Returns the certificate information as an array
 	 */
-	public function info(bool $shortnames = true) /*: array|bool*/
+	public function info(bool $shortnames = true): array|bool
 	{
 		return $this->x509 ? \openssl_x509_parse($this->x509, $shortnames) : false;
 	}
 
-	public static function getCipherMethods(bool $aliases = false) : array
+	public static function getCipherMethods(bool $aliases = false): array
 	{
 		return \openssl_get_cipher_methods($aliases);
 	}
 
-	public function createSelfSigned(\SnappyMail\SensitiveString $passphrase, ?string $privateKey = null) : array
+	public function createSelfSigned(\SnappyMail\SensitiveString $passphrase, ?string $privateKey = null): array
 	{
 		$options = array(
 			'config'             => __DIR__ . '/openssl.cnf',
@@ -175,7 +177,7 @@ class Certificate
 		#[\SensitiveParameter]
 		string $pass = '',
 		array $args = array()
-	) : string
+	): string
 	{
 		$out = '';
     	\openssl_pkcs12_export($this->x509, $out, $this->pkey, $pass, $args);
