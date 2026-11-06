@@ -1,4 +1,6 @@
 import ko from 'ko';
+import * as Local from 'Storage/Client';
+import { ClientSideKeyNameLeftPanelDisabled } from 'Common/EnumsUser';
 
 let keyScopeFake = 'all';
 
@@ -22,7 +24,11 @@ export const
 	dropdownVisibility = ko.observable(false).extend({ rateLimit: 0 }),
 
 	leftPanelDisabled = ko.observable(false),
-	toggleLeftPanel = () => leftPanelDisabled(!leftPanelDisabled()),
+	toggleLeftPanel = () => {
+		leftPanelDisabled(!leftPanelDisabled());
+		// remember the user's choice, see ThemeStore.populate()
+		Local.set(ClientSideKeyNameLeftPanelDisabled, leftPanelDisabled());
+	},
 
 	createElement = (name, attr) => {
 		let el = doc.createElement(name);

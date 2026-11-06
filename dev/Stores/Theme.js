@@ -4,6 +4,8 @@ import { isArray, arrayLength } from 'Common/Utils';
 import { cssLink, serverRequestRaw } from 'Common/Links';
 import { SaveSettingStatus } from 'Common/Enums';
 import { addSubscribablesTo } from 'External/ko';
+import * as Local from 'Storage/Client';
+import { ClientSideKeyNameLeftPanelDisabled } from 'Common/EnumsUser';
 
 let __themeTimer = 0;
 
@@ -39,7 +41,7 @@ export const
 		ThemeStore.fontSerif(SettingsGet('fontSerif'));
 		ThemeStore.fontMono(SettingsGet('fontMono'));
 
-		leftPanelDisabled(ThemeStore.isMobile());
+		leftPanelDisabled(ThemeStore.isMobile() || !!Local.get(ClientSideKeyNameLeftPanelDisabled));
 	},
 
 	changeTheme = (value, themeTrigger = ()=>0) => {

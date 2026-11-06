@@ -63,6 +63,7 @@ ClientSideKeyNameMessageListSize = 5,
 ClientSideKeyNameLastSignMe = 7,
 ClientSideKeyNameMessageHeaderFullInfo = 9,
 ClientSideKeyNameMessageAttachmentControls = 10,
+ClientSideKeyNameLeftPanelDisabled = 11,
 
 /**
  * @enum {number}

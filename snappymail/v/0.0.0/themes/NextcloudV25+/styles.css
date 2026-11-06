@@ -1384,6 +1384,70 @@ html.rl-left-panel-disabled #rl-app .b-folders .b-folders-system a.selectable {
 	text-overflow: clip;
 }
 
+/* Collapsed folder panel: system folder icons only, unread count as a corner badge */
+html.rl-left-panel-disabled #rl-app #rl-left .b-content {
+	opacity: 1;
+	overflow-x: hidden;
+	min-width: 0;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+html.rl-left-panel-disabled #rl-app .b-folders .b-folders-system a.selectable {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	margin: 2px auto;
+	padding: 0;
+	font-size: 0;
+}
+
+html.rl-left-panel-disabled #rl-app .b-folders .b-toolbar .btn.buttonCompose {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box !important;
+	width: 44px;
+	min-width: 44px;
+	max-width: none;
+	height: 44px;
+	max-height: none;
+	margin: 3px auto !important;
+	padding: 0;
+	line-height: 1;
+	text-overflow: clip;
+}
+
+html.rl-left-panel-disabled #rl-app .b-folders .b-toolbar .btn.buttonCompose i {
+	margin: 0;
+	font-size: 18px;
+}
+
+html.rl-left-panel-disabled #rl-app .b-folders .b-folders-system a.selectable::before {
+	margin: 0;
+	font-size: 18px;
+}
+
+html.rl-left-panel-disabled #rl-app .b-folders .b-folders-system a[data-unread]::after {
+	top: 2px;
+	right: 0;
+	transform: none;
+	min-width: 0;
+	padding: 0 4px;
+	font-size: 10px;
+	line-height: 16px;
+}
+
+html.rl-left-panel-disabled #rl-app .b-folders .b-folders-system .flag-icon,
+html.rl-left-panel-disabled #rl-app .b-folders hr,
+html.rl-left-panel-disabled #rl-app .b-folders .search-input-wrp,
+html.rl-left-panel-disabled #rl-app .b-folders .e-checkbox,
+html.rl-left-panel-disabled #rl-app .b-folders .b-folders-user {
+	display: none;
+}
+
 #rl-app .b-folders hr {
 	border-top: solid var(--nc-color-main-text);
 	border-radius: var(--nc-border-radius-large);

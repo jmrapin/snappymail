@@ -514,7 +514,9 @@ class ServiceActions
 			$bCacheEnabled = !$bAppDebug && $this->Config()->Get('cache', 'system_data', true);
 			$sCacheFileName = '';
 			if ($bCacheEnabled) {
-				$sCacheFileName = '/CssCache/'.$this->oActions->Plugins()->Hash().'/'.$sTheme.'/'.APP_VERSION.'/' . $sMinify;
+				// include the theme file time so edits to the theme refresh the cache
+				$sCacheFileName = '/CssCache/'.$this->oActions->Plugins()->Hash().'/'.$sTheme.'/'.APP_VERSION.'/' . $sMinify
+					. '/' . @\filemtime(APP_VERSION_ROOT_PATH.'themes/'.$sTheme.'/styles.css');
 				$this->oActions->verifyCacheByKey(\md5($sCacheFileName . ($bJson ? 1 : 0)));
 				$sResult = $this->Cacher()->Get($sCacheFileName);
 			}

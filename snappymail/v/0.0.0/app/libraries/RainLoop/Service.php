@@ -191,7 +191,9 @@ abstract class Service
 					$sAppJsMin,
 					$sAppCssMin,
 					$aTemplateParameters,
-					APP_VERSION
+					APP_VERSION,
+					// theme CSS is inlined into the cached template, so refresh it when the theme changes
+					@\filemtime(APP_VERSION_ROOT_PATH.'themes/'.$sThemeName.'/styles.css')
 				))
 			);
 
