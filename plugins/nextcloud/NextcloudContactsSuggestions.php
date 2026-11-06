@@ -20,7 +20,10 @@ class NextcloudContactsSuggestions implements \RainLoop\Providers\Suggestions\IS
 				return [];
 			}
 
-			$cm = \OC::$server->getContactsManager();
+			$cm = \method_exists(\OC::$server, 'getContactsManager')
+				? \OC::$server->getContactsManager()
+				// Nextcloud 34+
+				: \OCP\Server::get(\OCP\Contacts\IManager::class);
 			if (!$cm || !$cm->isEnabled()) {
 				return [];
 			}
@@ -70,7 +73,7 @@ class NextcloudContactsSuggestions implements \RainLoop\Providers\Suggestions\IS
 				return \array_slice(\array_values($aResult), 0, $iInputLimit);
 			}
 		}
-		catch (\Exception $oException)
+		catch (\Throwable $oException)
 		{
 			$this->logException($oException);
 		}
