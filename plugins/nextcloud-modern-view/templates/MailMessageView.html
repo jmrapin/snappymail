@@ -23,7 +23,7 @@
 		<a class="mv-btn" data-bind="command: moveCommand" data-i18n="[title]GLOBAL/MOVE_TO"><i class="mi mi-drive-file-move"></i></a>
 	</div>
 	<span class="mv-spacer"></span>
-	<div class="mv-group">
+	<div class="mv-group" data-bind="visible: message">
 		<a class="mv-btn buttonUp" data-bind="command: goUpCommand"><i class="mi mi-chevron-left"></i></a>
 		<a class="mv-btn buttonDown" data-bind="command: goDownCommand"><i class="mi mi-chevron-right"></i></a>
 	</div>
@@ -52,32 +52,44 @@
 					<a target="_blank" href="#" tabindex="-1" data-bind="attr: { href: firstUnsubsribeLink }"><i class="mi mi-unsubscribe"></i><span data-i18n="MESSAGE/BUTTON_UNSUBSCRIBE"></span></a>
 				</li>
 			</div>
-			<div data-bind="with: message" class="dividerbar">
+			<!-- ko if: tagsAllowed -->
+			<div class="dividerbar mv-menu-tags">
+				<!-- ko foreach: message()?.tagOptions() || [] -->
 				<li role="presentation">
-					<a href="#" tabindex="-1" data-bind="click: printMessage"><i class="mi mi-print"></i><span data-i18n="MESSAGE/MENU_PRINT"></span></a>
+					<a href="#" tabindex="-1" data-bind="click: toggle, attr: { title: value }"><i class="mi" data-bind="css: checked ? 'mi-check-box' : 'mi-check-box-outline-blank'"></i><span data-bind="text: label, attr: { class: css }"></span></a>
 				</li>
+				<!-- /ko -->
 				<li role="presentation">
-					<a href="#" tabindex="-1" data-bind="click: popupMessage"><i class="mi mi-open-in-new"></i><span data-i18n="MESSAGE/BUTTON_IN_NEW_WINDOW"></span></a>
-				</li>
-				<li role="presentation" data-bind="visible: html() && !isHtml()">
-					<a href="#" tabindex="-1" data-bind="click: viewHtml"><i class="mi mi-visibility"></i><span data-i18n="MESSAGE/HTML_VIEW"></span></a>
-				</li>
-				<li role="presentation" data-bind="visible: isHtml()">
-					<a href="#" tabindex="-1" data-bind="click: viewPlain"><i class="mi mi-article"></i><span data-i18n="MESSAGE/PLAIN_VIEW"></span></a>
-				</li>
-				<li role="presentation">
-					<a href="#" tabindex="-1" data-bind="click: swapColors"><i class="mi mi-visibility"></i><span data-i18n="MESSAGE/SWAP_COLORS"></span></a>
-				</li>
-				<li role="presentation">
-					<a href="#" tabindex="-1" data-bind="click: $root.toggleFullScreen"><i class="mi mi-fullscreen"></i><span data-i18n="SHORTCUTS_HELP/LABEL_FULLSCREEN_TOGGLE"></span></a>
+					<a href="#" tabindex="-1" data-bind="click: newTag"><i class="mi mi-label"></i><span data-bind="text: rl.i18n('MESSAGE/NEW_TAG')"></span></a>
 				</li>
 			</div>
-			<div data-bind="with: message" class="dividerbar">
+			<!-- /ko -->
+			<div class="dividerbar">
 				<li role="presentation">
-					<a target="_blank" href="#" tabindex="-1" data-bind="attr: { href: viewRaw() }"><i class="mi mi-code"></i><span data-i18n="MESSAGE/MENU_VIEW_ORIGINAL"></span></a>
+					<a href="#" tabindex="-1" data-bind="click: () => message()?.printMessage()"><i class="mi mi-print"></i><span data-i18n="MESSAGE/MENU_PRINT"></span></a>
 				</li>
 				<li role="presentation">
-					<a target="_blank" href="#" tabindex="-1" data-bind="attr: { href: downloadLink() }"><i class="mi mi-download"></i><span data-i18n="MESSAGE/MENU_DOWNLOAD_ORIGINAL"></span></a>
+					<a href="#" tabindex="-1" data-bind="click: () => message()?.popupMessage()"><i class="mi mi-open-in-new"></i><span data-i18n="MESSAGE/BUTTON_IN_NEW_WINDOW"></span></a>
+				</li>
+				<li role="presentation" data-bind="visible: message()?.html() && !message()?.isHtml()">
+					<a href="#" tabindex="-1" data-bind="click: () => message()?.viewHtml()"><i class="mi mi-visibility"></i><span data-i18n="MESSAGE/HTML_VIEW"></span></a>
+				</li>
+				<li role="presentation" data-bind="visible: message()?.isHtml()">
+					<a href="#" tabindex="-1" data-bind="click: () => message()?.viewPlain()"><i class="mi mi-article"></i><span data-i18n="MESSAGE/PLAIN_VIEW"></span></a>
+				</li>
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="click: () => message()?.swapColors()"><i class="mi mi-visibility"></i><span data-i18n="MESSAGE/SWAP_COLORS"></span></a>
+				</li>
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="click: toggleFullScreen"><i class="mi mi-fullscreen"></i><span data-i18n="SHORTCUTS_HELP/LABEL_FULLSCREEN_TOGGLE"></span></a>
+				</li>
+			</div>
+			<div class="dividerbar">
+				<li role="presentation">
+					<a target="_blank" href="#" tabindex="-1" data-bind="attr: { href: message()?.viewRaw() }"><i class="mi mi-code"></i><span data-i18n="MESSAGE/MENU_VIEW_ORIGINAL"></span></a>
+				</li>
+				<li role="presentation">
+					<a target="_blank" href="#" tabindex="-1" data-bind="attr: { href: message()?.downloadLink() }"><i class="mi mi-download"></i><span data-i18n="MESSAGE/MENU_DOWNLOAD_ORIGINAL"></span></a>
 				</li>
 			</div>
 		</menu>
@@ -97,101 +109,65 @@
 
 	<div class="b-message" data-bind="visible: message, i18nUpdate: message, css: message()?.lineAsCss(0)">
 
-		<div class="messageItemHeader" data-bind="if: message, i18nUpdate: message">
-			<div class="subjectParent">
-				<span class="infoParent g-ui-user-select-none fontastic" data-bind="click: toggleFullInfo">ℹ</span>
-				<span class="flagParent g-ui-user-select-none flagOff fontastic" data-bind="text: message().isFlagged() ? '★' : '☆', css: {flagOn: message().isFlagged(), flagOff: !message().isFlagged()}"></span>
-				<span class="subject" data-bind="text: message().subject"></span>
+		<div class="messageItemHeader mv-header" data-bind="if: message, i18nUpdate: message">
+			<div class="subjectParent mv-subject-row">
+				<span class="subject mv-subject" data-bind="text: message().subject, attr: { title: message().subject }"></span>
+				<span class="mv-subject-icons">
+					<span class="mv-shield" tabindex="0" data-bind="visible: mvAuth().show, css: mvAuth().level">
+						<i class="mi" data-bind="css: mvAuth().icon"></i>
+						<span class="mv-shield-panel">
+							<span class="mv-shield-head" data-bind="text: mvAuth().head"></span>
+							<!-- ko if: mvAuth().local -->
+							<span class="mv-shield-row"><b class="mv-y">✔</b><span class="mv-wide" data-bind="text: rl.i18n('MODERN_VIEW/DELIVERED_LOCALLY')"></span></span>
+							<!-- /ko -->
+							<!-- ko foreach: mvAuth().rows -->
+							<span class="mv-shield-row" data-bind="attr: { title: title }"><b data-bind="text: mark, css: cls"></b><span data-bind="text: name"></span><span class="mv-why" data-bind="text: why"></span></span>
+							<!-- /ko -->
+						</span>
+					</span>
+					<span class="flagParent mv-star" data-bind="css: { flagOn: message().isFlagged() }"><i class="mi" data-bind="css: message().isFlagged() ? 'mi-star-fill' : 'mi-star'"></i></span>
+				</span>
 			</div>
-			<div class="informationShort">
-				<span class="from" data-bind="html: viewFromShort, attr:{ title: message().from }"></span>
-				<!-- ko if: localDelivery -->
-				<i class="fontastic">✅</i>
+			<div class="mv-from">
+				<span class="mv-name" data-bind="text: mvFromName, attr: { title: message().from }"></span>
+				<span class="mv-addr" data-bind="text: mvFromAddr, visible: mvFromAddr"></span>
+			</div>
+			<time class="mv-date" data-time-format="AUTO" data-bind="visible: 0 < message().dateTimestamp(), time: message().dateTimestamp()"></time>
+			<div class="mv-to">
+				<!-- ko if: message().to.length -->
+				<span class="mv-k" data-i18n="GLOBAL/TO"></span>
+				<span class="mv-recips" data-bind="text: message().to, attr: { title: message().to }"></span>
 				<!-- /ko -->
-				<!-- ko ifnot: localDelivery -->
-				<i class="fontastic" data-bind="text: dkimIcon, css: dkimIconClass, attr:{ title: dkimTitle }"></i>
-				<i class="fontastic" data-bind="text: dmarcIcon, css: dmarcIconClass, attr:{ title: dmarcTitle }"></i>
-				<i class="fontastic" data-bind="text: spfIcon, css: spfIconClass, attr:{ title: spfTitle }"></i>
-				<!-- /ko -->
+				<a href="#" class="mv-details-toggle" data-bind="click: toggleFullInfo, css: { open: showFullInfo }">
+					<i class="mi mi-keyboard-arrow-down"></i>
+					<span data-bind="hidden: showFullInfo" data-i18n="MODERN_VIEW/DETAILS"></span>
+					<span data-bind="visible: showFullInfo" data-i18n="MODERN_VIEW/HIDE_DETAILS"></span>
+				</a>
 			</div>
 		</div>
 		<div id="messageItem">
-			<div class="messageItemHeader" data-bind="if: message, i18nUpdate: message">
-				<div data-bind="hidden: showFullInfo">
-					<time class="date" data-time-format="FULL" data-bind="visible: 0 < message().dateTimestamp(), time: message().dateTimestamp()"></time>
-					<div class="informationShortWrp">
-						<div class="informationShort" data-bind="visible: message().to.length">
-							<span data-i18n="GLOBAL/TO"></span>:
-							<span data-bind="text: message().to"></span>
-						</div>
-						<div class="informationShort" data-bind="visible: message().cc.length">
-							<span data-i18n="GLOBAL/CC"></span>:
-							<span data-bind="text: message().cc"></span>
-						</div>
-					</div>
-					<div class="informationShort" data-bind="visible: message().spamResult">
-						<span data-i18n="MESSAGE/SPAM_SCORE"></span>:
-						<meter min="0" max="100" optimum="0" low="33" high="66" data-bind="value: message().spamScore, attr:{ title: message().spamStatus() }"></meter>
-					</div>
-				</div>
-				<div class="informationFull" data-bind="visible: showFullInfo, with: message">
-					<table>
-						<tr data-bind="visible: from.length">
-							<td data-i18n="GLOBAL/FROM"></td>
-							<td data-bind="text: from"></td>
-						</tr>
-						<tr data-bind="visible: to.length">
-							<td data-i18n="GLOBAL/TO"></td>
-							<td data-bind="text: to"></td>
-						</tr>
-						<tr data-bind="visible: cc.length">
-							<td data-i18n="GLOBAL/CC"></td>
-							<td data-bind="text: cc"></td>
-						</tr>
-						<tr data-bind="visible: bcc.length">
-							<td data-i18n="GLOBAL/BCC"></td>
-							<td data-bind="text: bcc"></td>
-						</tr>
-						<tr data-bind="visible: replyTo.length">
-							<td data-i18n="GLOBAL/REPLY_TO"></td>
-							<td data-bind="text: replyTo"></td>
-						</tr>
-						<tr data-bind="visible: dateTimestamp">
-							<td data-i18n="MESSAGE/LABEL_DATE"></td>
-							<td>
-								<time data-time-format="FULL" data-bind="time: dateTimestamp"></time>
-								&nbsp;
-								(<time data-time-format="FROMNOW" data-bind="time: dateTimestamp"></time>)
-							</td>
-						</tr>
-						<tr data-bind="visible: spamResult">
-							<td data-i18n="GLOBAL/SPAM"></td>
-							<td data-bind="text: spamStatus()"></td>
-						</tr>
-						<tr data-bind="visible: friendlySize()">
-							<td data-i18n="POPUPS_FILTER/SELECT_FIELD_SIZE"></td>
-							<td class="size" data-bind="text: friendlySize()"></td>
-						</tr>
-					</table>
+			<div class="messageItemHeader mv-header2" data-bind="if: message, i18nUpdate: message">
+				<div class="mv-details" data-bind="visible: showFullInfo, with: message">
+					<span class="mv-k" data-bind="visible: cc.length" data-i18n="GLOBAL/CC"></span>
+					<span data-bind="visible: cc.length, text: cc"></span>
+					<span class="mv-k" data-bind="visible: bcc.length" data-i18n="GLOBAL/BCC"></span>
+					<span data-bind="visible: bcc.length, text: bcc"></span>
+					<span class="mv-k" data-bind="visible: replyTo.length" data-i18n="GLOBAL/REPLY_TO"></span>
+					<span data-bind="visible: replyTo.length, text: replyTo"></span>
+					<span class="mv-k" data-bind="visible: dateTimestamp" data-i18n="MESSAGE/LABEL_DATE"></span>
+					<span data-bind="visible: dateTimestamp">
+						<time data-time-format="FULL" data-bind="time: dateTimestamp"></time>
+						(<time data-time-format="FROMNOW" data-bind="time: dateTimestamp"></time>)
+					</span>
+					<span class="mv-k" data-bind="visible: friendlySize()" data-i18n="POPUPS_FILTER/SELECT_FIELD_SIZE"></span>
+					<span data-bind="visible: friendlySize(), text: friendlySize()"></span>
+					<span class="mv-k" data-bind="visible: spamResult" data-i18n="GLOBAL/SPAM"></span>
+					<span data-bind="visible: spamResult, text: spamStatus()"></span>
 				</div>
 				<div class="hasVirus" data-bind="visible: message().hasVirus" data-i18n="MESSAGE/HAS_VIRUS_WARNING"></div>
 				<!-- ko if: tagsAllowed -->
-				<div class="messageTags">
-					<span data-i18n="MESSAGE/TAGS"></span>:
+				<div class="messageTags mv-tags" data-bind="visible: tagsToHTML">
 					<span class="messageAssignedTags" data-bind="html: tagsToHTML"></span>
-					<div class="btn-group" data-bind="registerBootstrapDropdown: true" style="display: inline-block">
-						<a class="btn btn-thin btn-transparent dropdown-toggle fontastic" id="tags-dropdown-id" href="#" tabindex="-1">🏷</a>
-						<menu class="dropdown-menu right-edge" role="menu" aria-labelledby="tags-dropdown-id">
-							<div data-bind="foreach: message().tagOptions()">
-								<li role="presentation">
-									<a href="#" tabindex="-1" data-icon="☐" data-bind="click: toggle, text: label, attr:{ title: value, class: css, 'data-icon': checked ? '☑' : '☐' }"></a>
-								</li>
-							</div>
-							<li role="presentation" class="dividerbar">
-								<a href="#" tabindex="-1" data-icon="✚" data-bind="click: newTag" data-i18n="MESSAGE/NEW_TAG"></a>
-							</li>
-						</menu>
-					</div>
 				</div>
 				<!-- /ko -->
 			</div>

@@ -1,0 +1,11 @@
+{
+	"MODERN_VIEW": {
+		"DETAILS": "details",
+		"HIDE_DETAILS": "hide details",
+		"SENDER_VERIFIED": "Sender verified",
+		"SENDER_NO_DMARC": "Sender verified, no DMARC policy",
+		"SENDER_NOT_VERIFIED": "Sender could not be verified",
+		"DELIVERED_LOCALLY": "Delivered locally (same server)",
+		"TAGS": "Tags"
+	}
+}

@@ -158,3 +158,247 @@ html.sm-msgView-bottom:not(.rl-mobile) #rl-app .mv-toolbar .buttonClose {
 	width: 20px;
 	height: 20px;
 }
+
+/* ===== Header (step 5) ===== */
+
+/*
+ * subject ............................. shield star
+ * [pic] name <address>                         date
+ * [pic] To: recipients  ⌄ details
+ */
+#rl-app .messageView .messageItemHeader.mv-header {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	grid-template-areas:
+		"subj subj subj"
+		"pic  from date"
+		"pic  to   to";
+	column-gap: 12px;
+	row-gap: 2px;
+	align-items: center;
+	padding: 14px 20px 12px;
+	background: transparent;
+	border-bottom: 1px solid var(--color-border, #ededed);
+	border-radius: 0;
+}
+#rl-app .mv-header .fromPic {
+	grid-area: pic;
+	float: none;
+	align-self: start;
+	width: 44px;
+	height: 44px;
+	margin: 2px 0 0;
+	padding: 0;
+	border-radius: 50%;
+	object-fit: cover;
+}
+#rl-app .mv-header .mv-subject-row {
+	grid-area: subj;
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	margin-bottom: 10px;
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 1.35;
+}
+/* long subjects: at most 2 lines, full text in the tooltip */
+#rl-app .mv-header .mv-subject {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	overflow-wrap: anywhere;
+	white-space: normal;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+}
+#rl-app .mv-subject-icons {
+	flex: none;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	margin-left: auto;
+	font-size: 15px;
+	font-weight: normal;
+}
+#rl-app .mv-star,
+#rl-app .mv-shield {
+	position: relative;
+	display: inline-grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border-radius: var(--border-radius-element, 8px);
+	color: var(--color-text-maxcontrast, #6b6b6b);
+	cursor: pointer;
+}
+#rl-app .mv-star:hover,
+#rl-app .mv-shield:hover,
+#rl-app .mv-shield:focus-visible {
+	background-color: var(--color-background-hover, #f5f5f5);
+	outline: none;
+}
+#rl-app .mv-star .mi,
+#rl-app .mv-shield .mi {
+	width: 22px;
+	height: 22px;
+}
+#rl-app .mv-star.flagOn {
+	color: #e0a800;
+}
+#rl-app .mv-shield { cursor: default; }
+#rl-app .mv-shield.mv-ok   { color: var(--color-success-text, #1f7a3a); }
+#rl-app .mv-shield.mv-warn { color: var(--color-warning-text, #a86400); }
+#rl-app .mv-shield.mv-bad  { color: var(--color-error-text, #c42b1c); }
+
+#rl-app .mv-shield-panel {
+	display: none;
+	position: absolute;
+	top: 36px;
+	right: -6px;
+	z-index: 50;
+	min-width: 260px;
+	padding: 8px 14px;
+	background-color: var(--color-main-background, #fff);
+	color: var(--color-main-text, #222);
+	border: 1px solid var(--color-border, #ededed);
+	border-radius: var(--border-radius-large, 10px);
+	box-shadow: 0 4px 14px rgba(0, 0, 0, .15);
+	font-size: 13px;
+	line-height: 1.8;
+	white-space: nowrap;
+	text-align: left;
+	cursor: default;
+}
+#rl-app .mv-shield:hover .mv-shield-panel,
+#rl-app .mv-shield:focus-within .mv-shield-panel {
+	display: block;
+}
+#rl-app .mv-shield-head {
+	display: block;
+	margin-bottom: 2px;
+	font-weight: 700;
+}
+#rl-app .mv-ok   .mv-shield-head { color: var(--color-success-text, #1f7a3a); }
+#rl-app .mv-warn .mv-shield-head { color: var(--color-warning-text, #a86400); }
+#rl-app .mv-bad  .mv-shield-head { color: var(--color-error-text, #c42b1c); }
+#rl-app .mv-shield-row {
+	display: grid;
+	grid-template-columns: 18px 56px auto;
+	align-items: center;
+}
+#rl-app .mv-shield-row .mv-wide { grid-column: 2 / 4; }
+#rl-app .mv-shield-row .mv-why  { color: var(--color-text-maxcontrast, #6b6b6b); }
+#rl-app .mv-y { color: var(--color-success-text, #1f7a3a); }
+#rl-app .mv-w { color: var(--color-warning-text, #a86400); }
+#rl-app .mv-n { color: var(--color-error-text, #c42b1c); }
+
+#rl-app .mv-header .mv-from {
+	grid-area: from;
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+}
+#rl-app .mv-header .mv-name {
+	flex: none;
+	max-width: 60%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-weight: 700;
+}
+#rl-app .mv-header .mv-addr {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+}
+#rl-app .mv-header .mv-date {
+	grid-area: date;
+	justify-self: end;
+	white-space: nowrap;
+	font-size: 13px;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+}
+#rl-app .mv-header .mv-to {
+	grid-area: to;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+	white-space: nowrap;
+}
+#rl-app .mv-header .mv-recips {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+#rl-app .mv-details-toggle {
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	padding: 0 6px 0 2px;
+	border-radius: 6px;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+	font-size: 13px;
+	text-decoration: none;
+}
+#rl-app .mv-details-toggle:hover {
+	background-color: var(--color-background-hover, #f5f5f5);
+	color: var(--color-main-text, #222);
+}
+#rl-app .mv-details-toggle .mi {
+	width: 18px;
+	height: 18px;
+	transition: transform .15s;
+}
+#rl-app .mv-details-toggle.open .mi {
+	transform: rotate(180deg);
+}
+
+/* details + tags: scroll with the message, aligned with the sender text */
+#rl-app .messageView .messageItemHeader.mv-header2 {
+	padding: 0 20px 0 76px;
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+}
+#rl-app .mv-header2:empty { display: none; }
+#rl-app .mv-header2 .mv-details {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+	column-gap: 14px;
+	row-gap: 4px;
+	margin: 10px 0 0;
+	padding: 10px 14px;
+	background-color: var(--color-background-hover, #f5f5f5);
+	border: 1px solid var(--color-border, #ededed);
+	border-radius: var(--border-radius-element, 8px);
+	font-size: 14px;
+	overflow-wrap: anywhere;
+}
+#rl-app .mv-header2 .mv-details[style*="display: none"] { display: none !important; }
+#rl-app .mv-header2 .mv-k {
+	color: var(--color-text-maxcontrast, #6b6b6b);
+	white-space: nowrap;
+}
+#rl-app .mv-header2 .mv-tags {
+	margin: 8px 0 0;
+	padding: 0;
+	border: 0;
+}
+#rl-app .mv-header2 .hasVirus {
+	margin: 8px 0 0;
+}
+@media screen and (max-width: 799px) {
+	#rl-app .messageView .messageItemHeader.mv-header2 { padding-left: 20px; }
+	#rl-app .mv-header2 .mv-details { grid-template-columns: auto minmax(0, 1fr); }
+}

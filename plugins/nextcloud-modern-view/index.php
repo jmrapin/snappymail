@@ -26,6 +26,7 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function Init() : void
 	{
+		$this->UseLangs(true);
 		$this->addCss('symbols.css');
 		$this->addCss('style.css');
 		$this->addJs('modern-view.js');
