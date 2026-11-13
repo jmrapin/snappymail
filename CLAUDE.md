@@ -43,6 +43,9 @@ These rules apply to every change in this repository.
   and don't call core methods without null checks from bindings (e.g. `message().tagOptions()`
   assumes a current folder; `listAttachments()` is `undefined` with no open message). Bindings inside
   `if: message` still update once after the message is cleared, so they need guards too. For hard cases: `localStorage.mvDebug = 1` + reload logs failing bindings.
+- **Core CSS hides things by layout and width** (e.g. `.top-toolbar` below 1400px, in the bottom
+  layout and in full screen). When a plugin template removes core's fallback, grep
+  `dev/Styles` for the element and override those rules too. Test narrow windows.
 - **Production builds strip `console.*`** from core (`drop_console`), so core errors are invisible.
   Plugin JS is not stripped: debug with a temporary wrapper in the plugin, then remove it.
 - **`with:` / `if:` / `foreach:` blocks re-render** and lose `data-i18n` translations unless the
