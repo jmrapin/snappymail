@@ -60,7 +60,7 @@
 				</li>
 				<!-- /ko -->
 				<li role="presentation">
-					<a href="#" tabindex="-1" data-bind="click: newTag"><i class="mi mi-label"></i><span data-bind="text: rl.i18n('MESSAGE/NEW_TAG')"></span></a>
+					<a href="#" tabindex="-1" data-bind="click: newTag"><i class="mi mi-label"></i><span data-bind="text: mvT('MESSAGE/NEW_TAG')"></span></a>
 				</li>
 			</div>
 			<!-- /ko -->
@@ -118,7 +118,7 @@
 						<span class="mv-shield-panel">
 							<span class="mv-shield-head" data-bind="text: mvAuth().head"></span>
 							<!-- ko if: mvAuth().local -->
-							<span class="mv-shield-row"><b class="mv-y">✔</b><span class="mv-wide" data-bind="text: rl.i18n('MODERN_VIEW/DELIVERED_LOCALLY')"></span></span>
+							<span class="mv-shield-row"><b class="mv-y">✔</b><span class="mv-wide" data-bind="text: mvT('MODERN_VIEW/DELIVERED_LOCALLY')"></span></span>
 							<!-- /ko -->
 							<!-- ko foreach: mvAuth().rows -->
 							<span class="mv-shield-row" data-bind="attr: { title: title }"><b data-bind="text: mark, css: cls"></b><span data-bind="text: name"></span><span class="mv-why" data-bind="text: why"></span></span>

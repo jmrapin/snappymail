@@ -7,6 +7,7 @@
 		return;
 	}
 
+
 	const
 		getEl = id => document.getElementById(id),
 
@@ -89,6 +90,8 @@
 		const view = e.detail;
 		if ('MailMessageView' === view.viewModelTemplateID) {
 			const from = () => view.message()?.from?.[0];
+			// translate from the template: globals like rl are not reachable inside bindings
+			view.mvT = key => rl.i18n(key);
 			view.mvFromName = ko.computed(() => from()?.name || from()?.email || '');
 			view.mvFromAddr = ko.computed(() => from()?.name && from()?.email ? '<' + from().email + '>' : '');
 			view.mvAuth = ko.computed(() => authStatus(view));
