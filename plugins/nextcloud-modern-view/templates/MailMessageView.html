@@ -1,0 +1,308 @@
+<!--
+	Nextcloud Modern View: replaces the built-in MailMessageView template.
+	Based on SnappyMail's app/templates/Views/User/MailMessageView.html (v3.0.1).
+	Changes: actions toolbar (Reply / Reply all / Forward, Archive / Spam / Delete / Move,
+	prev / next, the ☰ menu) with outline icons; no floating reply/☰ buttons on the message;
+	no × next to the subject. The close button is hidden by CSS in the side-by-side layout.
+-->
+<div class="top-toolbar g-ui-user-select-none btn-toolbar mv-toolbar">
+	<a class="mv-btn buttonClose" data-bind="click: closeMessage" data-i18n="[title]GLOBAL/CLOSE"><i class="mi mi-close"></i></a>
+	<div class="mv-group mv-replies" data-bind="visible: canBeRepliedOrForwarded, css: {'mv-replyall-first': 2 == msgDefaultAction()}">
+		<a class="mv-btn mv-primary mv-reply" data-bind="command: replyCommand" data-i18n="[title]MESSAGE/BUTTON_REPLY"><i class="mi mi-reply"></i><span class="mv-lbl" data-i18n="MESSAGE/BUTTON_REPLY"></span></a>
+		<a class="mv-btn mv-primary mv-replyall" data-bind="command: replyAllCommand" data-i18n="[title]MESSAGE/BUTTON_REPLY_ALL"><i class="mi mi-reply-all"></i><span class="mv-lbl" data-i18n="MESSAGE/BUTTON_REPLY_ALL"></span></a>
+		<a class="mv-btn mv-primary mv-forward" data-bind="command: forwardCommand" data-i18n="[title]MESSAGE/BUTTON_FORWARD"><i class="mi mi-forward"></i><span class="mv-lbl" data-i18n="MESSAGE/BUTTON_FORWARD"></span></a>
+	</div>
+	<a class="mv-btn mv-primary buttonEdit" data-bind="visible: isDraftFolder(), command: editCommand" data-i18n="[title]MESSAGE/BUTTON_EDIT"><i class="mi mi-edit"></i><span class="mv-lbl" data-i18n="MESSAGE/BUTTON_EDIT"></span></a>
+	<span class="mv-sep" data-bind="visible: message"></span>
+	<div class="mv-group" data-bind="visible: message">
+		<a class="mv-btn" data-bind="visible: archiveAllowed, command: archiveCommand" data-i18n="[title]GLOBAL/TO_ARCHIVE"><i class="mi mi-archive"></i></a>
+		<a class="mv-btn" data-bind="visible: canMarkAsSpam, command: spamCommand" data-i18n="[title]GLOBAL/TO_SPAM"><i class="mi mi-report"></i></a>
+		<a class="mv-btn" data-bind="visible: isSpamFolder, command: notSpamCommand" data-i18n="[title]GLOBAL/NOT_SPAM"><i class="mi mi-mark-email-read"></i></a>
+		<a class="mv-btn mv-danger" data-bind="visible: !canBeUndeleted(), command: deleteCommand" data-i18n="[title]GLOBAL/DELETE"><i class="mi mi-delete"></i></a>
+		<a class="mv-btn" data-bind="visible: canBeUndeleted, command: undeleteCommand" data-i18n="[title]GLOBAL/UNDELETE"><i class="mi mi-delete mv-rotate"></i></a>
+		<a class="mv-btn" data-bind="command: moveCommand" data-i18n="[title]GLOBAL/MOVE_TO"><i class="mi mi-drive-file-move"></i></a>
+	</div>
+	<span class="mv-spacer"></span>
+	<div class="mv-group">
+		<a class="mv-btn buttonUp" data-bind="command: goUpCommand"><i class="mi mi-chevron-left"></i></a>
+		<a class="mv-btn buttonDown" data-bind="command: goDownCommand"><i class="mi mi-chevron-right"></i></a>
+	</div>
+	<div class="btn-group mv-more" data-bind="visible: message, registerBootstrapDropdown: true, initDom: actionsMenu">
+		<a class="mv-btn dropdown-toggle" id="more-view-dropdown-id" href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"><i class="mi mi-menu"></i></a>
+		<menu class="dropdown-menu right-edge mv-menu" role="menu" aria-labelledby="more-view-dropdown-id">
+			<div data-bind="visible: !isDraftFolder()">
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="command: forwardAsAttachmentCommand"><i class="mi mi-attach-email"></i><span data-i18n="MESSAGE/BUTTON_FORWARD_AS_ATTACHMENT"></span></a>
+				</li>
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="command: editAsNewCommand"><i class="mi mi-edit"></i><span data-i18n="MESSAGE/BUTTON_EDIT_AS_NEW"></span></a>
+				</li>
+			</div>
+			<div class="dividerbar">
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="click: setUnseen"><i class="mi mi-mark-email-unread"></i><span data-i18n="MESSAGE_LIST/MENU_UNSET_SEEN"></span></a>
+				</li>
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="command: copyCommand"><i class="mi mi-content-copy"></i><span data-i18n="GLOBAL/COPY_TO"></span></a>
+				</li>
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="command: deleteWithoutMoveCommand"><i class="mi mi-delete"></i><span data-i18n="MESSAGE_LIST/BUTTON_DELETE_WITHOUT_MOVE"></span></a>
+				</li>
+				<li role="presentation" data-bind="visible: firstUnsubsribeLink">
+					<a target="_blank" href="#" tabindex="-1" data-bind="attr: { href: firstUnsubsribeLink }"><i class="mi mi-unsubscribe"></i><span data-i18n="MESSAGE/BUTTON_UNSUBSCRIBE"></span></a>
+				</li>
+			</div>
+			<div data-bind="with: message" class="dividerbar">
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="click: printMessage"><i class="mi mi-print"></i><span data-i18n="MESSAGE/MENU_PRINT"></span></a>
+				</li>
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="click: popupMessage"><i class="mi mi-open-in-new"></i><span data-i18n="MESSAGE/BUTTON_IN_NEW_WINDOW"></span></a>
+				</li>
+				<li role="presentation" data-bind="visible: html() && !isHtml()">
+					<a href="#" tabindex="-1" data-bind="click: viewHtml"><i class="mi mi-visibility"></i><span data-i18n="MESSAGE/HTML_VIEW"></span></a>
+				</li>
+				<li role="presentation" data-bind="visible: isHtml()">
+					<a href="#" tabindex="-1" data-bind="click: viewPlain"><i class="mi mi-article"></i><span data-i18n="MESSAGE/PLAIN_VIEW"></span></a>
+				</li>
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="click: swapColors"><i class="mi mi-visibility"></i><span data-i18n="MESSAGE/SWAP_COLORS"></span></a>
+				</li>
+				<li role="presentation">
+					<a href="#" tabindex="-1" data-bind="click: $root.toggleFullScreen"><i class="mi mi-fullscreen"></i><span data-i18n="SHORTCUTS_HELP/LABEL_FULLSCREEN_TOGGLE"></span></a>
+				</li>
+			</div>
+			<div data-bind="with: message" class="dividerbar">
+				<li role="presentation">
+					<a target="_blank" href="#" tabindex="-1" data-bind="attr: { href: viewRaw() }"><i class="mi mi-code"></i><span data-i18n="MESSAGE/MENU_VIEW_ORIGINAL"></span></a>
+				</li>
+				<li role="presentation">
+					<a target="_blank" href="#" tabindex="-1" data-bind="attr: { href: downloadLink() }"><i class="mi mi-download"></i><span data-i18n="MESSAGE/MENU_DOWNLOAD_ORIGINAL"></span></a>
+				</li>
+			</div>
+		</menu>
+	</div>
+</div>
+<div class="messageView">
+	<div class="b-message-view-backdrop" data-bind="visible: moveAction">
+		<div class="backdrop-message" data-icon="📁" data-i18n="MESSAGE/MESSAGE_VIEW_MOVE_DESC"></div>
+	</div>
+	<div class="b-message-view-checked-helper" data-bind="visible: !message() && '' === messageError() && hasCheckedMessages(), text: printableCheckedMessageCount()"></div>
+
+	<div class="b-message-view-desc error" data-bind="visible: !message() && '' !== messageError() && !hasCheckedMessages(), text: messageError()">
+	</div>
+
+	<div class="b-message-view-desc" data-i18n="MESSAGE/MESSAGE_VIEW_DESC" data-bind="visible: !message() && '' === messageError() && !hasCheckedMessages()">
+	</div>
+
+	<div class="b-message" data-bind="visible: message, i18nUpdate: message, css: message()?.lineAsCss(0)">
+
+		<div class="messageItemHeader" data-bind="if: message, i18nUpdate: message">
+			<div class="subjectParent">
+				<span class="infoParent g-ui-user-select-none fontastic" data-bind="click: toggleFullInfo">ℹ</span>
+				<span class="flagParent g-ui-user-select-none flagOff fontastic" data-bind="text: message().isFlagged() ? '★' : '☆', css: {flagOn: message().isFlagged(), flagOff: !message().isFlagged()}"></span>
+				<span class="subject" data-bind="text: message().subject"></span>
+			</div>
+			<div class="informationShort">
+				<span class="from" data-bind="html: viewFromShort, attr:{ title: message().from }"></span>
+				<!-- ko if: localDelivery -->
+				<i class="fontastic">✅</i>
+				<!-- /ko -->
+				<!-- ko ifnot: localDelivery -->
+				<i class="fontastic" data-bind="text: dkimIcon, css: dkimIconClass, attr:{ title: dkimTitle }"></i>
+				<i class="fontastic" data-bind="text: dmarcIcon, css: dmarcIconClass, attr:{ title: dmarcTitle }"></i>
+				<i class="fontastic" data-bind="text: spfIcon, css: spfIconClass, attr:{ title: spfTitle }"></i>
+				<!-- /ko -->
+			</div>
+		</div>
+		<div id="messageItem">
+			<div class="messageItemHeader" data-bind="if: message, i18nUpdate: message">
+				<div data-bind="hidden: showFullInfo">
+					<time class="date" data-time-format="FULL" data-bind="visible: 0 < message().dateTimestamp(), time: message().dateTimestamp()"></time>
+					<div class="informationShortWrp">
+						<div class="informationShort" data-bind="visible: message().to.length">
+							<span data-i18n="GLOBAL/TO"></span>:
+							<span data-bind="text: message().to"></span>
+						</div>
+						<div class="informationShort" data-bind="visible: message().cc.length">
+							<span data-i18n="GLOBAL/CC"></span>:
+							<span data-bind="text: message().cc"></span>
+						</div>
+					</div>
+					<div class="informationShort" data-bind="visible: message().spamResult">
+						<span data-i18n="MESSAGE/SPAM_SCORE"></span>:
+						<meter min="0" max="100" optimum="0" low="33" high="66" data-bind="value: message().spamScore, attr:{ title: message().spamStatus() }"></meter>
+					</div>
+				</div>
+				<div class="informationFull" data-bind="visible: showFullInfo, with: message">
+					<table>
+						<tr data-bind="visible: from.length">
+							<td data-i18n="GLOBAL/FROM"></td>
+							<td data-bind="text: from"></td>
+						</tr>
+						<tr data-bind="visible: to.length">
+							<td data-i18n="GLOBAL/TO"></td>
+							<td data-bind="text: to"></td>
+						</tr>
+						<tr data-bind="visible: cc.length">
+							<td data-i18n="GLOBAL/CC"></td>
+							<td data-bind="text: cc"></td>
+						</tr>
+						<tr data-bind="visible: bcc.length">
+							<td data-i18n="GLOBAL/BCC"></td>
+							<td data-bind="text: bcc"></td>
+						</tr>
+						<tr data-bind="visible: replyTo.length">
+							<td data-i18n="GLOBAL/REPLY_TO"></td>
+							<td data-bind="text: replyTo"></td>
+						</tr>
+						<tr data-bind="visible: dateTimestamp">
+							<td data-i18n="MESSAGE/LABEL_DATE"></td>
+							<td>
+								<time data-time-format="FULL" data-bind="time: dateTimestamp"></time>
+								&nbsp;
+								(<time data-time-format="FROMNOW" data-bind="time: dateTimestamp"></time>)
+							</td>
+						</tr>
+						<tr data-bind="visible: spamResult">
+							<td data-i18n="GLOBAL/SPAM"></td>
+							<td data-bind="text: spamStatus()"></td>
+						</tr>
+						<tr data-bind="visible: friendlySize()">
+							<td data-i18n="POPUPS_FILTER/SELECT_FIELD_SIZE"></td>
+							<td class="size" data-bind="text: friendlySize()"></td>
+						</tr>
+					</table>
+				</div>
+				<div class="hasVirus" data-bind="visible: message().hasVirus" data-i18n="MESSAGE/HAS_VIRUS_WARNING"></div>
+				<!-- ko if: tagsAllowed -->
+				<div class="messageTags">
+					<span data-i18n="MESSAGE/TAGS"></span>:
+					<span class="messageAssignedTags" data-bind="html: tagsToHTML"></span>
+					<div class="btn-group" data-bind="registerBootstrapDropdown: true" style="display: inline-block">
+						<a class="btn btn-thin btn-transparent dropdown-toggle fontastic" id="tags-dropdown-id" href="#" tabindex="-1">🏷</a>
+						<menu class="dropdown-menu right-edge" role="menu" aria-labelledby="tags-dropdown-id">
+							<div data-bind="foreach: message().tagOptions()">
+								<li role="presentation">
+									<a href="#" tabindex="-1" data-icon="☐" data-bind="click: toggle, text: label, attr:{ title: value, class: css, 'data-icon': checked ? '☑' : '☐' }"></a>
+								</li>
+							</div>
+							<li role="presentation" class="dividerbar">
+								<a href="#" tabindex="-1" data-icon="✚" data-bind="click: newTag" data-i18n="MESSAGE/NEW_TAG"></a>
+							</li>
+						</menu>
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
+			<div tabindex="0" data-bind="hasfocus: messageDomFocused">
+
+				<div class="loading" data-bind="visible: messageLoadingThrottle">
+					<i class="icon-spinner"></i>
+					<span data-i18n="GLOBAL/LOADING"></span>
+				</div>
+
+				<div data-bind="hidden: messageLoadingThrottle">
+					<div class="bodySubHeader" data-bind="if: message, i18nUpdate: message">
+						<div class="readReceipt" data-bind="visible: askReadReceipt, click: readReceipt"
+							data-icon="✉" data-i18n="MESSAGE/BUTTON_NOTIFY_READ_RECEIPT"></div>
+						<details class="attachmentsPlace" data-bind="visible: hasAttachments, css: {'selection-mode' : showAttachmentControls}, attr: { open: hasAttachments }">
+							<summary data-i18n="MESSAGE/PRINT_LABEL_ATTACHMENTS"></summary>
+							<!-- ko ifnot: simpleAttachmentsList -->
+							<ul class="attachmentList" data-bind="foreach: listAttachments">
+								<li class="attachmentItem" draggable="true"
+										data-bind="event: { dragstart: eventDragStart }, attr: { title: fileName }, css: {checked: checked}">
+									<div class="attachmentIcon" data-bind="css: { hasPreview: hasPreview(), hasPreplay: hasPreplay(), isImage: isImage() }, attr: { style: thumbnailStyle() }">
+										<i class="hidePreview iconMain" data-bind="css: iconClass()"></i>
+										<div class="showPreview">
+											<a data-bind="css: {attachmentImagePreview: isImage()}, attr: { title: fileName, href: linkPreviewMain() }" target="_blank">
+												<i class="iconMain" data-bind="visible: !hasThumbnail(), css: iconClass()"></i>
+												<div class="iconPreview fontastic">👁</div>
+											</a>
+										</div>
+									</div>
+									<div class="attachmentNameParent">
+										<div class="attachmentName" data-bind="text: fileName"></div>
+										<div class="attachmentSize" data-bind="text: friendlySize()"></div>
+									</div>
+									<div class="checkboxAttachment fontastic"
+										data-bind="visible: download, text: checked() ? '☑' : '☐', click: toggleChecked"></div>
+								</li>
+							</ul>
+							<!-- /ko -->
+							<!-- ko if: simpleAttachmentsList -->
+							<ul class="attachmentListSimple" data-bind="foreach: listAttachments">
+								<li class="attachmentItem" data-bind="attr: { title: fileName }, css: {checked: checked}">
+									<span class="attachmentName" data-bind="text: fileName"></span>
+									<i class="checkboxAttachment fontastic"
+										data-bind="visible: download, text: checked() ? '☑' : '☐', click: toggleChecked"></i>
+								</li>
+							</ul>
+							<!-- /ko -->
+							<i class="fontastic controls-handle" data-bind="visible: allowAttachmentControls, click: toggleAttachmentControls">⚙</i>
+							<div class="attachmentsControls" data-bind="visible: showAttachmentControls">
+								<span data-bind="visible: downloadAsZipAllowed">
+									<i class="fontastic iconcolor-red" data-bind="visible: downloadAsZipError">✖</i>
+									<i class="icon-file-archive" data-bind="visible: !downloadAsZipError(),
+										css: {'icon-file-archive': !downloadAsZipLoading(), 'icon-spinner': downloadAsZipLoading()}"></i>
+									<span class="g-ui-link" data-bind="click: downloadAsZip"
+										data-i18n="MESSAGE/LINK_DOWNLOAD_AS_ZIP"></span>
+								</span>
+							</div>
+						</details>
+
+						<div class="btn-toolbar showImages" data-bind="visible: message().hasImages()">
+							<div class="btn" data-bind="click: showImages" data-icon="🖼" data-i18n="MESSAGE/BUTTON_SHOW_IMAGES"></div>
+							<div class="btn-group dropdown" data-bind="registerBootstrapDropdown: true, visible: showWhitelistOptions" style="display: inline-block">
+								<a class="btn dropdown-toggle" id="whitelist-dropdown-id" data-icon="🖼" href="#" tabindex="-1"><span data-i18n="SETTINGS_GENERAL/IMAGES_WHITELIST"></span> ▼</a>
+								<menu class="dropdown-menu" role="menu" aria-labelledby="whitelist-dropdown-id">
+									<!-- ko foreach: message().whitelistOptions() -->
+									<li role="presentation">
+										<a href="#" tabindex="-1" data-bind="click: $root.whitelistText, text: $data"></a>
+									</li>
+									<!-- /ko -->
+								</menu>
+							</div>
+						</div>
+
+						<div class="btn-toolbar" data-bind="visible: message().hasTracking()">
+							<div class="btn" data-bind="visible: !nowTracking(), click: showTracking" data-icon="🔗" data-i18n="MESSAGE/ENABLE_TRACKING_LINKS"></div>
+							<div class="alert" data-bind="visible: nowTracking" data-i18n="MESSAGE/TRACKING_ENABLED" style="margin:0"></div>
+						</div>
+
+						<div data-bind="visible: message().pgpEncrypted()">
+							<div class="crypto-control encrypted" data-bind="css: {success: message().pgpDecrypted()}">
+								<span data-icon="🔒" data-i18n="OPENPGP/ENCRYPTED_MESSAGE"></span>
+								<button class="btn" data-bind="visible: pgpSupported, click: pgpDecrypt" data-i18n="CRYPTO/DECRYPT"></button>
+								<div class="alert-error" data-icon="⚠" data-bind="visible: message().pgpEncrypted()?.error, text: message().pgpEncrypted()?.error"></div>
+							</div>
+						</div>
+						<div data-bind="visible: message().pgpSigned()">
+							<div class="crypto-control signed" data-bind="css: {success: true === message().pgpSigned()?.success, error: false === message().pgpSigned()?.success}">
+								<span data-icon="✍" data-i18n="OPENPGP/SIGNED_MESSAGE"></span>
+								<button class="btn" data-bind="visible: pgpSupported, click: pgpVerify" data-i18n="CRYPTO/VERIFY"></button>
+								<div data-icon="⚠" data-bind="visible: message().pgpSigned()?.error, text: message().pgpSigned()?.error"></div>
+							</div>
+						</div>
+
+						<div data-bind="visible: message().smimeEncrypted()">
+							<div class="crypto-control encrypted" data-bind="css: {success: message().smimeDecrypted()}">
+								<span data-icon="🔒" data-i18n="SMIME/ENCRYPTED_MESSAGE"></span>
+								<button class="btn" data-bind="click: smimeDecrypt" data-i18n="CRYPTO/DECRYPT"></button>
+								<div class="alert-error" data-icon="⚠" data-bind="visible: message().smimeEncrypted()?.error, text: message().smimeEncrypted()?.error"></div>
+							</div>
+						</div>
+						<div data-bind="visible: message().smimeSigned()">
+							<div class="crypto-control signed" data-bind="css: {success: true === message().smimeSigned()?.success, error: false === message().smimeSigned()?.success}">
+								<span data-icon="✍" data-i18n="SMIME/SIGNED_MESSAGE"></span>
+								<button class="btn" data-bind="click: smimeVerify" data-i18n="CRYPTO/VERIFY"></button>
+							</div>
+						</div>
+					</div>
+
+					<div class="bodyText" dir="auto"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
