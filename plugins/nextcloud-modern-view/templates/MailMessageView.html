@@ -199,23 +199,23 @@
 								<a href="#" class="mv-lnk" data-bind="click: mvAttCollapse"><i class="mi mi-keyboard-arrow-up"></i><span data-bind="text: mvT('MODERN_VIEW/SHOW_LESS')"></span></a>
 							</div>
 							<div class="mv-att-row">
-								<div class="mv-att-list" data-bind="foreach: { data: mvAttRows, as: 'row' }, event: { scroll: mvAttScrolled }">
-									<div class="mv-att-line" data-bind="foreach: { data: row, as: 'att' }">
+								<div class="mv-att-list" data-bind="foreach: mvAttRows, event: { scroll: mvAttScrolled }">
+									<div class="mv-att-line" data-bind="foreach: $data">
 										<div class="mv-att" draggable="true" data-bind="
-											css: { 'mv-hidden': !$root.mvAttExpanded() && !$root.mvAttSelecting() && att.mvIndex >= $root.mvAttFit(), 'mv-sel': $root.mvAttSelecting() && att.checked() },
-											attr: { title: att.fileName },
-											event: { dragstart: att.eventDragStart }">
+											css: { 'mv-hidden': !$root.mvAttExpanded() && !$root.mvAttSelecting() && $data.mvIndex >= $root.mvAttFit(), 'mv-sel': $root.mvAttSelecting() && $data.checked() },
+											attr: { title: $data.fileName },
+											event: { dragstart: $data.eventDragStart }">
 											<a class="mv-att-main" target="_blank" data-bind="
-												attr: { href: att.hasPreview() ? att.linkPreviewMain() : att.linkDownload() },
-												click: (data, event) => $root.mvAttClick(att, event)">
-												<span class="mv-cb" data-bind="css: { on: att.checked }"></span>
-												<span class="mv-att-ic" data-bind="css: $root.mvAttIconClass(att), attr: { style: att.thumbnailStyle() || '' }, text: att.hasThumbnail() ? '' : $root.mvAttExt(att)"></span>
+												attr: { href: $data.hasPreview() ? $data.linkPreviewMain() : $data.linkDownload() },
+												click: (data, event) => $root.mvAttClick($data, event)">
+												<span class="mv-cb" data-bind="css: { on: $data.checked }"></span>
+												<span class="mv-att-ic" data-bind="css: $root.mvAttIconClass($data), attr: { style: $data.thumbnailStyle() || '' }, text: $data.hasThumbnail() ? '' : $root.mvAttExt($data)"></span>
 												<span class="mv-att-tx">
-													<span class="mv-att-nm" data-bind="text: att.fileName"></span>
-													<span class="mv-att-sz" data-bind="text: att.friendlySize()"></span>
+													<span class="mv-att-nm" data-bind="text: $data.fileName"></span>
+													<span class="mv-att-sz" data-bind="text: $data.friendlySize()"></span>
 												</span>
 											</a>
-											<a href="#" class="mv-att-dd" data-bind="click: (data, event) => $root.mvAttOpenMenu(att, event), attr: { title: $root.mvT('GLOBAL/MORE') }"><i class="mi mi-keyboard-arrow-down"></i></a>
+											<a href="#" class="mv-att-dd" data-bind="click: (data, event) => $root.mvAttOpenMenu($data, event), attr: { title: $root.mvT('GLOBAL/MORE') }"><i class="mi mi-keyboard-arrow-down"></i></a>
 										</div>
 									</div>
 								</div>
