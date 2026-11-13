@@ -35,6 +35,8 @@ These rules apply to every change in this repository.
   A throwing binding during a request callback surfaces as a misleading "Request failed".
 - **SnappyMail's knockout is a trimmed build: there is no `ko.pureComputed`.** Use `ko.computed`.
   Check that any `ko.*` API you use exists in `vendors/knockout` before relying on it.
+- **`foreach` has no `as:` alias** (only `foreach: list` / `foreach: { data: list }`): inside the
+  loop the item is `$data`, the view is `$root`, the outer item is `$parent`.
 - **Production builds strip `console.*`** from core (`drop_console`), so core errors are invisible.
   Plugin JS is not stripped: debug with a temporary wrapper in the plugin, then remove it.
 - **`with:` / `if:` / `foreach:` blocks re-render** and lose `data-i18n` translations unless the
