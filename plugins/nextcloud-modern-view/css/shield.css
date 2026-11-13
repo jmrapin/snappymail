@@ -1,0 +1,51 @@
+/*
+ * Nextcloud Modern View: sender verification shield and its hover panel (step 5).
+ * Colours use the Nextcloud theme variables (--color-*); fallbacks are Nextcloud's light defaults.
+ */
+
+#rl-app .mv-shield { cursor: default; }
+#rl-app .mv-shield.mv-ok   { color: var(--color-success-text, #1f7a3a); }
+#rl-app .mv-shield.mv-warn { color: var(--color-warning-text, #a86400); }
+#rl-app .mv-shield.mv-bad  { color: var(--color-error-text, #c42b1c); }
+
+#rl-app .mv-shield-panel {
+	display: none;
+	position: absolute;
+	top: 36px;
+	right: -6px;
+	z-index: 50;
+	min-width: 260px;
+	padding: 8px 14px;
+	background-color: var(--color-main-background, #fff);
+	color: var(--color-main-text, #222);
+	border: 1px solid var(--color-border, #ededed);
+	border-radius: var(--border-radius-large, 10px);
+	box-shadow: 0 4px 14px rgba(0, 0, 0, .15);
+	font-size: 13px;
+	line-height: 1.8;
+	white-space: nowrap;
+	text-align: left;
+	cursor: default;
+}
+#rl-app .mv-shield:hover .mv-shield-panel,
+#rl-app .mv-shield:focus-within .mv-shield-panel {
+	display: block;
+}
+#rl-app .mv-shield-head {
+	display: block;
+	margin-bottom: 2px;
+	font-weight: 700;
+}
+#rl-app .mv-ok   .mv-shield-head { color: var(--color-success-text, #1f7a3a); }
+#rl-app .mv-warn .mv-shield-head { color: var(--color-warning-text, #a86400); }
+#rl-app .mv-bad  .mv-shield-head { color: var(--color-error-text, #c42b1c); }
+#rl-app .mv-shield-row {
+	display: grid;
+	grid-template-columns: 18px 56px auto;
+	align-items: center;
+}
+#rl-app .mv-shield-row .mv-wide { grid-column: 2 / 4; }
+#rl-app .mv-shield-row .mv-why  { color: var(--color-text-maxcontrast, #6b6b6b); }
+#rl-app .mv-y { color: var(--color-success-text, #1f7a3a); }
+#rl-app .mv-w { color: var(--color-warning-text, #a86400); }
+#rl-app .mv-n { color: var(--color-error-text, #c42b1c); }

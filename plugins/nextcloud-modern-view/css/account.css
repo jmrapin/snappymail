@@ -1,0 +1,45 @@
+/*
+ * Nextcloud Modern View: compact account switcher, initials pill (step 4).
+ * Colours use the Nextcloud theme variables (--color-*); fallbacks are Nextcloud's light defaults.
+ */
+
+#rl-app #V-SystemDropDown .accountPlace,
+#rl-app #V-SystemDropDown #top-system-dropdown-id > i.fontastic {
+	display: none;
+}
+/* core draws its own ▼ (Layout.less); the pill uses the outline icon instead */
+#rl-app #V-SystemDropDown #top-system-dropdown-id::after {
+	content: none;
+	display: none;
+}
+#rl-app #V-SystemDropDown #top-system-dropdown-id {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	height: 40px;
+	padding: 0 4px 0 5px !important;
+	border: 1px solid var(--color-border, #ededed) !important;
+	border-radius: 20px !important;
+	background: transparent;
+}
+#rl-app #V-SystemDropDown .btn-toolbar {
+	border: 0;
+	padding: 0;
+	height: auto;
+}
+#rl-app .mv-initials {
+	display: grid;
+	place-items: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	background-color: var(--color-primary-element-light, #e5eff4);
+	color: var(--color-primary-element, #00679e);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: .02em;
+}
+#rl-app .mv-initials + .mi {
+	width: 20px;
+	height: 20px;
+}
