@@ -28,8 +28,8 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 		DESCRIPTION = 'Compact modern reading pane: actions in the toolbar, sender verification shield, one-line attachments, outline icons';
 
 	const
-		CSS = ['symbols', 'toolbar', 'account', 'header', 'shield', 'attachments', 'attachments-select'],
-		JS  = ['util', 'header', 'account', 'shield', 'attachments', 'attachments-layout', 'attachments-actions'];
+		CSS = ['symbols', 'folders', 'toolbar', 'messagelist-toolbar', 'account', 'header', 'shield', 'attachments', 'attachments-select'],
+		JS  = ['util', 'header', 'account', 'shield', 'attachments', 'attachments-layout', 'attachments-actions', 'messagelist-toolbar'];
 
 	public function Init() : void
 	{
