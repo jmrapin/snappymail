@@ -23,6 +23,9 @@ These rules apply to every change in this repository.
 
 - New features and UI changes go in a **fork-only plugin** (e.g. `plugins/nextcloud-modern-view`),
   not in core files. A plugin template with the same name replaces the built-in one.
+- **Never modify upstream themes** (`snappymail/v/0.0.0/themes/*`). Layer style changes in the
+  plugin's CSS on top of the theme, so theme fixes from upstream keep flowing in. A fork-only theme
+  is only for app-wide pure-CSS restyling, and then as a new theme folder, never an edited copy.
 - Change core only for genuine bug fixes that upstream could take; keep those commits small and
   self-contained.
 - After every upstream merge, run the test list in `.claude/plans/` — upstream renames don't
