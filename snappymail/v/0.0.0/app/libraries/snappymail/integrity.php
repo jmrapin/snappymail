@@ -139,4 +139,28 @@ abstract class Integrity
 		}
 		return static::$aSri;
 	}
+
+	/**
+	 * Short id of the current static JS/CSS build, used as a cache-busting query string.
+	 * It changes whenever the files change, even when APP_VERSION does not (a fork
+	 * redeploying under the same version). Otherwise browsers keep the old cached
+	 * files, which then fail the new SRI hashes and leave a blank page.
+	 */
+	public static function buildId(bool $bMinified = true): string
+	{
+		static $aIds = [];
+		$iKey = (int) $bMinified;
+		if (!isset($aIds[$iKey])) {
+			if ($bMinified) {
+				$sSource = \json_encode(static::loadSriHashes());
+			} else {
+				$sSource = '';
+				foreach (['js/libs.js', 'js/app.js', 'js/admin.js', 'css/app.css', 'css/admin.css'] as $sFile) {
+					$sSource .= $sFile . ':' . @\filemtime(APP_VERSION_ROOT_PATH . 'static/' . $sFile) . ';';
+				}
+			}
+			$aIds[$iKey] = \substr(\sha1($sSource), 0, 10);
+		}
+		return $aIds[$iKey];
+	}
 }

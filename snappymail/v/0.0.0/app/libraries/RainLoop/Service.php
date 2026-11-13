@@ -193,7 +193,9 @@ abstract class Service
 					$aTemplateParameters,
 					APP_VERSION,
 					// theme CSS is inlined into the cached template, so refresh it when the theme changes
-					@\filemtime(APP_VERSION_ROOT_PATH.'themes/'.$sThemeName.'/styles.css')
+					@\filemtime(APP_VERSION_ROOT_PATH.'themes/'.$sThemeName.'/styles.css'),
+					// the CSS link and its SRI hash are baked into the cached template, so refresh it on a new build
+					\SnappyMail\Integrity::buildId((bool) $sAppCssMin)
 				))
 			);
 
@@ -214,7 +216,8 @@ abstract class Service
 				$aTemplateParameters['{{BaseAppBootCss}}'] = \file_get_contents(APP_VERSION_ROOT_PATH.'static/css/boot'.$sAppCssMin.'.css');
 				$aTemplateParameters['{{BaseAppBootScript}}'] = \file_get_contents(APP_VERSION_ROOT_PATH.'static/js'.($sAppJsMin ? '/min' : '').'/boot'.$sAppJsMin.'.js');
 				$aTemplateParameters['{{BaseAppMainCssLink}}'] = Utils::WebStaticPath('css/'.$sCssFile)
-					. '?' . \rawurlencode((string) $oConfig->Get('cache', 'index', 'v1'));
+					. '?' . \rawurlencode((string) $oConfig->Get('cache', 'index', 'v1'))
+					. '-' . \SnappyMail\Integrity::buildId((bool) $sAppCssMin);
 				$aTemplateParameters['{{BaseAppMainCssSri}}'] = empty($aSri[$sCssFile]) ? '' : ' integrity="'.$aSri[$sCssFile].'"';
 				$aTemplateParameters['{{BaseAppThemeCss}}'] = \preg_replace('/\\s*([:;{},]+)\\s*/s', '$1', $oActions->compileCss($sThemeName, $bAdmin));
 				$aTemplateParameters['{{BaseLanguage}}'] = $oActions->compileLanguage($sLanguage, $bAdmin);

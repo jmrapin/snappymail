@@ -774,7 +774,9 @@ class Actions
 
 		$aResult['StaticLibsJs'] = Utils::WebStaticPath('js/' . ($bAppJsDebug ? '' : 'min/') .
 			'libs' . ($bAppJsDebug ? '' : '.min') . '.js')
-			. '?' . \rawurlencode((string) $this->oConfig->Get('cache', 'index', 'v1'));
+			. '?' . \rawurlencode((string) $this->oConfig->Get('cache', 'index', 'v1'))
+			// the app/admin URL is derived from this one in boot.js, so the id must cover all JS files
+			. '-' . \SnappyMail\Integrity::buildId(!$bAppJsDebug);
 
 		if (!$bAppJsDebug) {
 			$aSri = \SnappyMail\Integrity::loadSriHashes();
