@@ -117,3 +117,22 @@ html.sm-msgView-bottom:not(.rl-mobile) #rl-app .mv-toolbar .buttonClose {
 	height: 18px;
 	opacity: .75;
 }
+
+/*
+ * Core hides the message toolbar below 1400px in the side layout, in the bottom layout and in
+ * full screen (Styles/User/MessageView.less), because it also has floating reply / ☰ buttons on
+ * the message. This template has no such buttons, so the toolbar must always show on screen.
+ * (Printing still hides it: core's @media print rules are left alone.)
+ */
+@media screen {
+	html.sm-msgView-side #rl-app #V-MailMessageView .top-toolbar.mv-toolbar,
+	html.sm-msgView-bottom #rl-app #V-MailMessageView .top-toolbar.mv-toolbar,
+	html.rl-fullscreen #rl-app #V-MailMessageView .top-toolbar.mv-toolbar {
+		display: flex !important;
+		visibility: visible;
+	}
+	/* full screen hides the account switcher, so no room needs to be kept for it */
+	html.rl-fullscreen #rl-app #V-MailMessageView .mv-toolbar {
+		padding-right: 12px;
+	}
+}
