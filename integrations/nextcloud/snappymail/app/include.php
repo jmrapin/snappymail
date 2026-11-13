@@ -53,5 +53,10 @@ if (class_exists('OC')) {
 
 /**
  * Also update extensions on upgrade
+ *
+ * Disabled in this fork: it re-downloads every enabled plugin from the upstream
+ * repository on each version change, overwriting the fork's own plugins
+ * (avatars route URL, nextcloud contacts fix, ai-reply-suggest, search-filters).
+ * The fork's deploy installs its plugins itself.
  */
-define('SNAPPYMAIL_UPDATE_PLUGINS', 1);
+//define('SNAPPYMAIL_UPDATE_PLUGINS', 1);
