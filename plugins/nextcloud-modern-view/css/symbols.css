@@ -2,7 +2,7 @@
  * Material Symbols, Rounded, weight 400 (outline style; "-fill" = filled variant)
  * Copyright Google LLC, Apache License 2.0 - https://github.com/google/material-design-icons
  * SVGs from the npm package @material-symbols/svg-400 0.49.0 (rounded/), embedded as CSS masks
- * so no font or external request is needed. Regenerate with gen-symbols.js in this folder (node gen-symbols.js <package>/rounded symbols.css).
+ * so no font or external request is needed. Regenerate: node tools/gen-symbols.js <@material-symbols/svg-400>/rounded css/symbols.css
  *
  * Usage: <i class="mi mi-reply"></i> - the icon takes the current text colour and is 1.25em.
  */

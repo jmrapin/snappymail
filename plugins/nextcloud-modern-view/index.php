@@ -10,6 +10,9 @@
  *
  * Template overrides work because ServiceActions::compileTemplates() lets a plugin
  * template replace a built-in template with the same file name.
+ *
+ * Files are split per feature (see CLAUDE.md); js/util.js must load first and the
+ * MailMessageView hooks run in the order the files are listed below.
  */
 class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
@@ -17,20 +20,26 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 		NAME     = 'Nextcloud Modern View',
 		AUTHOR   = 'jmrapin',
 		URL      = 'https://github.com/jmrapin/snappymail',
-		VERSION  = '0.1',
+		VERSION  = '0.2',
 		RELEASE  = '2026-11-13',
 		REQUIRED = '3.0.1',
 		CATEGORY = 'General',
 		LICENSE  = 'MIT',
 		DESCRIPTION = 'Compact modern reading pane: actions in the toolbar, sender verification shield, one-line attachments, outline icons';
 
+	const
+		CSS = ['symbols', 'toolbar', 'account', 'header', 'shield', 'attachments', 'attachments-select'],
+		JS  = ['util', 'header', 'account', 'shield', 'attachments', 'attachments-layout', 'attachments-actions'];
+
 	public function Init() : void
 	{
 		$this->UseLangs(true);
-		$this->addCss('symbols.css');
-		$this->addCss('style.css');
-		$this->addCss('attachments.css');
-		$this->addJs('modern-view.js');
+		foreach (static::CSS as $sName) {
+			$this->addCss("css/{$sName}.css");
+		}
+		foreach (static::JS as $sName) {
+			$this->addJs("js/{$sName}.js");
+		}
 		// Replaces the built-in template with the same name
 		$this->addTemplate('templates/MailMessageView.html');
 	}

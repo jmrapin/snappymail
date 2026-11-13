@@ -1,0 +1,119 @@
+/*
+ * Nextcloud Modern View: reading pane toolbar and ☰ menu (step 3).
+ * Colours use the Nextcloud theme variables (--color-*); fallbacks are Nextcloud's light defaults.
+ */
+
+/* line under the toolbar only when a message is open (an empty toolbar would leave a stray line) */
+#rl-app #V-MailMessageView .mv-toolbar.mv-has-message {
+	border-bottom: 1px solid var(--color-border, #ededed);
+}
+
+#rl-app #V-MailMessageView .mv-toolbar {
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	gap: 2px;
+	/* the account switcher (#V-SystemDropDown) floats over the right end */
+	padding-right: calc(var(--mv-account-width, 72px) + 16px);
+	container-type: inline-size;
+	/* above the message area, so the ☰ menu opens on top of it (not clipped) */
+	position: relative;
+	z-index: 102;
+}
+
+#rl-app .mv-group {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+
+#rl-app .mv-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	flex: none;
+	height: 40px;
+	min-width: 40px;
+	padding: 0 9px;
+	box-sizing: border-box;
+	border: 0;
+	border-radius: var(--border-radius-element, 8px);
+	background: transparent;
+	color: var(--color-main-text, #222);
+	font-size: 14px;
+	line-height: 1;
+	text-decoration: none;
+	white-space: nowrap;
+	cursor: pointer;
+	user-select: none;
+}
+#rl-app .mv-btn .mi {
+	width: 22px;
+	height: 22px;
+	vertical-align: middle;
+}
+#rl-app .mv-btn:hover,
+#rl-app .mv-btn:focus-visible,
+#rl-app .mv-more.show > .mv-btn {
+	background-color: var(--color-background-hover, #f5f5f5);
+	outline: none;
+}
+#rl-app .mv-btn.disabled {
+	opacity: .35;
+	pointer-events: none;
+}
+#rl-app .mv-btn.mv-primary {
+	color: var(--color-primary-element, #00679e);
+}
+#rl-app .mv-btn.mv-danger:hover {
+	color: var(--color-error-text, #c42b1c);
+}
+#rl-app .mv-rotate {
+	transform: rotate(180deg);
+}
+
+/* Default action "Reply All" puts Reply all first */
+#rl-app .mv-replies.mv-replyall-first .mv-replyall {
+	order: -1;
+}
+
+#rl-app .mv-sep {
+	flex: none;
+	width: 1px;
+	height: 22px;
+	margin: 0 6px;
+	background-color: var(--color-border, #ededed);
+}
+#rl-app .mv-spacer {
+	flex: 1 1 auto;
+}
+
+/* Labels on Reply / Reply all / Forward / Edit only when the pane is wide enough */
+#rl-app .mv-lbl {
+	display: none;
+}
+@container (min-width: 900px) {
+	#rl-app .mv-lbl {
+		display: inline;
+	}
+}
+
+/* No close button in the side-by-side / bottom layout (Esc still closes);
+   keep it on mobile and when the preview pane is off, where it is the way back to the list */
+html.sm-msgView-side:not(.rl-mobile) #rl-app .mv-toolbar .buttonClose,
+html.sm-msgView-bottom:not(.rl-mobile) #rl-app .mv-toolbar .buttonClose {
+	display: none;
+}
+
+/* ☰ menu */
+#rl-app .mv-menu a {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+#rl-app .mv-menu .mi {
+	width: 18px;
+	height: 18px;
+	opacity: .75;
+}
