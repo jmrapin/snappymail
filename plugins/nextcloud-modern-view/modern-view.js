@@ -71,8 +71,12 @@
 				level = ('pass' !== spf || 'pass' !== dkim || ('pass' !== dmarc && 'none' !== dmarc))
 					? 'bad'
 					: ('none' === dmarc ? 'warn' : 'ok');
+			// The Sent folder holds your own mail: no shield there at all.
+			// (SentFolder is the setting at page load; a change applies after a reload.)
+			const sentFolder = rl.settings.get('SentFolder'),
+				inSent = !!sentFolder && view.message()?.folder === sentFolder;
 			return {
-				show: !(allNone && (local || view.isDraftFolder())),
+				show: !inSent && !(allNone && (local || view.isDraftFolder())),
 				local: local,
 				level: 'mv-' + level,
 				icon: { ok: 'mi-verified-user', warn: 'mi-gpp-maybe', bad: 'mi-gpp-bad' }[level],
