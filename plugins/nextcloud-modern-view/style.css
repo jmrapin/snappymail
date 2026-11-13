@@ -6,6 +6,11 @@
 
 /* ===== Reading pane toolbar (step 3) ===== */
 
+/* line under the toolbar only when a message is open (an empty toolbar would leave a stray line) */
+#rl-app #V-MailMessageView .mv-toolbar.mv-has-message {
+	border-bottom: 1px solid var(--color-border, #ededed);
+}
+
 #rl-app #V-MailMessageView .mv-toolbar {
 	display: flex;
 	align-items: center;
@@ -13,7 +18,6 @@
 	gap: 2px;
 	/* the account switcher (#V-SystemDropDown) floats over the right end */
 	padding-right: calc(var(--mv-account-width, 72px) + 16px);
-	border-bottom: 1px solid var(--color-border, #ededed);
 	container-type: inline-size;
 	/* above the message area, so the ☰ menu opens on top of it (not clipped) */
 	position: relative;

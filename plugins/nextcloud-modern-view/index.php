@@ -29,6 +29,7 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 		$this->UseLangs(true);
 		$this->addCss('symbols.css');
 		$this->addCss('style.css');
+		$this->addCss('attachments.css');
 		$this->addJs('modern-view.js');
 		// Replaces the built-in template with the same name
 		$this->addTemplate('templates/MailMessageView.html');

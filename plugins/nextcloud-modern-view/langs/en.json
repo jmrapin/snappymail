@@ -6,6 +6,14 @@
 		"SENDER_NO_DMARC": "Sender verified, no DMARC policy",
 		"SENDER_NOT_VERIFIED": "Sender could not be verified",
 		"DELIVERED_LOCALLY": "Delivered locally (same server)",
-		"TAGS": "Tags"
+		"TAGS": "Tags",
+		"SHOW_ALL": "Show all (%N%)",
+		"SHOW_LESS": "Show less",
+		"DOWNLOAD_ALL": "Download all",
+		"DOWNLOAD": "Download",
+		"PREVIEW": "Preview",
+		"SELECT": "Select…",
+		"ATTACHMENTS_SUMMARY": "%N% attachments · %SIZE%",
+		"N_OF_M_SELECTED": "%N% of %M% selected"
 	}
 }

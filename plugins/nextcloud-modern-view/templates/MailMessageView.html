@@ -5,7 +5,7 @@
 	prev / next, the ☰ menu) with outline icons; no floating reply/☰ buttons on the message;
 	no × next to the subject. The close button is hidden by CSS in the side-by-side layout.
 -->
-<div class="top-toolbar g-ui-user-select-none btn-toolbar mv-toolbar">
+<div class="top-toolbar g-ui-user-select-none btn-toolbar mv-toolbar" data-bind="css: { 'mv-has-message': message }">
 	<a class="mv-btn buttonClose" data-bind="click: closeMessage" data-i18n="[title]GLOBAL/CLOSE"><i class="mi mi-close"></i></a>
 	<div class="mv-group mv-replies" data-bind="visible: canBeRepliedOrForwarded, css: {'mv-replyall-first': 2 == msgDefaultAction()}">
 		<a class="mv-btn mv-primary mv-reply" data-bind="command: replyCommand" data-i18n="[title]MESSAGE/BUTTON_REPLY"><i class="mi mi-reply"></i><span class="mv-lbl" data-i18n="MESSAGE/BUTTON_REPLY"></span></a>
@@ -182,50 +182,58 @@
 					<div class="bodySubHeader" data-bind="if: message, i18nUpdate: message">
 						<div class="readReceipt" data-bind="visible: askReadReceipt, click: readReceipt"
 							data-icon="✉" data-i18n="MESSAGE/BUTTON_NOTIFY_READ_RECEIPT"></div>
-						<details class="attachmentsPlace" data-bind="visible: hasAttachments, css: {'selection-mode' : showAttachmentControls}, attr: { open: hasAttachments }">
-							<summary data-i18n="MESSAGE/PRINT_LABEL_ATTACHMENTS"></summary>
-							<!-- ko ifnot: simpleAttachmentsList -->
-							<ul class="attachmentList" data-bind="foreach: listAttachments">
-								<li class="attachmentItem" draggable="true"
-										data-bind="event: { dragstart: eventDragStart }, attr: { title: fileName }, css: {checked: checked}">
-									<div class="attachmentIcon" data-bind="css: { hasPreview: hasPreview(), hasPreplay: hasPreplay(), isImage: isImage() }, attr: { style: thumbnailStyle() }">
-										<i class="hidePreview iconMain" data-bind="css: iconClass()"></i>
-										<div class="showPreview">
-											<a data-bind="css: {attachmentImagePreview: isImage()}, attr: { title: fileName, href: linkPreviewMain() }" target="_blank">
-												<i class="iconMain" data-bind="visible: !hasThumbnail(), css: iconClass()"></i>
-												<div class="iconPreview fontastic">👁</div>
+						<!-- Attachments (step 6): one line of cards, "Show all" opens two rows that scroll sideways together -->
+						<div class="attachmentsPlace mv-atts" data-bind="visible: hasAttachments, css: { 'mv-expanded': mvAttExpanded, 'mv-selecting': mvAttSelecting }">
+							<div class="mv-att-selbar" data-bind="visible: mvAttSelecting">
+								<span class="mv-cb" data-bind="css: { on: mvAttAllChecked }, click: mvAttToggleAll"></span>
+								<span class="mv-att-count" data-bind="text: mvAttSelectedText"></span>
+								<button class="mv-sbtn mv-sbtn-primary" data-bind="click: mvAttDownloadSelected, enable: mvAttSelectedCount() > 0, visible: downloadAsZipAllowed"><i class="mi mi-download"></i><span data-bind="text: mvT('MESSAGE/LINK_DOWNLOAD_AS_ZIP')"></span></button>
+								<button class="mv-sbtn" data-bind="click: mvAttSaveSelected, enable: mvAttSelectedCount() > 0, visible: mvHasNextcloud"><i class="mi mi-cloud-upload"></i><span data-bind="text: mvT('NEXTCLOUD/SAVE_ATTACHMENTS')"></span></button>
+								<span class="mv-spacer"></span>
+								<button class="mv-sbtn mv-sbtn-ghost" data-bind="click: mvAttCancelSelect, text: mvT('GLOBAL/CANCEL')"></button>
+							</div>
+							<div class="mv-att-head" data-bind="visible: mvAttExpanded() && !mvAttSelecting()">
+								<span data-bind="text: mvAttSummary"></span>
+								<span class="mv-spacer"></span>
+								<a href="#" class="mv-lnk" data-bind="visible: downloadAsZipAllowed() && listAttachments().length > 1, click: mvAttDownloadAll"><i class="mi mi-download"></i><span data-bind="text: mvT('MODERN_VIEW/DOWNLOAD_ALL')"></span></a>
+								<a href="#" class="mv-lnk" data-bind="click: mvAttCollapse"><i class="mi mi-keyboard-arrow-up"></i><span data-bind="text: mvT('MODERN_VIEW/SHOW_LESS')"></span></a>
+							</div>
+							<div class="mv-att-row">
+								<div class="mv-att-list" data-bind="foreach: { data: mvAttRows, as: 'row' }, event: { scroll: mvAttScrolled }">
+									<div class="mv-att-line" data-bind="foreach: { data: row, as: 'att' }">
+										<div class="mv-att" draggable="true" data-bind="
+											css: { 'mv-hidden': !$root.mvAttExpanded() && !$root.mvAttSelecting() && att.mvIndex >= $root.mvAttFit(), 'mv-sel': $root.mvAttSelecting() && att.checked() },
+											attr: { title: att.fileName },
+											event: { dragstart: att.eventDragStart }">
+											<a class="mv-att-main" target="_blank" data-bind="
+												attr: { href: att.hasPreview() ? att.linkPreviewMain() : att.linkDownload() },
+												click: (data, event) => $root.mvAttClick(att, event)">
+												<span class="mv-cb" data-bind="css: { on: att.checked }"></span>
+												<span class="mv-att-ic" data-bind="css: $root.mvAttIconClass(att), attr: { style: att.thumbnailStyle() || '' }, text: att.hasThumbnail() ? '' : $root.mvAttExt(att)"></span>
+												<span class="mv-att-tx">
+													<span class="mv-att-nm" data-bind="text: att.fileName"></span>
+													<span class="mv-att-sz" data-bind="text: att.friendlySize()"></span>
+												</span>
 											</a>
+											<a href="#" class="mv-att-dd" data-bind="click: (data, event) => $root.mvAttOpenMenu(att, event), attr: { title: $root.mvT('GLOBAL/MORE') }"><i class="mi mi-keyboard-arrow-down"></i></a>
 										</div>
 									</div>
-									<div class="attachmentNameParent">
-										<div class="attachmentName" data-bind="text: fileName"></div>
-										<div class="attachmentSize" data-bind="text: friendlySize()"></div>
-									</div>
-									<div class="checkboxAttachment fontastic"
-										data-bind="visible: download, text: checked() ? '☑' : '☐', click: toggleChecked"></div>
-								</li>
-							</ul>
-							<!-- /ko -->
-							<!-- ko if: simpleAttachmentsList -->
-							<ul class="attachmentListSimple" data-bind="foreach: listAttachments">
-								<li class="attachmentItem" data-bind="attr: { title: fileName }, css: {checked: checked}">
-									<span class="attachmentName" data-bind="text: fileName"></span>
-									<i class="checkboxAttachment fontastic"
-										data-bind="visible: download, text: checked() ? '☑' : '☐', click: toggleChecked"></i>
-								</li>
-							</ul>
-							<!-- /ko -->
-							<i class="fontastic controls-handle" data-bind="visible: allowAttachmentControls, click: toggleAttachmentControls">⚙</i>
-							<div class="attachmentsControls" data-bind="visible: showAttachmentControls">
-								<span data-bind="visible: downloadAsZipAllowed">
-									<i class="fontastic iconcolor-red" data-bind="visible: downloadAsZipError">✖</i>
-									<i class="icon-file-archive" data-bind="visible: !downloadAsZipError(),
-										css: {'icon-file-archive': !downloadAsZipLoading(), 'icon-spinner': downloadAsZipLoading()}"></i>
-									<span class="g-ui-link" data-bind="click: downloadAsZip"
-										data-i18n="MESSAGE/LINK_DOWNLOAD_AS_ZIP"></span>
-								</span>
+								</div>
+								<a href="#" class="mv-more-chip" data-bind="visible: !mvAttExpanded() && !mvAttSelecting() && mvAttFit() < listAttachments().length, click: mvAttExpand, text: mvAttShowAllText"></a>
+								<a href="#" class="mv-lnk mv-all" data-bind="visible: !mvAttExpanded() && !mvAttSelecting() && downloadAsZipAllowed() && listAttachments().length > 1, click: mvAttDownloadAll"><i class="mi mi-download"></i><span data-bind="text: mvT('MODERN_VIEW/DOWNLOAD_ALL')"></span></a>
 							</div>
-						</details>
+							<!-- per-attachment ▾ menu (fixed position, outside the scrolling list) -->
+							<menu class="dropdown-menu mv-att-menu" data-bind="visible: mvAttMenu, style: { top: mvAttMenuPos().top + 'px', left: mvAttMenuPos().left + 'px' }">
+								<li role="presentation" data-bind="visible: mvAttMenu()?.hasPreview()"><a href="#" data-bind="click: () => mvAttAction('preview')"><i class="mi mi-visibility"></i><span data-bind="text: mvT('MODERN_VIEW/PREVIEW')"></span></a></li>
+								<li role="presentation"><a href="#" data-bind="click: () => mvAttAction('open')"><i class="mi mi-open-in-new"></i><span data-bind="text: mvT('MESSAGE/BUTTON_IN_NEW_WINDOW')"></span></a></li>
+								<li role="presentation"><a href="#" data-bind="click: () => mvAttAction('download')"><i class="mi mi-download"></i><span data-bind="text: mvT('MODERN_VIEW/DOWNLOAD')"></span></a></li>
+								<li role="presentation" class="dividerbar" data-bind="visible: mvHasNextcloud"><a href="#" data-bind="click: () => mvAttAction('nextcloud')"><i class="mi mi-cloud-upload"></i><span data-bind="text: mvT('NEXTCLOUD/SAVE_ATTACHMENTS')"></span></a></li>
+								<li role="presentation" data-bind="visible: mvAttMenuIsIcs"><a href="#" data-bind="click: () => mvAttAction('calendar')"><i class="mi mi-event"></i><span data-bind="text: mvT('NEXTCLOUD/SAVE_ICS')"></span></a></li>
+								<li role="presentation" class="dividerbar" data-bind="visible: listAttachments().length > 1"><a href="#" data-bind="click: () => mvAttAction('select')"><i class="mi mi-check-box"></i><span data-bind="text: mvT('MODERN_VIEW/SELECT')"></span></a></li>
+							</menu>
+							<!-- kept hidden: the nextcloud plugin appends its Save to Nextcloud / calendar controls here and defines saveNextcloud(), nextcloudSaveICS() -->
+							<div class="attachmentsControls" hidden></div>
+						</div>
 
 						<div class="btn-toolbar showImages" data-bind="visible: message().hasImages()">
 							<div class="btn" data-bind="click: showImages" data-icon="🖼" data-i18n="MESSAGE/BUTTON_SHOW_IMAGES"></div>
