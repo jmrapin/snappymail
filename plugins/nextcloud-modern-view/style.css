@@ -120,6 +120,11 @@ html.sm-msgView-bottom:not(.rl-mobile) #rl-app .mv-toolbar .buttonClose {
 #rl-app #V-SystemDropDown #top-system-dropdown-id > i.fontastic {
 	display: none;
 }
+/* core draws its own ▼ (Layout.less); the pill uses the outline icon instead */
+#rl-app #V-SystemDropDown #top-system-dropdown-id::after {
+	content: none;
+	display: none;
+}
 #rl-app #V-SystemDropDown #top-system-dropdown-id {
 	display: inline-flex;
 	align-items: center;
