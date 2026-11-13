@@ -133,7 +133,6 @@ export class MessageModel extends AbstractModel {
 			dkim: [],
 			spf: [],
 			dmarc: [],
-			localDelivery: false,
 			messageId: '',
 			inReplyTo: '',
 			references: '',
@@ -579,7 +578,9 @@ export class MessageModel extends AbstractModel {
 
 			body.querySelectorAll('[data-x-style-url]').forEach(node => {
 				JSON.parse(node.dataset.xStyleUrl).forEach(data => {
-					if (isValid(data[1])) {
+					// cid: is an inline attachment, not an external image
+					// (check this url, not the leftover src of the img loop above, which may be undefined)
+					if (!data[1].startsWith('cid:') && isValid(data[1])) {
 						node.style[data[0]] = "url('" + (useProxy ? proxy(data[1]) : data[1]) + "')"
 					}
 				});
@@ -641,6 +642,7 @@ export class MessageModel extends AbstractModel {
 			}
 		})
 		.catch(e => {
+			console.error(e);
 			data.error = e.message;
 		})
 		.finally(() => {

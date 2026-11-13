@@ -62,23 +62,23 @@ abstract class Base
 
 		$options = [];
 		if ('mysql' === $oSettings->driver) {
-			// PHP 8.5 deprecates PDO::MYSQL_ATTR_* in favour of Pdo\Mysql::ATTR_* (PHP 8.4+)
-			$sAttr = \class_exists('Pdo\\Mysql', false) ? 'Pdo\\Mysql::ATTR_' : 'PDO::MYSQL_ATTR_';
-			if ($oSettings->sslCa) {
-				$options[\constant($sAttr . 'SSL_CA')] = $oSettings->sslCa;
+			if (!\class_exists('PDO\\Mysql', false)) {
+				require \SNAPPYMAIL_LIBRARIES_PATH . '/polyfill/pdo.php';
 			}
-			// PHP 8.0 https://github.com/the-djmaze/snappymail/issues/1205
-			if (\defined($sAttr . 'SSL_VERIFY_SERVER_CERT')) {
-				$options[\constant($sAttr . 'SSL_VERIFY_SERVER_CERT')] = $oSettings->sslVerify;
+			if ($oSettings->sslCa) {
+				$options[\PDO\Mysql::ATTR_SSL_CA] = $oSettings->sslCa;
+			}
+			if (\defined('PDO\\Mysql::ATTR_SSL_VERIFY_SERVER_CERT')) {
+				$options[\PDO\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = $oSettings->sslVerify;
 			}
 			if ($oSettings->sslCiphers) {
-				$options[\constant($sAttr . 'SSL_CIPHER')] = $oSettings->sslCiphers;
+				$options[\PDO\Mysql::ATTR_SSL_CIPHER] = $oSettings->sslCiphers;
 			}
 /*
-			$options[\PDO::MYSQL_ATTR_SSL_CAPATH] = '';
+			$options[\PDO\Mysql::ATTR_SSL_CAPATH] = '';
 			// mutual (two-way) authentication
-			$options[\PDO::MYSQL_ATTR_SSL_KEY] = '';
-			$options[\PDO::MYSQL_ATTR_SSL_CERT] = '';
+			$options[\PDO\Mysql::ATTR_SSL_KEY] = '';
+			$options[\PDO\Mysql::ATTR_SSL_CERT] = '';
 */
 		}
 

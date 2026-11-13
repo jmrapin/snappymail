@@ -20,6 +20,7 @@ class NextcloudContactsSuggestions implements \RainLoop\Providers\Suggestions\IS
 				return [];
 			}
 
+//			$cm = \OCA\SnappyMail\Util\SnappyMailHelper::getContactsManager();
 			$cm = \method_exists(\OC::$server, 'getContactsManager')
 				? \OC::$server->getContactsManager()
 				// Nextcloud 34+

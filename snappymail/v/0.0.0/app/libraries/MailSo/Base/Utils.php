@@ -221,21 +221,21 @@ abstract class Utils
 		$sValue = \preg_replace('/[\r\n\t]+/m', ' ', $sValue);
 
 		$aEncodeArray = array('');
-		$aMatch = array();
-//		\preg_match_all('/=\?[^\?]+\?[q|b|Q|B]\?[^\?]*?\?=/', $sValue, $aMatch);
-		\preg_match_all('/=\?[^\?]+\?[q|b|Q|B]\?.*?\?=/', $sValue, $aMatch);
+//		\preg_match_all('/=\?[^\?]+\?[q|b|Q|B]\?[^\?]*?\?=/', $sValue, $aEncodeArray);
+		\preg_match_all('/=\?[^\?]+\?[q|b|Q|B]\?.*?\?=/', $sValue, $aEncodeArray);
 
-		if (isset($aMatch[0]) && \is_array($aMatch[0])) {
-			for ($iIndex = 0, $iLen = \count($aMatch[0]); $iIndex < $iLen; ++$iIndex) {
-				if (isset($aMatch[0][$iIndex])) {
-					$iPos = \strpos($aMatch[0][$iIndex], '*');
+		if (isset($aEncodeArray[0]) && \is_array($aEncodeArray[0])) {
+			$aEncodeArray = \array_unique($aEncodeArray[0]);
+			for ($iIndex = 0, $iLen = \count($aEncodeArray); $iIndex < $iLen; ++$iIndex) {
+				if (isset($aEncodeArray[$iIndex])) {
+					$iPos = \strpos($aEncodeArray[$iIndex], '*');
 					if (false !== $iPos) {
-						$aMatch[0][$iIndex][0] = \substr($aMatch[0][$iIndex][0], 0, $iPos);
+						$aEncodeArray[$iIndex][0] = \substr($aEncodeArray[$iIndex][0], 0, $iPos);
 					}
 				}
 			}
-
-			$aEncodeArray = $aMatch[0];
+		} else {
+			$aEncodeArray = [];
 		}
 
 		$aParts = array();
@@ -413,26 +413,12 @@ abstract class Utils
 		return \trim($sValue);
 	}
 
-	/**
-	 * @deprecated use getEmailAddressLocalPart
-	 */
-	public static function GetAccountNameFromEmail(string $sEmail) : string
-	{
-		return static::getEmailAddressLocalPart($sEmail);
-	}
 	public static function getEmailAddressLocalPart(string $sEmail) : string
 	{
 		$iPos = \strrpos($sEmail, '@');
 		return (false === $iPos) ? $sEmail : \substr($sEmail, 0, $iPos);
 	}
 
-	/**
-	 * @deprecated use getEmailAddressDomain
-	 */
-	public static function GetDomainFromEmail(string $sEmail) : string
-	{
-		return static::getEmailAddressDomain($sEmail);
-	}
 	public static function getEmailAddressDomain(string $sEmail) : string
 	{
 		$iPos = \strrpos($sEmail, '@');
@@ -678,46 +664,16 @@ abstract class Utils
 		return !empty($sIp) && $sIp === \filter_var($sIp, FILTER_VALIDATE_IP);
 	}
 
-	/**
-	 * @deprecated
-	 */
-	public static function IdnToUtf8(string $sStr) : string
-	{
-		$trace = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
-		\SnappyMail\Log::warning('MailSo', "Deprecated function IdnToUtf8 called at {$trace['file']}#{$trace['line']}");
-		if (\preg_match('/(^|\.|@)xn--/i', $sStr)) {
-			$sStr = \str_contains($sStr, '@')
-			? \SnappyMail\IDN::emailToUtf8($string)
-			: \idn_to_utf8($string);
-		}
-		return $sStr;
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public static function IdnToAscii(string $sStr, bool $bLowerCase = false) : string
-	{
-		$trace = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
-		\SnappyMail\Log::warning('MailSo', "Deprecated function IdnToAscii called at {$trace['file']}#{$trace['line']}");
-		$aParts = \explode('@', $sStr);
-		$sDomain = \array_pop($aParts);
-		if (\preg_match('/[^\x20-\x7E]/', $sDomain)) {
-			$sDomain = \idn_to_ascii($string);
-		}
-		if ($bLowerCase) {
-			$sDomain = \strtolower($sDomain);
-		}
-		$aParts[] = $sDomain;
-		return \implode('@', $aParts);
-	}
-
 	public static function mkdir(string $directory) : void
 	{
+		\clearstatcache();
 		if (!\is_dir($directory)) {
-			// Another request may create it concurrently, so only fail when it still doesn't exist
-			if (!@\mkdir($directory, 0700, true) && !\is_dir($directory)) {
-				throw new \RuntimeException("Failed to create directory {$directory}: " . (\error_get_last()['message'] ?? ''));
+			if (!\mkdir($directory, 0700, true)) {
+				// Another request may create it concurrently, so only fail when it still doesn't exist
+				\clearstatcache();
+				if (!\is_dir($directory)) {
+					throw new \RuntimeException("Failed to create directory {$directory}");
+				}
 			}
 			\clearstatcache();
 		}

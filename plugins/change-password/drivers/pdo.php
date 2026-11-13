@@ -71,10 +71,13 @@ class ChangePasswordDriverPDO
 				\PDO::ATTR_ERRMODE           => \PDO::ERRMODE_EXCEPTION,
 			);
 			if ($this->oConfig->Get('plugin', 'pdo_mysql_ssl', false)) {
-				// PHP 8.5 deprecates PDO::MYSQL_ATTR_* in favour of Pdo\Mysql::ATTR_* (PHP 8.4+)
-				$attr = \class_exists('Pdo\\Mysql', false) ? 'Pdo\\Mysql::ATTR_' : 'PDO::MYSQL_ATTR_';
-				$pdo_attr[\constant($attr . 'SSL_CA')]                 = $this->oConfig->Get('plugin', 'pdo_mysql_ssl_ca', '');
-				$pdo_attr[\constant($attr . 'SSL_VERIFY_SERVER_CERT')] = $this->oConfig->Get('plugin', 'pdo_mysql_ssl_verify', true);
+				if (!\class_exists('PDO\\Mysql', false)) {
+					require \SNAPPYMAIL_LIBRARIES_PATH . '/polyfill/pdo.php';
+				}
+				$pdo_attr[\PDO\Mysql::ATTR_SSL_CA] = $this->oConfig->Get('plugin', 'pdo_mysql_ssl_ca', '');
+				if (\defined('PDO\\Mysql::ATTR_SSL_VERIFY_SERVER_CERT')) {
+					$pdo_attr[\PDO\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = $this->oConfig->Get('plugin', 'pdo_mysql_ssl_verify', true);
+				}
 			}
 
 			$conn = new \PDO(
@@ -94,7 +97,7 @@ class ChangePasswordDriverPDO
 				':newpass' => $encrypt_prefix . \ChangePasswordPlugin::encrypt($encrypt, $oNewPassword),
 				':domain' => \MailSo\Base\Utils::getEmailAddressDomain($sEmail),
 				':username' => \MailSo\Base\Utils::getEmailAddressLocalPart($sEmail),
-				':login_name' => $oAccount->IncLogin()
+				':login_name' => $oAccount->ImapUser()
 			);
 
 			$sql = $this->oConfig->Get('plugin', 'pdo_sql', '');
