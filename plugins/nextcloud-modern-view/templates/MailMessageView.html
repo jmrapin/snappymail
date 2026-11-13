@@ -54,7 +54,7 @@
 			</div>
 			<!-- ko if: tagsAllowed -->
 			<div class="dividerbar mv-menu-tags">
-				<!-- ko foreach: message()?.tagOptions() || [] -->
+				<!-- ko foreach: mvTagOptions -->
 				<li role="presentation">
 					<a href="#" tabindex="-1" data-bind="click: toggle, attr: { title: value }"><i class="mi" data-bind="css: checked ? 'mi-check-box' : 'mi-check-box-outline-blank'"></i><span data-bind="text: label, attr: { class: css }"></span></a>
 				</li>

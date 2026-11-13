@@ -67,7 +67,7 @@
 		};
 
 	NcModernView.onView('MailMessageView', view => {
-		view.mvAuth = ko.computed(() => status(view));
+		view.mvAuth = NcModernView.computed('mvAuth', () => status(view), { show: false, local: false, level: '', icon: '', head: '', rows: [] });
 	});
 
 })(window.rl);

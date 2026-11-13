@@ -37,6 +37,11 @@ These rules apply to every change in this repository.
   Check that any `ko.*` API you use exists in `vendors/knockout` before relying on it.
 - **`foreach` has no `as:` alias** (only `foreach: list` / `foreach: { data: list }`): inside the
   loop the item is `$data`, the view is `$root`, the outer item is `$parent`.
+- **Plugin code must never throw into core.** Core recomputes plugin observables while it handles
+  requests (folder switch, message list); a throw there shows up as "Request failed". In
+  `nextcloud-modern-view` use `NcModernView.computed(name, fn, fallback)` instead of `ko.computed`,
+  and don't call core methods without null checks from bindings (e.g. `message().tagOptions()`
+  assumes a current folder). For hard cases: `localStorage.mvDebug = 1` + reload logs failing bindings.
 - **Production builds strip `console.*`** from core (`drop_console`), so core errors are invisible.
   Plugin JS is not stripped: debug with a temporary wrapper in the plugin, then remove it.
 - **`with:` / `if:` / `foreach:` blocks re-render** and lose `data-i18n` translations unless the
