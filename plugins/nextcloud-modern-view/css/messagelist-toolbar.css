@@ -1,0 +1,51 @@
+/*
+ * Nextcloud Modern View: message list toolbar (step 7).
+ * Same look and height as the reading pane toolbar (.mv-btn styles come from toolbar.css),
+ * so the two bottom lines meet.
+ */
+
+#rl-app #V-MailMessageList .btn-toolbar.mv-list-toolbar {
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	gap: 2px;
+	/* same box as #V-MailMessageView .btn-toolbar in the theme: 10px padding, 5px top margin */
+	margin: 5px 0 0;
+	padding: 10px 12px;
+	background: transparent;
+	border-radius: 0;
+	border-bottom: 1px solid var(--color-border, #ededed);
+	text-align: start !important;
+	white-space: nowrap;
+}
+
+#rl-app .mv-list-toolbar .btn-group {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	margin: 0;
+}
+
+/* the theme gives list buttons a white box; ours are flat like the reading pane */
+#rl-app #V-MailMessageList .mv-list-toolbar .mv-btn {
+	background: transparent;
+	border: 0 !important;
+	border-radius: var(--border-radius-element, 8px) !important;
+	margin: 0;
+}
+#rl-app #V-MailMessageList .mv-list-toolbar .mv-btn:hover,
+#rl-app #V-MailMessageList .mv-list-toolbar .dropdown.show > .mv-btn {
+	background-color: var(--color-background-hover, #f5f5f5);
+}
+#rl-app #V-MailMessageList .mv-list-toolbar .mv-btn.disabled {
+	opacity: .35;
+}
+
+/* refresh spins while the list loads (core animates its spinner with .list-loading) */
+@keyframes mv-spin {
+	to { transform: rotate(360deg); }
+}
+#rl-app .list-loading .mv-list-toolbar .mv-reload .mi,
+#rl-app .mv-list-toolbar .mv-reload.list-loading .mi {
+	animation: mv-spin 1s linear infinite;
+}
