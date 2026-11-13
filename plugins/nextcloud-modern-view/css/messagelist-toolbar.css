@@ -9,9 +9,12 @@
 	align-items: center;
 	flex-wrap: nowrap;
 	gap: 2px;
-	/* same box as #V-MailMessageView .btn-toolbar in the theme: 10px padding, 5px top margin */
-	margin: 5px 0 0;
-	padding: 10px 12px;
+	/* height, vertical padding and top margin come from the shared rule in toolbar.css,
+	   so both panels line up; only the sides are set here */
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 12px;
+	padding-right: 12px;
 	background: transparent;
 	border-radius: 0;
 	border-bottom: 1px solid var(--color-border, #ededed);
