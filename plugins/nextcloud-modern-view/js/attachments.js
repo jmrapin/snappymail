@@ -47,6 +47,10 @@
 			return [items];
 		}, [[]]);
 
+		// core's listAttachments() is undefined while no message is open (folder switch): never
+		// read .length on it from a binding, that threw "Request failed"
+		view.mvAttCount = NcModernView.computed('mvAttCount', () => list().length, 0);
+
 		view.mvAttExt = att => (att.fileNameExt || '').toUpperCase().slice(0, 4) || 'FILE';
 		view.mvAttIconClass = att => (att.hasThumbnail() ? 'mv-thumb ' : '')
 			+ 'mv-ic-' + (EXT_CLASS[(att.fileNameExt || '').toLowerCase()] || 'gen');

@@ -41,7 +41,8 @@ These rules apply to every change in this repository.
   requests (folder switch, message list); a throw there shows up as "Request failed". In
   `nextcloud-modern-view` use `NcModernView.computed(name, fn, fallback)` instead of `ko.computed`,
   and don't call core methods without null checks from bindings (e.g. `message().tagOptions()`
-  assumes a current folder). For hard cases: `localStorage.mvDebug = 1` + reload logs failing bindings.
+  assumes a current folder; `listAttachments()` is `undefined` with no open message). Bindings inside
+  `if: message` still update once after the message is cleared, so they need guards too. For hard cases: `localStorage.mvDebug = 1` + reload logs failing bindings.
 - **Production builds strip `console.*`** from core (`drop_console`), so core errors are invisible.
   Plugin JS is not stripped: debug with a temporary wrapper in the plugin, then remove it.
 - **`with:` / `if:` / `foreach:` blocks re-render** and lose `data-i18n` translations unless the

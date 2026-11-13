@@ -195,7 +195,7 @@
 							<div class="mv-att-head" data-bind="visible: mvAttExpanded() && !mvAttSelecting()">
 								<span data-bind="text: mvAttSummary"></span>
 								<span class="mv-spacer"></span>
-								<a href="#" class="mv-lnk" data-bind="visible: downloadAsZipAllowed() && listAttachments().length > 1, click: mvAttDownloadAll"><i class="mi mi-download"></i><span data-bind="text: mvT('MODERN_VIEW/DOWNLOAD_ALL')"></span></a>
+								<a href="#" class="mv-lnk" data-bind="visible: downloadAsZipAllowed() && mvAttCount() > 1, click: mvAttDownloadAll"><i class="mi mi-download"></i><span data-bind="text: mvT('MODERN_VIEW/DOWNLOAD_ALL')"></span></a>
 								<a href="#" class="mv-lnk" data-bind="click: mvAttCollapse"><i class="mi mi-keyboard-arrow-up"></i><span data-bind="text: mvT('MODERN_VIEW/SHOW_LESS')"></span></a>
 							</div>
 							<div class="mv-att-row">
@@ -219,8 +219,8 @@
 										</div>
 									</div>
 								</div>
-								<a href="#" class="mv-more-chip" data-bind="visible: !mvAttExpanded() && !mvAttSelecting() && mvAttFit() < listAttachments().length, click: mvAttExpand, text: mvAttShowAllText"></a>
-								<a href="#" class="mv-lnk mv-all" data-bind="visible: !mvAttExpanded() && !mvAttSelecting() && downloadAsZipAllowed() && listAttachments().length > 1, click: mvAttDownloadAll"><i class="mi mi-download"></i><span data-bind="text: mvT('MODERN_VIEW/DOWNLOAD_ALL')"></span></a>
+								<a href="#" class="mv-more-chip" data-bind="visible: !mvAttExpanded() && !mvAttSelecting() && mvAttFit() < mvAttCount(), click: mvAttExpand, text: mvAttShowAllText"></a>
+								<a href="#" class="mv-lnk mv-all" data-bind="visible: !mvAttExpanded() && !mvAttSelecting() && downloadAsZipAllowed() && mvAttCount() > 1, click: mvAttDownloadAll"><i class="mi mi-download"></i><span data-bind="text: mvT('MODERN_VIEW/DOWNLOAD_ALL')"></span></a>
 							</div>
 							<!-- per-attachment ▾ menu (fixed position, outside the scrolling list) -->
 							<menu class="dropdown-menu mv-att-menu" data-bind="visible: mvAttMenu, style: { top: mvAttMenuPos().top + 'px', left: mvAttMenuPos().left + 'px' }">
@@ -229,7 +229,7 @@
 								<li role="presentation"><a href="#" data-bind="click: () => mvAttAction('download')"><i class="mi mi-download"></i><span data-bind="text: mvT('MODERN_VIEW/DOWNLOAD')"></span></a></li>
 								<li role="presentation" class="dividerbar" data-bind="visible: mvHasNextcloud"><a href="#" data-bind="click: () => mvAttAction('nextcloud')"><i class="mi mi-cloud-upload"></i><span data-bind="text: mvT('NEXTCLOUD/SAVE_ATTACHMENTS')"></span></a></li>
 								<li role="presentation" data-bind="visible: mvAttMenuIsIcs"><a href="#" data-bind="click: () => mvAttAction('calendar')"><i class="mi mi-event"></i><span data-bind="text: mvT('NEXTCLOUD/SAVE_ICS')"></span></a></li>
-								<li role="presentation" class="dividerbar" data-bind="visible: listAttachments().length > 1"><a href="#" data-bind="click: () => mvAttAction('select')"><i class="mi mi-check-box"></i><span data-bind="text: mvT('MODERN_VIEW/SELECT')"></span></a></li>
+								<li role="presentation" class="dividerbar" data-bind="visible: mvAttCount() > 1"><a href="#" data-bind="click: () => mvAttAction('select')"><i class="mi mi-check-box"></i><span data-bind="text: mvT('MODERN_VIEW/SELECT')"></span></a></li>
 							</menu>
 							<!-- kept hidden: the nextcloud plugin appends its Save to Nextcloud / calendar controls here and defines saveNextcloud(), nextcloudSaveICS() -->
 							<div class="attachmentsControls" hidden></div>
