@@ -168,6 +168,8 @@ class Manager
 			}, APP_VERSION)
 			. $fFiles($this->aJs[1]) . $fFiles($this->aJs[0])
 			. $fFiles($this->aCss[1]) . $fFiles($this->aCss[0])
+			// plugin templates are compiled into the cached index page
+			. $fFiles($this->aTemplates) . $fFiles($this->aAdminTemplates)
 		);
 	}
 
