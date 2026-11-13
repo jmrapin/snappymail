@@ -7,13 +7,11 @@
 #rl-app #messageItem .attachmentsPlace.mv-atts {
 	position: relative;
 	top: 0;
-	padding: 10px 20px 10px 76px;
+	/* full width: the cards start at the same left edge as the avatar */
+	padding: 10px 20px;
 	border: 0;
 	border-bottom: 1px solid var(--color-border, #ededed);
 	background: transparent;
-}
-@media screen and (max-width: 799px) {
-	#rl-app #messageItem .attachmentsPlace.mv-atts { padding-left: 20px; }
 }
 #rl-app .mv-att-row {
 	display: flex;
