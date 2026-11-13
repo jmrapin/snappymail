@@ -13,8 +13,14 @@
 		// Translate from the template: globals like rl are not reachable inside bindings
 		view.mvT = (key, values) => rl.i18n(key, values);
 
-		view.mvFromName = ko.computed(() => from()?.name || from()?.email || '');
-		view.mvFromAddr = ko.computed(() => from()?.name && from()?.email ? '<' + from().email + '>' : '');
+		view.mvFromName = NcModernView.computed('mvFromName', () => from()?.name || from()?.email || '', '');
+		view.mvFromAddr = NcModernView.computed('mvFromAddr', () => from()?.name && from()?.email ? '<' + from().email + '>' : '', '');
+
+		// Tag options for the ☰ menu. Core's message.tagOptions() reads
+		// FolderUserStore.currentFolder().optionalTags() without a null check, which can throw while
+		// switching folders; a throw there surfaced as "Request failed" on the message list.
+		view.mvTagOptions = NcModernView.computed('mvTagOptions', () =>
+			view.tagsAllowed() ? (view.message()?.tagOptions() || []) : [], []);
 	});
 
 })(window.rl);

@@ -35,9 +35,9 @@
 		view.mvAttFit = ko.observable(1000);
 		view.mvAttMenu = ko.observable(null);
 		view.mvAttMenuPos = ko.observable({ top: 0, left: 0 });
-		view.mvHasNextcloud = ko.computed(() => 'function' === typeof view.saveNextcloud);
+		view.mvHasNextcloud = NcModernView.computed('mvHasNextcloud', () => 'function' === typeof view.saveNextcloud, false);
 
-		view.mvAttRows = ko.computed(() => {
+		view.mvAttRows = NcModernView.computed('mvAttRows', () => {
 			const items = list();
 			items.forEach((a, i) => a.mvIndex = i);
 			if ((view.mvAttExpanded() || view.mvAttSelecting()) && items.length > 1) {
@@ -45,31 +45,31 @@
 				return [items.slice(0, half), items.slice(half)];
 			}
 			return [items];
-		});
+		}, [[]]);
 
 		view.mvAttExt = att => (att.fileNameExt || '').toUpperCase().slice(0, 4) || 'FILE';
 		view.mvAttIconClass = att => (att.hasThumbnail() ? 'mv-thumb ' : '')
 			+ 'mv-ic-' + (EXT_CLASS[(att.fileNameExt || '').toLowerCase()] || 'gen');
 
-		view.mvAttShowAllText = ko.computed(() => NcModernView.t('SHOW_ALL', { N: list().length }));
-		view.mvAttSummary = ko.computed(() => NcModernView.t('ATTACHMENTS_SUMMARY', {
+		view.mvAttShowAllText = NcModernView.computed('mvAttShowAllText', () => NcModernView.t('SHOW_ALL', { N: list().length }), '');
+		view.mvAttSummary = NcModernView.computed('mvAttSummary', () => NcModernView.t('ATTACHMENTS_SUMMARY', {
 			N: list().length,
 			SIZE: NcModernView.friendlySize(list().reduce((t, a) => t + (a.estimatedSize || 0), 0))
-		}));
+		}), '');
 
-		view.mvAttSelectedCount = ko.computed(() => list().filter(a => a.checked()).length);
-		view.mvAttAllChecked = ko.computed(() => list().length > 0 && list().every(a => a.checked()));
-		view.mvAttSelectedText = ko.computed(() => NcModernView.t('N_OF_M_SELECTED', {
+		view.mvAttSelectedCount = NcModernView.computed('mvAttSelectedCount', () => list().filter(a => a.checked()).length, 0);
+		view.mvAttAllChecked = NcModernView.computed('mvAttAllChecked', () => list().length > 0 && list().every(a => a.checked()), false);
+		view.mvAttSelectedText = NcModernView.computed('mvAttSelectedText', () => NcModernView.t('N_OF_M_SELECTED', {
 			N: view.mvAttSelectedCount(),
 			M: list().length
-		}));
+		}), '');
 
 		// "Add to calendar" only for an invite the nextcloud plugin has parsed (nextcloudICS)
-		view.mvAttMenuIsIcs = ko.computed(() => {
+		view.mvAttMenuIsIcs = NcModernView.computed('mvAttMenuIsIcs', () => {
 			const att = view.mvAttMenu();
 			return !!att && 'function' === typeof view.nextcloudSaveICS && !!ko.unwrap(view.nextcloudICS)
 				&& ('text/calendar' === att.mimeType || 'ics' === (att.fileNameExt || '').toLowerCase());
-		});
+		}, false);
 	});
 
 })(window.rl);

@@ -30,10 +30,10 @@
 
 	NcModernView.onView('SystemDropDown', view => {
 		// accountName() is a method that reads observables, so the computed tracks them
-		view.mvInitials = ko.computed(() => initials(
+		view.mvInitials = NcModernView.computed('mvInitials', () => initials(
 			('function' === typeof view.accountName ? view.accountName() : '')
 			|| ko.unwrap(view.accountEmail)
-		));
+		), '?');
 	});
 
 })(window.rl);
