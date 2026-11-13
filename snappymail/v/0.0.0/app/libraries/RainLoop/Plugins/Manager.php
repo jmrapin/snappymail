@@ -155,12 +155,19 @@ class Manager
 
 	public function Hash(): string
 	{
+		// Include the files' modification times: a plugin can change without a new VERSION
+		// (a fork's own copy, or a reinstall of the same version), and the hash keys both the
+		// server-side compiled JS/CSS cache and the browser-cached URL.
+		$fFiles = fn(array $aFiles) => \implode('', \array_map(
+			fn($sFile) => $sFile . ':' . (@\filemtime($sFile) ?: 0),
+			$aFiles
+		));
 		return \md5(
 			\array_reduce($this->aPlugins, function($sResult, $oPlugin){
 				return $sResult . "|{$oPlugin->Hash()}";
 			}, APP_VERSION)
-			. \implode('', $this->aJs[1]) . \implode('', $this->aJs[0])
-			. \implode('', $this->aCss[1]) . \implode('', $this->aCss[0])
+			. $fFiles($this->aJs[1]) . $fFiles($this->aJs[0])
+			. $fFiles($this->aCss[1]) . $fFiles($this->aCss[0])
 		);
 	}
 
