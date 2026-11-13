@@ -90,6 +90,12 @@
 	text-decoration: none;
 	cursor: pointer;
 }
+/* the theme colours a[target=_blank] (and :visited) links; cards keep the text colour */
+#rl-app a.mv-att-main,
+#rl-app a.mv-att-main:visited,
+#rl-app a.mv-att-main:active {
+	color: var(--color-main-text, #222);
+}
 #rl-app .mv-att-main:hover,
 #rl-app .mv-att-dd:hover,
 #rl-app .mv-att-dd:focus-visible {
