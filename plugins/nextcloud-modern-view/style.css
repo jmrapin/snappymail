@@ -14,7 +14,9 @@
 	/* the account switcher (#V-SystemDropDown) floats over the right end */
 	padding-right: calc(var(--mv-account-width, 72px) + 16px);
 	container-type: inline-size;
-	overflow: hidden;
+	/* above the message area, so the ☰ menu opens on top of it (not clipped) */
+	position: relative;
+	z-index: 102;
 }
 
 #rl-app .mv-group {
