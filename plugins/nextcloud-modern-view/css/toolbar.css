@@ -136,3 +136,35 @@ html.sm-msgView-bottom:not(.rl-mobile) #rl-app .mv-toolbar .buttonClose {
 		padding-right: 12px;
 	}
 }
+
+/*
+ * Compact top toolbars on both panels (message list and reading pane): 4px above and below the
+ * 40px buttons instead of the theme's 5px margin + 10px padding. The panels below them are sized
+ * as "100% minus the toolbar" by the theme (65px), so that is adjusted to match.
+ */
+#rl-app {
+	--mv-toolbar-height: 49px; /* 4 + 40 + 4 + 1px bottom line */
+}
+#rl-app #V-MailMessageView .btn-toolbar.mv-toolbar,
+#rl-app #V-MailMessageList .btn-toolbar.mv-list-toolbar {
+	box-sizing: border-box;
+	height: var(--mv-toolbar-height);
+	margin-top: 0;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	border-bottom: 1px solid transparent;
+}
+#rl-app #V-MailMessageView .btn-toolbar.mv-toolbar.mv-has-message,
+#rl-app #V-MailMessageList .btn-toolbar.mv-list-toolbar {
+	border-bottom-color: var(--color-border, #ededed);
+}
+#rl-app .messageList,
+#rl-app .messageView {
+	height: calc(100% - var(--mv-toolbar-height));
+}
+/* the account switcher floats over the reading pane toolbar: centre it on the same line */
+#rl-app #V-SystemDropDown {
+	margin-top: 0;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
