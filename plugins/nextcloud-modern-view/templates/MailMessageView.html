@@ -5,7 +5,7 @@
 	prev / next, the ☰ menu) with outline icons; no floating reply/☰ buttons on the message;
 	no × next to the subject. The close button is hidden by CSS in the side-by-side layout.
 -->
-<div class="top-toolbar g-ui-user-select-none btn-toolbar mv-toolbar" data-bind="css: { 'mv-has-message': message }">
+<div class="top-toolbar g-ui-user-select-none btn-toolbar mv-toolbar" data-bind="css: { 'mv-has-message': message, 'mv-busy': mvBusy }">
 	<a class="mv-btn buttonClose" data-bind="click: closeMessage" data-i18n="[title]GLOBAL/CLOSE"><i class="mi mi-close"></i></a>
 	<div class="mv-group mv-replies" data-bind="visible: canBeRepliedOrForwarded, css: {'mv-replyall-first': 2 == msgDefaultAction()}">
 		<a class="mv-btn mv-primary mv-reply" data-bind="command: replyCommand" data-i18n="[title]MESSAGE/BUTTON_REPLY"><i class="mi mi-reply"></i><span class="mv-lbl" data-i18n="MESSAGE/BUTTON_REPLY"></span></a>

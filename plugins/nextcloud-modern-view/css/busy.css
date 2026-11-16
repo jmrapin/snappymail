@@ -1,0 +1,62 @@
+/*
+ * Nextcloud Modern View: action feedback on the toolbars (see js/busy.js).
+ * - pressed: the button darkens and shrinks slightly while held
+ * - busy: an animated accent line under the toolbar, and Refresh spins
+ */
+
+/* pressed */
+#rl-app .mv-btn {
+	transition: background-color .12s, transform .08s;
+}
+#rl-app .mv-btn:active:not(.disabled) {
+	background-color: var(--color-background-darker, #dbdbdb) !important;
+	transform: scale(.92);
+}
+
+/* busy line: sits on the toolbar's bottom border */
+#rl-app #V-MailMessageView .mv-toolbar,
+#rl-app #V-MailMessageList .mv-list-toolbar {
+	position: relative;
+}
+#rl-app .mv-toolbar.mv-busy::after,
+#rl-app .mv-list-toolbar.mv-busy::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 2px;
+	background: linear-gradient(90deg,
+		transparent 0%,
+		var(--color-primary-element, #00679e) 40%,
+		var(--color-primary-element, #00679e) 60%,
+		transparent 100%) no-repeat;
+	background-size: 40% 100%;
+	animation: mv-busy-slide 1.1s ease-in-out infinite;
+	pointer-events: none;
+}
+@keyframes mv-busy-slide {
+	from { background-position: -40% 0; }
+	to   { background-position: 140% 0; }
+}
+
+/* Refresh spins while the list loads */
+@keyframes mv-spin {
+	to { transform: rotate(360deg); }
+}
+#rl-app .mv-list-toolbar.mv-busy .mv-reload .mi {
+	animation: mv-spin .9s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#rl-app .mv-toolbar.mv-busy::after,
+	#rl-app .mv-list-toolbar.mv-busy::after,
+	#rl-app .mv-list-toolbar.mv-busy .mv-reload .mi {
+		animation: none;
+	}
+	#rl-app .mv-toolbar.mv-busy::after,
+	#rl-app .mv-list-toolbar.mv-busy::after {
+		background: var(--color-primary-element, #00679e);
+		opacity: .5;
+	}
+}

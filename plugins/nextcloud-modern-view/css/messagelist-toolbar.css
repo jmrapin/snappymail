@@ -43,12 +43,3 @@
 #rl-app #V-MailMessageList .mv-list-toolbar .mv-btn.disabled {
 	opacity: .35;
 }
-
-/* refresh spins while the list loads (core animates its spinner with .list-loading) */
-@keyframes mv-spin {
-	to { transform: rotate(360deg); }
-}
-#rl-app .list-loading .mv-list-toolbar .mv-reload .mi,
-#rl-app .mv-list-toolbar .mv-reload.list-loading .mi {
-	animation: mv-spin 1s linear infinite;
-}
