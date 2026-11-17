@@ -4,24 +4,13 @@
  * Collapsed: one line of cards; those that don't fit go behind "Show all (N)".
  * Expanded / selecting: two rows (first half, rest) that scroll sideways together.
  * Layout lives in attachments-layout.js, clicks/menu/selection in attachments-actions.js.
+ * Icons and fitting are shared with the compose window (attachments-common.js).
  * Note: SnappyMail's knockout build has no ko.pureComputed, use ko.computed.
  */
 (rl => {
 	if (!rl) {
 		return;
 	}
-
-	const EXT_CLASS = {
-		pdf: 'pdf',
-		doc: 'doc', docx: 'doc', odt: 'doc', rtf: 'doc', txt: 'doc', md: 'doc',
-		xls: 'xls', xlsx: 'xls', ods: 'xls', csv: 'xls',
-		ppt: 'ppt', pptx: 'ppt', odp: 'ppt',
-		zip: 'zip', rar: 'zip', '7z': 'zip', gz: 'zip', tar: 'zip', tgz: 'zip',
-		ics: 'ics', vcs: 'ics', vcf: 'ics',
-		eml: 'eml', msg: 'eml',
-		jpg: 'img', jpeg: 'img', png: 'img', gif: 'img', webp: 'img', heic: 'img',
-		bmp: 'img', svg: 'img', tif: 'img', tiff: 'img'
-	};
 
 	NcModernView.onView('MailMessageView', view => {
 		const list = () => view.listAttachments() || [];
@@ -51,9 +40,8 @@
 		// read .length on it from a binding, that threw "Request failed"
 		view.mvAttCount = NcModernView.computed('mvAttCount', () => list().length, 0);
 
-		view.mvAttExt = att => (att.fileNameExt || '').toUpperCase().slice(0, 4) || 'FILE';
-		view.mvAttIconClass = att => (att.hasThumbnail() ? 'mv-thumb ' : '')
-			+ 'mv-ic-' + (EXT_CLASS[(att.fileNameExt || '').toLowerCase()] || 'gen');
+		view.mvAttExt = att => NcModernView.att.extLabel(att.fileNameExt);
+		view.mvAttIconClass = att => (att.hasThumbnail() ? 'mv-thumb ' : '') + NcModernView.att.iconClass(att.fileNameExt);
 
 		view.mvAttShowAllText = NcModernView.computed('mvAttShowAllText', () => NcModernView.t('SHOW_ALL', { N: list().length }), '');
 		view.mvAttSummary = NcModernView.computed('mvAttSummary', () => NcModernView.t('ATTACHMENTS_SUMMARY', {

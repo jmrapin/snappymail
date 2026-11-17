@@ -8,29 +8,7 @@
 		return;
 	}
 
-	const
-		GAP = 8,      // px between cards (css/attachments.css .mv-att-line gap)
-		CHIP = 130,   // px reserved for the "Show all (N)" chip
-		listEl = () => document.querySelector('#V-MailMessageView .mv-att-list'),
-
-		// largest number of cards (at least 1) that fits in avail px, keeping room for the chip
-		countFitting = (cards, avail) => {
-			const widths = cards.map(c => c.offsetWidth),
-				total = widths.reduce((t, w) => t + w + GAP, -GAP);
-			if (total <= avail) {
-				return cards.length;
-			}
-			let used = 0, n = 0;
-			for (const w of widths) {
-				const next = used + w + (n ? GAP : 0);
-				if (next > avail - CHIP) {
-					break;
-				}
-				used = next;
-				++n;
-			}
-			return Math.max(1, n);
-		};
+	const listEl = () => document.querySelector('#V-MailMessageView .mv-att-list');
 
 	NcModernView.onView('MailMessageView', view => {
 		const
@@ -45,7 +23,7 @@
 				view.mvAttFit(1000); // show all to measure, then hide what doesn't fit
 				requestAnimationFrame(() => {
 					const cards = [...el.querySelectorAll('.mv-att')];
-					cards.length && view.mvAttFit(countFitting(cards, el.clientWidth));
+					cards.length && view.mvAttFit(NcModernView.att.fitCount(cards, el.clientWidth));
 				});
 			},
 

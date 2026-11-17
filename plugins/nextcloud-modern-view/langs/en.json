@@ -27,6 +27,7 @@
 		"IMG_MEDIUM": "Medium",
 		"IMG_LARGE": "Large",
 		"IMG_ORIGINAL": "Original size",
-		"IMG_REMOVE": "Delete"
+		"IMG_REMOVE": "Delete",
+		"ATT_REMOVE": "Remove"
 	}
 }
