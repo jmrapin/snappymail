@@ -1,0 +1,106 @@
+/*
+ * Nextcloud Modern View: editor colour palettes (js/editor-colors.js) and a selection that stays
+ * visible on coloured text.
+ */
+
+.mv-colors {
+	display: none;
+	position: fixed;
+	z-index: 1100;
+	width: 252px;
+	padding: 8px;
+	box-sizing: border-box;
+	background: var(--color-main-background, #fff);
+	color: var(--color-main-text, #222);
+	border: 1px solid var(--color-border, #ededed);
+	border-radius: var(--border-radius-large, 12px);
+	box-shadow: 0 6px 20px rgba(0, 0, 0, .15);
+	font-size: 14px;
+}
+.mv-colors.show {
+	display: block;
+}
+
+.mv-colors-reset,
+.mv-colors-more {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	min-height: 32px;
+	margin: 0;
+	padding: 4px 6px;
+	box-sizing: border-box;
+	border: 0;
+	border-radius: var(--border-radius-element, 8px);
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	text-align: start;
+	cursor: pointer;
+}
+.mv-colors-reset:hover,
+.mv-colors-more:hover {
+	background: var(--color-background-hover, #f5f5f5);
+}
+/* "no colour": a white square with a red diagonal */
+.mv-colors-none {
+	flex: none;
+	width: 18px;
+	height: 18px;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	background: linear-gradient(to top right, #fff calc(50% - 1px), #e53935 50%, #fff calc(50% + 1px));
+}
+
+.mv-colors-grid {
+	display: grid;
+	grid-template-columns: repeat(10, 20px);
+	gap: 3px;
+	justify-content: space-between;
+	margin: 6px 0;
+	padding: 6px 0;
+	border-top: 1px solid var(--color-border, #ededed);
+	border-bottom: 1px solid var(--color-border, #ededed);
+}
+.mv-colors-swatch {
+	width: 20px;
+	height: 20px;
+	min-width: 0;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	border: 1px solid rgba(0, 0, 0, .15);
+	border-radius: 4px;
+	cursor: pointer;
+}
+.mv-colors-swatch:hover {
+	transform: scale(1.2);
+	box-shadow: 0 0 0 2px var(--color-main-background, #fff), 0 0 0 3px var(--color-primary-element, #00679e);
+}
+
+/* "More colours…": the browser's own picker, opened by clicking the label */
+.mv-colors-more input[type="color"] {
+	flex: none;
+	width: 20px;
+	height: 20px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+	border-radius: 50%;
+	cursor: pointer;
+}
+.mv-colors-more input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.mv-colors-more input[type="color"]::-webkit-color-swatch { border: 0; opacity: 0; }
+
+/* selected text: solid, so it shows on any text or background colour */
+#rl-app .squire-wysiwyg::selection,
+#rl-app .squire-wysiwyg *::selection {
+	background: var(--color-primary-element, #00679e);
+	color: var(--color-primary-element-text, #fff);
+}
+/* …but not over a selected image: its frame and handles show the selection (js/editor-images.js) */
+#rl-app .squire-wysiwyg img::selection {
+	background: transparent;
+}

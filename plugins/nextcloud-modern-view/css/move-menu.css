@@ -1,0 +1,144 @@
+/*
+ * Nextcloud Modern View: "Move to ▾" quick menu (see js/move-menu.js) and split-button carets.
+ */
+
+#rl-app .mv-dd-caret {
+	width: 18px !important;
+	height: 18px !important;
+	margin-left: -6px;
+}
+
+.mv-move-menu {
+	display: none;
+	position: fixed;
+	z-index: 1000;
+	width: 270px;
+	padding: 6px;
+	box-sizing: border-box;
+	background: var(--color-main-background, #fff);
+	color: var(--color-main-text, #222);
+	border: 1px solid var(--color-border, #ededed);
+	border-radius: var(--border-radius-large, 12px);
+	box-shadow: 0 6px 20px rgba(0, 0, 0, .15);
+	font-size: 14px;
+}
+.mv-move-menu.show {
+	display: block;
+}
+
+.mv-move-search {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	height: 34px;
+	margin: 0 0 6px;
+	padding: 0 8px;
+	border: 1px solid var(--color-border-dark, #dbdbdb);
+	border-radius: var(--border-radius-element, 8px);
+}
+.mv-move-search:focus-within {
+	border-color: var(--color-primary-element, #00679e);
+}
+.mv-move-search .mi {
+	width: 18px;
+	height: 18px;
+	opacity: .6;
+}
+.mv-move-search input,
+.mv-move-search input:focus {
+	flex: 1;
+	min-width: 0;
+	height: 30px;
+	margin: 0;
+	padding: 0;
+	border: 0 !important;
+	outline: none;
+	box-shadow: none !important;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+}
+
+.mv-move-list {
+	max-height: min(360px, 60vh);
+	overflow-y: auto;
+}
+.mv-move-head {
+	padding: 6px 10px 4px;
+	font-weight: 600;
+	font-size: 13px;
+}
+.mv-move-none {
+	padding: 8px 10px;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+}
+
+.mv-move-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 7px 10px;
+	border-radius: var(--border-radius-element, 8px);
+	color: inherit !important;
+	text-decoration: none !important;
+	white-space: nowrap;
+}
+.mv-move-item span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.mv-move-item:hover,
+.mv-move-item:focus-visible {
+	background: var(--color-background-hover, #f5f5f5);
+	outline: none;
+}
+.mv-move-item .mi {
+	width: 18px;
+	height: 18px;
+	opacity: .75;
+}
+.mv-move-item span {
+	flex: 1;
+	min-width: 0;
+}
+.mv-move-head:not(:first-child) {
+	margin-top: 4px;
+	padding-top: 8px;
+	border-top: 1px solid var(--color-border, #ededed);
+}
+/* the move / copy icons on each folder row */
+.mv-move-act {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 30px;
+	height: 30px;
+	margin: -5px 0;
+	border-radius: 6px;
+	color: var(--color-primary-element, #00679e);
+}
+.mv-move-act:last-child {
+	margin-right: -6px;
+}
+.mv-move-act:hover {
+	background: var(--color-background-darker, #dbdbdb);
+}
+.mv-move-act .mi {
+	opacity: 1;
+}
+
+/* ▾ split buttons (Forward, Delete, Download): the caret is its own small button */
+#rl-app .mv-split,
+#rl-app .mv-split-dd {
+	display: flex;
+	align-items: center;
+	margin: 0;
+}
+#rl-app .mv-caret {
+	min-width: 20px;
+	padding: 0 2px;
+	margin-left: -4px;
+}
+#rl-app .mv-ovf-hidden + .mv-split-dd {
+	display: none;
+}

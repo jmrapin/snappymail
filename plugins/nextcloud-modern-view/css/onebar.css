@@ -1,0 +1,149 @@
+/*
+ * Nextcloud Modern View: one action bar over the message list and the reading pane (js/onebar.js).
+ * html.mv-onebar is set when the admin option is on. The bar is pinned to the top of #rl-right
+ * only while the message list view is shown (#rl-right.mv-onebar-on, set by js/onebar.js), so the
+ * Settings screens and the list-less reading pane are not affected.
+ * Button looks (.mv-btn, .mv-sep, ☰ menu) come from toolbar.css.
+ */
+
+/* the bar's lines: Nextcloud's --color-border is too faint on white */
+#rl-app {
+	--mv-line: var(--color-border-dark, #dbdbdb);
+}
+html.mv-onebar #rl-app #rl-right.mv-onebar-on {
+	position: relative;
+	padding-top: var(--mv-toolbar-height);
+	box-sizing: border-box;
+}
+#rl-app #mv-onebar {
+	display: none;
+}
+html.mv-onebar #rl-app #rl-right.mv-onebar-on > #mv-onebar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 102; /* above the panels so its menus open over them; the account pill is 103 */
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	gap: 2px;
+	height: var(--mv-toolbar-height);
+	margin: 0;
+	padding: 4px calc(var(--mv-account-width, 80px) + 8px) 4px 12px;
+	box-sizing: border-box;
+	background: var(--color-main-background, #fff);
+	border: 0;
+	border-bottom: 1px solid var(--mv-line);
+	border-radius: 0;
+	text-align: start;
+	white-space: nowrap;
+}
+html.mv-onebar.rl-fullscreen #rl-app #mv-onebar {
+	padding-right: 12px;
+}
+
+/* while the bar is shown, the panels lose their own toolbars and take the full height below it.
+   Scoped like the bar itself (more specific than toolbar.css's narrow-window display:flex
+   !important), so the reading pane keeps its toolbar when it replaces the list (no preview pane) */
+html.mv-onebar #rl-app #rl-right.mv-onebar-on #V-MailMessageList > .btn-toolbar,
+html.mv-onebar #rl-app #rl-right.mv-onebar-on #V-MailMessageView .top-toolbar.mv-toolbar {
+	display: none !important;
+}
+html.mv-onebar:not(.sm-msgView-bottom) #rl-app #rl-right.mv-onebar-on .messageList,
+html.mv-onebar #rl-app #rl-right.mv-onebar-on .messageView {
+	height: 100%;
+}
+
+/* Reply / Reply all in a fixed blue, so they stand apart from Forward */
+#rl-app #mv-onebar .mv-btn.mv-rep {
+	color: #1a73e8;
+}
+
+/* flagged: the flag takes the warning colour */
+#rl-app #mv-onebar .mv-btn.mv-on {
+	color: var(--color-warning, #c28900);
+}
+
+/* mobile only: folders panel and compose (the list toolbar that had them is hidden) */
+#rl-app #mv-onebar .mv-mobile-only {
+	display: none;
+}
+html.rl-mobile #rl-app #mv-onebar .mv-mobile-only {
+	display: inline-flex;
+}
+/* close / back only where it is the way back to the list */
+html.sm-msgView-side:not(.rl-mobile) #rl-app #mv-onebar .buttonClose,
+html.sm-msgView-bottom:not(.rl-mobile) #rl-app #mv-onebar .buttonClose {
+	display: none !important;
+}
+
+/* "3 selected ✕" */
+#rl-app .mv-selchip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	flex: none;
+	height: 30px;
+	margin-right: 6px;
+	padding: 0 4px 0 12px;
+	border-radius: 15px;
+	background: var(--color-primary-element-light, #e5eff4);
+	color: var(--color-primary-element, #00679e);
+	font-size: 13px;
+	font-weight: 600;
+}
+#rl-app .mv-selchip-x {
+	padding: 2px 7px;
+	border-radius: 10px;
+	color: inherit !important;
+	text-decoration: none !important;
+}
+#rl-app .mv-selchip-x:hover {
+	background: var(--color-primary-element-light-hover, #dbe7ee);
+}
+
+/* ▾ menus: Delete permanently in red */
+#rl-app .mv-danger-item a,
+#rl-app .mv-danger-item .mi {
+	color: var(--color-error-text, #c42b1c);
+}
+
+/* the search row closes the list's header with a line, as the hidden list toolbar did */
+html.mv-onebar #rl-app #rl-right.mv-onebar-on #V-MailMessageList .second-toolbar {
+	border-bottom: 1px solid var(--mv-line);
+}
+
+/* the line between the list and the message: on its left side by side, on top in the bottom layout
+   (side by side, the top line is the bar's own). Drawn on a layer over .messageView, because its
+   background covers anything drawn on #V-MailMessageView; it takes no width either */
+html.mv-onebar #rl-app #rl-right.mv-onebar-on .messageView::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 11;
+}
+html.mv-onebar.sm-msgView-side:not(.rl-mobile) #rl-app #rl-right.mv-onebar-on .messageView::before {
+	border-left: 1px solid var(--mv-line);
+}
+html.mv-onebar.sm-msgView-bottom:not(.rl-mobile) #rl-app #rl-right.mv-onebar-on .messageView::before {
+	border-top: 1px solid var(--mv-line);
+}
+
+/* Sort sits next to the search box (js/messagelist-toolbar.js moves it there) */
+#rl-app .second-toolbar .mv-search-sort {
+	display: inline-flex;
+	align-items: center;
+	flex: none;
+	margin: 0 0 0 2px;
+}
+#rl-app .second-toolbar .mv-search-sort .mv-btn {
+	height: 36px;
+	min-width: 36px;
+	padding: 0 6px;
+}
+#rl-app .second-toolbar .mv-search-sort .dropdown-menu {
+	right: 0;
+	left: auto;
+}

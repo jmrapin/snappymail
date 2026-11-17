@@ -1,0 +1,18 @@
+/*
+ * Nextcloud Modern View: toolbar overflow (see js/overflow.js).
+ * Buttons that don't fit are hidden; in the reading pane they appear at the top of the ☰ menu.
+ */
+
+#rl-app .mv-ovf-hidden {
+	display: none !important;
+}
+
+#rl-app .mv-ovf-menu:not(:empty) {
+	margin-bottom: 4px;
+	padding-bottom: 4px;
+	border-bottom: 1px solid var(--color-border, #ededed);
+}
+#rl-app .mv-ovf-menu li.disabled {
+	opacity: .45;
+	pointer-events: none;
+}

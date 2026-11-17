@@ -1,15 +1,16 @@
 /**
  * Nextcloud Modern View: shared helpers. Loaded first (see index.php).
  *
- * Feature files register view hooks with NcModernView.onView(templateId, fn); the hooks run in
- * the order the files are loaded, so a later file can rely on what an earlier one put on the view.
+ * Feature files register view hooks with NcModernView.onView(templateId, fn) (before binding) or
+ * onBuild(templateId, fn) (DOM ready); the hooks run in the order the files are loaded, so a later
+ * file can rely on what an earlier one put on the view.
  */
 (rl => {
 	if (!rl) {
 		return;
 	}
 
-	const hooks = [];
+	const hooks = [], buildHooks = [];
 
 	/**
 	 * Errors thrown by our computeds or bindings while SnappyMail processes a request (folder
@@ -54,8 +55,17 @@
 		hooks.forEach(([templateId, fn]) => templateId === view.viewModelTemplateID && fn(view));
 	});
 
+	// fired after the view's template is bound, so its DOM exists
+	addEventListener('rl-view-model', e => {
+		const view = e.detail;
+		buildHooks.forEach(([templateId, fn]) => templateId === view.viewModelTemplateID && fn(view, view.viewModelDom));
+	});
+
 	window.NcModernView = {
 		onView: (templateId, fn) => hooks.push([templateId, safe('init ' + templateId, fn)]),
+
+		// like onView, but once the view's DOM is built: fn(view, dom)
+		onBuild: (templateId, fn) => buildHooks.push([templateId, safe('build ' + templateId, fn)]),
 
 		// ko.computed that can't throw into core: NcModernView.computed('name', () => ..., fallback)
 		computed: (label, fn, fallback) => ko.computed(safe(label, fn, fallback)),

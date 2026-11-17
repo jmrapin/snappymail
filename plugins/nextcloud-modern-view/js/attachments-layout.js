@@ -38,7 +38,8 @@
 
 			fit = () => {
 				const el = listEl();
-				if (!el || scrolling()) {
+				// still hidden (message loading): the ResizeObserver below runs fit again once it shows
+				if (!el?.clientWidth || scrolling()) {
 					return;
 				}
 				view.mvAttFit(1000); // show all to measure, then hide what doesn't fit
@@ -57,6 +58,15 @@
 			};
 
 		view.mvAttRelayout = () => setTimeout(() => { fit(); fade(); }, 0);
+
+		// The list is inside "if: message", so each message gets a new element (initDom hands it
+		// over). When a message opens, the list is often still hidden or empty and every card
+		// measures 0px, so it is fitted again whenever it gets its real size.
+		const resized = new ResizeObserver(() => view.mvAttRelayout());
+		view.mvAttListInit = el => {
+			resized.disconnect();
+			el && resized.observe(el);
+		};
 		view.mvAttScrolled = () => { fade(); return true; };
 		view.mvAttExpand = () => { view.mvAttExpanded(true); view.mvAttRelayout(); return false; };
 		view.mvAttCollapse = () => { view.mvAttExpanded(false); view.mvAttRelayout(); return false; };

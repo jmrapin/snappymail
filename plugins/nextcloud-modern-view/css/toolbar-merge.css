@@ -1,0 +1,13 @@
+/*
+ * Nextcloud Modern View: one action bar across the list and the reading pane.
+ *
+ * While the message list is on screen next to (or above) the message, its toolbar already has
+ * Archive / Spam / Delete / Move, and they act on the open message when nothing is checked
+ * (MessagelistUserStore.listCheckedOrSelected). So the reading pane drops its copies (.mv-dup)
+ * and the two toolbars read as one bar: list actions on the left, Reply / Forward on the right.
+ * On mobile, in full screen and without the preview pane the list is hidden, so they stay.
+ */
+html.sm-msgView-side:not(.rl-mobile):not(.rl-fullscreen) #rl-app #V-MailMessageView .mv-dup,
+html.sm-msgView-bottom:not(.rl-mobile):not(.rl-fullscreen) #rl-app #V-MailMessageView .mv-dup {
+	display: none !important;
+}

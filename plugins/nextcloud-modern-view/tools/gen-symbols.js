@@ -6,7 +6,13 @@ const icons = ['reply','reply_all','forward','attach_email','attach_file','archi
 	'chevron_left','chevron_right','keyboard_arrow_down','keyboard_arrow_up','arrow_drop_down',
 	'star','star-fill','verified_user','gpp_maybe','gpp_bad','download','print','open_in_new',
 	'article','fullscreen','code','edit','unsubscribe','cloud_upload','visibility','event',
-	'check_box','check_box_outline_blank','sort','filter_list','refresh'];
+	'check_box','check_box_outline_blank','sort','filter_list','refresh',
+	'flag','delete_forever','folder','search',
+	'send','save','contacts','signature','lock','priority_high','minimize',
+	'format_bold','format_italic','format_underlined','strikethrough_s','subscript','superscript',
+	'format_list_numbered','format_list_bulleted','format_quote','format_indent_decrease','format_indent_increase',
+	'link','image','add_photo_alternate','undo','redo','format_clear','format_color_text','format_color_fill',
+	'format_textdirection_l_to_r','format_textdirection_r_to_l'];
 let css = `/*
  * Material Symbols, Rounded, weight 400 (outline style; "-fill" = filled variant)
  * Copyright Google LLC, Apache License 2.0 - https://github.com/google/material-design-icons

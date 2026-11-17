@@ -14,6 +14,19 @@
 		"PREVIEW": "Preview",
 		"SELECT": "Select…",
 		"ATTACHMENTS_SUMMARY": "%N% attachments · %SIZE%",
-		"N_OF_M_SELECTED": "%N% of %M% selected"
+		"N_OF_M_SELECTED": "%N% of %M% selected",
+		"MOVE_SEARCH": "Search for a folder",
+		"MOVE_RECENT": "Most recent",
+		"MOVE_ALL": "All folders",
+		"N_SELECTED": "%N% selected",
+		"MOVE_NONE": "No folder found",
+		"COLOR_AUTO": "Automatic",
+		"COLOR_NONE": "No colour",
+		"COLOR_MORE": "More colours…",
+		"IMG_SMALL": "Small",
+		"IMG_MEDIUM": "Medium",
+		"IMG_LARGE": "Large",
+		"IMG_ORIGINAL": "Original size",
+		"IMG_REMOVE": "Delete"
 	}
 }

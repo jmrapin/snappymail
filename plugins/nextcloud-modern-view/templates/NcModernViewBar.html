@@ -1,0 +1,88 @@
+<!--
+	Nextcloud Modern View: the single action bar over the message list and the reading pane
+	(js/onebar.js renders it with js/onebar-model.js as the view model).
+	It acts on the ticked messages, or on the open message when nothing is ticked; "one"-message
+	actions are disabled while messages are ticked. data-mv-ovf = overflow order (highest leaves
+	first, js/overflow.js); data-mv-sub = the ▾ menu whose items go into ☰ with it.
+-->
+<a class="mv-btn mv-mobile-only" data-bind="click: toggleLeft" data-i18n="[title]SETTINGS_LABELS/FOLDERS"><i class="mi mi-folder"></i></a>
+<a class="mv-btn mv-mobile-only mv-primary" data-bind="click: compose" data-i18n="[title]FOLDER_LIST/BUTTON_NEW_MESSAGE"><i class="mi mi-edit"></i></a>
+<a class="mv-btn buttonClose" data-bind="visible: hasMessage, click: closeMessage" data-i18n="[title]GLOBAL/CLOSE"><i class="mi mi-close"></i></a>
+<a class="mv-btn mv-reload" data-bind="click: reload" data-i18n="[title]MESSAGE_LIST/BUTTON_RELOAD"><i class="mi mi-refresh"></i></a>
+
+<span class="mv-sep"></span>
+<a class="mv-btn mv-rep" data-mv-ovf="2" data-bind="visible: !isDraft(), command: reply" data-i18n="[title]MESSAGE/BUTTON_REPLY"><i class="mi mi-reply"></i></a>
+<a class="mv-btn mv-rep" data-mv-ovf="4" data-bind="visible: !isDraft(), command: replyAll" data-i18n="[title]MESSAGE/BUTTON_REPLY_ALL"><i class="mi mi-reply-all"></i></a>
+<a class="mv-btn" data-mv-ovf="5" data-mv-sub="#mv-bar-fwd" data-bind="visible: !isDraft(), command: forward" data-i18n="[title]MESSAGE/BUTTON_FORWARD"><i class="mi mi-forward"></i></a>
+<div class="btn-group mv-split-dd" data-bind="visible: !isDraft(), registerBootstrapDropdown: true">
+	<a class="mv-btn mv-caret dropdown-toggle" id="mv-bar-fwd-toggle" data-bind="css: { disabled: fwdMenuOff }" href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"><i class="mi mi-arrow-drop-down"></i></a>
+	<menu class="dropdown-menu mv-menu" id="mv-bar-fwd" role="menu" aria-labelledby="mv-bar-fwd-toggle">
+		<li role="presentation"><a href="#" tabindex="-1" data-bind="command: forward"><i class="mi mi-forward"></i><span data-i18n="MESSAGE/BUTTON_FORWARD"></span></a></li>
+		<li role="presentation"><a href="#" tabindex="-1" data-bind="command: forwardAsAttachment"><i class="mi mi-attach-email"></i><span data-i18n="MESSAGE/BUTTON_FORWARD_AS_ATTACHMENT"></span></a></li>
+	</menu>
+</div>
+<a class="mv-btn mv-rep" data-mv-ovf="2" data-bind="visible: isDraft, command: edit" data-i18n="[title]MESSAGE/BUTTON_EDIT"><i class="mi mi-edit"></i></a>
+
+<span class="mv-sep"></span>
+<a class="mv-btn" data-mv-ovf="7" data-bind="visible: L.archiveAllowed, command: L.archiveCommand" data-i18n="[title]GLOBAL/TO_ARCHIVE"><i class="mi mi-archive"></i></a>
+<a class="mv-btn" data-mv-ovf="8" data-bind="visible: L.canMarkAsSpam, command: L.spamCommand" data-i18n="[title]GLOBAL/TO_SPAM"><i class="mi mi-report"></i></a>
+<a class="mv-btn" data-mv-ovf="8" data-bind="visible: L.isSpamFolder, command: L.notSpamCommand" data-i18n="[title]GLOBAL/NOT_SPAM"><i class="mi mi-mark-email-read"></i></a>
+<a class="mv-btn mv-danger" data-mv-ovf="6" data-mv-sub="#mv-bar-del" data-bind="command: L.deleteCommand" data-i18n="[title]GLOBAL/DELETE"><i class="mi mi-delete"></i></a>
+<div class="btn-group mv-split-dd" data-bind="registerBootstrapDropdown: true">
+	<a class="mv-btn mv-caret dropdown-toggle" id="mv-bar-del-toggle" data-bind="css: { disabled: delMenuOff }" href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"><i class="mi mi-arrow-drop-down"></i></a>
+	<menu class="dropdown-menu mv-menu" id="mv-bar-del" role="menu" aria-labelledby="mv-bar-del-toggle">
+		<li role="presentation"><a href="#" tabindex="-1" data-bind="command: L.deleteCommand"><i class="mi mi-delete"></i><span data-i18n="GLOBAL/DELETE"></span></a></li>
+		<li role="presentation" class="mv-danger-item"><a href="#" tabindex="-1" data-bind="command: L.deleteWithoutMoveCommand"><i class="mi mi-delete-forever"></i><span data-i18n="MESSAGE_LIST/BUTTON_DELETE_WITHOUT_MOVE"></span></a></li>
+		<li role="presentation" data-bind="visible: !L.hideDeleted()"><a href="#" tabindex="-1" data-bind="command: L.undeleteCommand"><i class="mi mi-delete mv-rotate"></i><span data-i18n="GLOBAL/UNDELETE"></span></a></li>
+	</menu>
+</div>
+<a class="mv-btn mv-move-btn" data-mv-ovf="9" data-bind="command: L.moveCommand" data-i18n="[title]GLOBAL/MOVE_TO"><i class="mi mi-drive-file-move"></i><i class="mi mi-arrow-drop-down mv-dd-caret"></i></a>
+
+<span class="mv-sep"></span>
+<a class="mv-btn" data-mv-ovf="11" data-bind="css: { disabled: !hasTarget() }, click: toggleSeen, attr: { title: seenTitle }"><i class="mi" data-bind="css: seenIcon"></i></a>
+<a class="mv-btn" data-mv-ovf="12" data-bind="css: { disabled: !hasTarget(), 'mv-on': allFlagged }, click: toggleFlag, attr: { title: flagTitle }"><i class="mi mi-flag"></i></a>
+<div class="btn-group" data-bind="visible: V.tagsAllowed, registerBootstrapDropdown: true">
+	<a class="mv-btn dropdown-toggle" id="mv-bar-tags-toggle" data-mv-ovf="13" data-mv-sub="#mv-bar-tags" href="#" tabindex="-1" data-bind="css: { disabled: !single() }, attr: { title: tagsTitle }"><i class="mi mi-label"></i></a>
+	<menu class="dropdown-menu mv-menu" id="mv-bar-tags" role="menu" aria-labelledby="mv-bar-tags-toggle">
+		<!-- ko foreach: V.mvTagOptions -->
+		<li role="presentation"><a href="#" tabindex="-1" data-bind="click: toggle, attr: { title: value }"><i class="mi" data-bind="css: checked ? 'mi-check-box' : 'mi-check-box-outline-blank'"></i><span data-bind="text: label, attr: { class: css }"></span></a></li>
+		<!-- /ko -->
+		<li role="presentation"><a href="#" tabindex="-1" data-bind="click: newTag"><i class="mi mi-label"></i><span data-bind="text: t('MESSAGE/NEW_TAG')"></span></a></li>
+	</menu>
+</div>
+<a class="mv-btn" data-mv-ovf="14" data-mv-sub="#mv-bar-dl" data-bind="visible: L.downloadAsZipAllowed, command: L.downloadAttachCommand" data-i18n="[title]MESSAGE_LIST/DOWNLOAD_ALL_ATTACHMENTS"><i class="mi mi-download"></i></a>
+<div class="btn-group mv-split-dd" data-bind="registerBootstrapDropdown: true">
+	<a class="mv-btn mv-caret dropdown-toggle" id="mv-bar-dl-toggle" data-bind="css: { disabled: dlMenuOff }" href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"><i class="mi mi-arrow-drop-down"></i></a>
+	<menu class="dropdown-menu mv-menu" id="mv-bar-dl" role="menu" aria-labelledby="mv-bar-dl-toggle">
+		<li role="presentation" data-bind="visible: L.downloadAsZipAllowed"><a href="#" tabindex="-1" data-bind="command: L.downloadAttachCommand"><i class="mi mi-download"></i><span data-i18n="MESSAGE_LIST/DOWNLOAD_ALL_ATTACHMENTS"></span></a></li>
+		<li role="presentation" data-bind="visible: canSaveAttachmentsToNextcloud"><a href="#" tabindex="-1" data-bind="css: { disabled: !single() }, click: saveAttachmentsToNextcloud"><i class="mi mi-cloud-upload"></i><span data-bind="text: t('NEXTCLOUD/SAVE_ATTACHMENTS')"></span></a></li>
+		<li role="presentation" data-bind="visible: canSaveMessageToNextcloud"><a href="#" tabindex="-1" data-bind="css: { disabled: !single() }, click: saveMessageToNextcloud"><i class="mi mi-cloud-upload"></i><span data-bind="text: t('NEXTCLOUD/SAVE_EML')"></span></a></li>
+		<li role="presentation"><a target="_blank" href="#" tabindex="-1" data-bind="css: { disabled: !single() }, attr: { href: emlLink }"><i class="mi mi-code"></i><span data-i18n="MESSAGE/MENU_DOWNLOAD_ORIGINAL"></span></a></li>
+	</menu>
+</div>
+<a class="mv-btn" data-mv-ovf="15" data-bind="css: { disabled: !single() }, click: print" data-i18n="[title]MESSAGE/MENU_PRINT"><i class="mi mi-print"></i></a>
+<a class="mv-btn" data-mv-ovf="16" data-bind="visible: !isDraft(), command: editAsNew" data-i18n="[title]MESSAGE/BUTTON_EDIT_AS_NEW"><i class="mi mi-edit"></i></a>
+<a class="mv-btn" data-mv-ovf="17" data-bind="css: { disabled: !single() }, click: openInWindow" data-i18n="[title]MESSAGE/BUTTON_IN_NEW_WINDOW"><i class="mi mi-open-in-new"></i></a>
+
+<span class="mv-spacer"></span>
+<span class="mv-selchip" data-bind="visible: checkedCount() > 0"><span data-bind="text: checkedText"></span><a href="#" class="mv-selchip-x" data-bind="click: clearChecked" data-i18n="[title]GLOBAL/CANCEL">✕</a></span>
+<a class="mv-btn" data-mv-ovf="3" data-bind="visible: hasMessage, command: prev" data-i18n="[title]MESSAGE/BUTTON_THREAD_PREV"><i class="mi mi-chevron-left"></i></a>
+<a class="mv-btn" data-mv-ovf="3" data-bind="visible: hasMessage, command: next" data-i18n="[title]MESSAGE/BUTTON_THREAD_NEXT"><i class="mi mi-chevron-right"></i></a>
+<div class="btn-group mv-more" data-bind="registerBootstrapDropdown: true">
+	<a class="mv-btn dropdown-toggle" id="mv-bar-more-toggle" href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"><i class="mi mi-menu"></i></a>
+	<menu class="dropdown-menu right-edge mv-menu" role="menu" aria-labelledby="mv-bar-more-toggle">
+		<div class="mv-ovf-menu"></div>
+		<div>
+			<li role="presentation" data-bind="visible: unsubscribeLink"><a target="_blank" href="#" tabindex="-1" data-bind="css: { disabled: !single() }, attr: { href: unsubscribeLink }"><i class="mi mi-unsubscribe"></i><span data-i18n="MESSAGE/BUTTON_UNSUBSCRIBE"></span></a></li>
+			<li role="presentation" data-bind="visible: canViewHtml"><a href="#" tabindex="-1" data-bind="click: viewHtml"><i class="mi mi-visibility"></i><span data-i18n="MESSAGE/HTML_VIEW"></span></a></li>
+			<li role="presentation" data-bind="visible: canViewPlain"><a href="#" tabindex="-1" data-bind="click: viewPlain"><i class="mi mi-article"></i><span data-i18n="MESSAGE/PLAIN_VIEW"></span></a></li>
+			<li role="presentation" data-bind="visible: hasMessage"><a href="#" tabindex="-1" data-bind="css: { disabled: !single() }, click: swapColors"><i class="mi mi-visibility"></i><span data-i18n="MESSAGE/SWAP_COLORS"></span></a></li>
+			<li role="presentation" data-bind="visible: hasMessage"><a target="_blank" href="#" tabindex="-1" data-bind="css: { disabled: !single() }, attr: { href: rawLink }"><i class="mi mi-code"></i><span data-i18n="MESSAGE/MENU_VIEW_ORIGINAL"></span></a></li>
+		</div>
+		<div class="dividerbar">
+			<li role="presentation"><a href="#" tabindex="-1" data-bind="click: markAllRead"><i class="mi mi-mark-email-read"></i><span data-i18n="MESSAGE_LIST/MENU_SET_ALL_SEEN"></span></a></li>
+			<li role="presentation" data-bind="visible: canEmptyFolder"><a href="#" tabindex="-1" data-bind="click: emptyFolder"><i class="mi mi-delete-forever"></i><span data-i18n="MESSAGE_LIST/BUTTON_EMPTY_FOLDER"></span></a></li>
+			<li role="presentation"><a href="#" tabindex="-1" data-bind="click: fullScreen"><i class="mi mi-fullscreen"></i><span data-i18n="SHORTCUTS_HELP/LABEL_FULLSCREEN_TOGGLE"></span></a></li>
+		</div>
+	</menu>
+</div>

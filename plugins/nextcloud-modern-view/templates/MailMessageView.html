@@ -2,34 +2,47 @@
 	Nextcloud Modern View: replaces the built-in MailMessageView template.
 	Based on SnappyMail's app/templates/Views/User/MailMessageView.html (v3.0.1).
 	Changes: actions toolbar (Reply / Reply all / Forward, Archive / Spam / Delete / Move,
-	prev / next, the ☰ menu) with outline icons; no floating reply/☰ buttons on the message;
+	prev / next, the ☰ menu) with outline icons. .mv-dup buttons are hidden while the message
+	list, whose toolbar has the same actions, is on screen (css/toolbar-merge.css). data-mv-ovf is
+	the overflow order: the highest moves into the ☰ menu first when the toolbar is too narrow
+	(js/overflow.js); no floating reply/☰ buttons on the message;
 	no × next to the subject. The close button is hidden by CSS in the side-by-side layout.
 -->
 <div class="top-toolbar g-ui-user-select-none btn-toolbar mv-toolbar" data-bind="css: { 'mv-has-message': message, 'mv-busy': mvBusy }">
 	<a class="mv-btn buttonClose" data-bind="click: closeMessage" data-i18n="[title]GLOBAL/CLOSE"><i class="mi mi-close"></i></a>
 	<div class="mv-group mv-replies" data-bind="visible: canBeRepliedOrForwarded, css: {'mv-replyall-first': 2 == msgDefaultAction()}">
-		<a class="mv-btn mv-primary mv-reply" data-bind="command: replyCommand" data-i18n="[title]MESSAGE/BUTTON_REPLY"><i class="mi mi-reply"></i><span class="mv-lbl" data-i18n="MESSAGE/BUTTON_REPLY"></span></a>
-		<a class="mv-btn mv-primary mv-replyall" data-bind="command: replyAllCommand" data-i18n="[title]MESSAGE/BUTTON_REPLY_ALL"><i class="mi mi-reply-all"></i><span class="mv-lbl" data-i18n="MESSAGE/BUTTON_REPLY_ALL"></span></a>
-		<a class="mv-btn mv-primary mv-forward" data-bind="command: forwardCommand" data-i18n="[title]MESSAGE/BUTTON_FORWARD"><i class="mi mi-forward"></i><span class="mv-lbl" data-i18n="MESSAGE/BUTTON_FORWARD"></span></a>
+		<a class="mv-btn mv-primary mv-reply" data-mv-ovf="2" data-bind="command: replyCommand" data-i18n="[title]MESSAGE/BUTTON_REPLY"><i class="mi mi-reply"></i></a>
+		<a class="mv-btn mv-primary mv-replyall" data-mv-ovf="4" data-bind="command: replyAllCommand" data-i18n="[title]MESSAGE/BUTTON_REPLY_ALL"><i class="mi mi-reply-all"></i></a>
+		<span class="mv-split">
+			<a class="mv-btn mv-primary mv-forward" data-mv-ovf="5" data-bind="command: forwardCommand" data-i18n="[title]MESSAGE/BUTTON_FORWARD"><i class="mi mi-forward"></i></a>
+			<div class="btn-group mv-split-dd" data-bind="registerBootstrapDropdown: true">
+				<a class="mv-btn mv-primary mv-caret dropdown-toggle" id="mv-forward-dropdown-id" href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"><i class="mi mi-arrow-drop-down"></i></a>
+				<menu class="dropdown-menu mv-menu" role="menu" aria-labelledby="mv-forward-dropdown-id">
+					<li role="presentation"><a href="#" tabindex="-1" data-bind="command: forwardCommand"><i class="mi mi-forward"></i><span data-i18n="MESSAGE/BUTTON_FORWARD"></span></a></li>
+					<li role="presentation"><a href="#" tabindex="-1" data-bind="command: forwardAsAttachmentCommand"><i class="mi mi-attach-email"></i><span data-i18n="MESSAGE/BUTTON_FORWARD_AS_ATTACHMENT"></span></a></li>
+				</menu>
+			</div>
+		</span>
 	</div>
-	<a class="mv-btn mv-primary buttonEdit" data-bind="visible: isDraftFolder(), command: editCommand" data-i18n="[title]MESSAGE/BUTTON_EDIT"><i class="mi mi-edit"></i><span class="mv-lbl" data-i18n="MESSAGE/BUTTON_EDIT"></span></a>
-	<span class="mv-sep" data-bind="visible: message"></span>
+	<a class="mv-btn mv-primary buttonEdit" data-mv-ovf="2" data-bind="visible: isDraftFolder(), command: editCommand" data-i18n="[title]MESSAGE/BUTTON_EDIT"><i class="mi mi-edit"></i></a>
+	<span class="mv-sep mv-dup" data-bind="visible: message"></span>
 	<div class="mv-group" data-bind="visible: message">
-		<a class="mv-btn" data-bind="visible: archiveAllowed, command: archiveCommand" data-i18n="[title]GLOBAL/TO_ARCHIVE"><i class="mi mi-archive"></i></a>
-		<a class="mv-btn" data-bind="visible: canMarkAsSpam, command: spamCommand" data-i18n="[title]GLOBAL/TO_SPAM"><i class="mi mi-report"></i></a>
-		<a class="mv-btn" data-bind="visible: isSpamFolder, command: notSpamCommand" data-i18n="[title]GLOBAL/NOT_SPAM"><i class="mi mi-mark-email-read"></i></a>
-		<a class="mv-btn mv-danger" data-bind="visible: !canBeUndeleted(), command: deleteCommand" data-i18n="[title]GLOBAL/DELETE"><i class="mi mi-delete"></i></a>
-		<a class="mv-btn" data-bind="visible: canBeUndeleted, command: undeleteCommand" data-i18n="[title]GLOBAL/UNDELETE"><i class="mi mi-delete mv-rotate"></i></a>
-		<a class="mv-btn" data-bind="command: moveCommand" data-i18n="[title]GLOBAL/MOVE_TO"><i class="mi mi-drive-file-move"></i></a>
+		<a class="mv-btn mv-dup" data-mv-ovf="7" data-bind="visible: archiveAllowed, command: archiveCommand" data-i18n="[title]GLOBAL/TO_ARCHIVE"><i class="mi mi-archive"></i></a>
+		<a class="mv-btn mv-dup" data-mv-ovf="8" data-bind="visible: canMarkAsSpam, command: spamCommand" data-i18n="[title]GLOBAL/TO_SPAM"><i class="mi mi-report"></i></a>
+		<a class="mv-btn mv-dup" data-mv-ovf="8" data-bind="visible: isSpamFolder, command: notSpamCommand" data-i18n="[title]GLOBAL/NOT_SPAM"><i class="mi mi-mark-email-read"></i></a>
+		<a class="mv-btn mv-danger mv-dup" data-mv-ovf="6" data-bind="visible: !canBeUndeleted(), command: deleteCommand" data-i18n="[title]GLOBAL/DELETE"><i class="mi mi-delete"></i></a>
+		<a class="mv-btn" data-mv-ovf="6" data-bind="visible: canBeUndeleted, command: undeleteCommand" data-i18n="[title]GLOBAL/UNDELETE"><i class="mi mi-delete mv-rotate"></i></a>
+		<a class="mv-btn mv-dup" data-mv-ovf="9" data-bind="command: moveCommand" data-i18n="[title]GLOBAL/MOVE_TO"><i class="mi mi-drive-file-move"></i><i class="mi mi-arrow-drop-down mv-dd-caret"></i></a>
 	</div>
 	<span class="mv-spacer"></span>
 	<div class="mv-group" data-bind="visible: message">
-		<a class="mv-btn buttonUp" data-bind="command: goUpCommand"><i class="mi mi-chevron-left"></i></a>
-		<a class="mv-btn buttonDown" data-bind="command: goDownCommand"><i class="mi mi-chevron-right"></i></a>
+		<a class="mv-btn buttonUp" data-mv-ovf="3" data-bind="command: goUpCommand" data-i18n="[title]MESSAGE/BUTTON_THREAD_PREV"><i class="mi mi-chevron-left"></i></a>
+		<a class="mv-btn buttonDown" data-mv-ovf="3" data-bind="command: goDownCommand" data-i18n="[title]MESSAGE/BUTTON_THREAD_NEXT"><i class="mi mi-chevron-right"></i></a>
 	</div>
 	<div class="btn-group mv-more" data-bind="visible: message, registerBootstrapDropdown: true, initDom: actionsMenu">
 		<a class="mv-btn dropdown-toggle" id="more-view-dropdown-id" href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"><i class="mi mi-menu"></i></a>
 		<menu class="dropdown-menu right-edge mv-menu" role="menu" aria-labelledby="more-view-dropdown-id">
+			<div class="mv-ovf-menu"><!-- toolbar buttons that do not fit (js/overflow.js) --></div>
 			<div data-bind="visible: !isDraftFolder()">
 				<li role="presentation">
 					<a href="#" tabindex="-1" data-bind="command: forwardAsAttachmentCommand"><i class="mi mi-attach-email"></i><span data-i18n="MESSAGE/BUTTON_FORWARD_AS_ATTACHMENT"></span></a>
@@ -199,7 +212,7 @@
 								<a href="#" class="mv-lnk" data-bind="click: mvAttCollapse"><i class="mi mi-keyboard-arrow-up"></i><span data-bind="text: mvT('MODERN_VIEW/SHOW_LESS')"></span></a>
 							</div>
 							<div class="mv-att-row">
-								<div class="mv-att-list" data-bind="foreach: mvAttRows, event: { scroll: mvAttScrolled }">
+								<div class="mv-att-list" data-bind="initDom: mvAttListInit, foreach: mvAttRows, event: { scroll: mvAttScrolled }">
 									<div class="mv-att-line" data-bind="foreach: $data">
 										<div class="mv-att" draggable="true" data-bind="
 											css: { 'mv-hidden': !$root.mvAttExpanded() && !$root.mvAttSelecting() && $data.mvIndex >= $root.mvAttFit(), 'mv-sel': $root.mvAttSelecting() && $data.checked() },

@@ -13,8 +13,8 @@
 	align-items: center;
 	flex-wrap: nowrap;
 	gap: 2px;
-	/* the account switcher (#V-SystemDropDown) floats over the right end */
-	padding-right: calc(var(--mv-account-width, 72px) + 16px);
+	/* the account switcher (#V-SystemDropDown) floats over the right end; js/account.js measures it */
+	padding-right: calc(var(--mv-account-width, 80px) + 8px);
 	container-type: inline-size;
 	/* above the message area, so the ☰ menu opens on top of it (not clipped) */
 	position: relative;
@@ -89,15 +89,6 @@
 	flex: 1 1 auto;
 }
 
-/* Labels on Reply / Reply all / Forward / Edit only when the pane is wide enough */
-#rl-app .mv-lbl {
-	display: none;
-}
-@container (min-width: 900px) {
-	#rl-app .mv-lbl {
-		display: inline;
-	}
-}
 
 /* No close button in the side-by-side / bottom layout (Esc still closes);
    keep it on mobile and when the preview pane is off, where it is the way back to the list */

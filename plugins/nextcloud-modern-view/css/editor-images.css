@@ -1,0 +1,98 @@
+/*
+ * Nextcloud Modern View: selected image in the HTML editor (js/editor-images.js): a frame around
+ * it and a bar with the size presets and Delete.
+ */
+
+.mv-img-frame {
+	display: none;
+	z-index: 1050;
+	box-sizing: border-box;
+	outline: 1px solid var(--color-primary-element, #00679e);
+	background: transparent;
+	pointer-events: none;
+}
+.mv-img-frame.show {
+	display: block;
+}
+/* corner grab handles: drag to resize */
+.mv-img-grip {
+	position: absolute;
+	width: 9px;
+	height: 9px;
+	box-sizing: border-box;
+	border: 1px solid var(--color-primary-element, #00679e);
+	background: var(--color-main-background, #fff);
+	pointer-events: auto;
+	touch-action: none;
+}
+.mv-img-grip-nw { top: -5px; left: -5px; cursor: nwse-resize; }
+.mv-img-grip-se { bottom: -5px; right: -5px; cursor: nwse-resize; }
+.mv-img-grip-ne { top: -5px; right: -5px; cursor: nesw-resize; }
+.mv-img-grip-sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
+
+.mv-img-bar {
+	display: none;
+	z-index: 1060;
+	align-items: center;
+	gap: 0;
+	padding: 3px;
+	background: var(--color-main-background, #fff);
+	color: var(--color-main-text, #222);
+	border: 1px solid var(--color-border, #ededed);
+	border-radius: var(--border-radius-element, 8px);
+	box-shadow: 0 4px 14px rgba(0, 0, 0, .12);
+	font-size: 13px;
+	white-space: nowrap;
+}
+.mv-img-bar.show {
+	display: flex;
+}
+/* same look as the editor toolbar buttons; !important beats Nextcloud's global button style */
+.mv-img-bar button {
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	height: 28px !important;
+	min-height: 0 !important;
+	min-width: 28px !important;
+	margin: 0 !important;
+	padding: 0 8px !important;
+	border: 0 !important;
+	border-radius: var(--border-radius-element, 8px) !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: inherit !important;
+	font: inherit !important;
+	font-weight: normal !important;
+	line-height: 1 !important;
+	cursor: pointer;
+}
+.mv-img-bar button.mv-img-del {
+	padding: 0 !important;
+}
+.mv-img-bar button:hover {
+	background: var(--color-background-hover, #f5f5f5) !important;
+}
+.mv-img-bar .mv-img-size.mv-on {
+	background: var(--color-primary-element-light, #e5eff4) !important;
+	color: var(--color-primary-element, #00679e) !important;
+}
+.mv-img-bar .mv-img-del:hover {
+	color: var(--color-error-text, #c42b1c) !important;
+}
+.mv-img-bar .mi {
+	width: 18px;
+	height: 18px;
+	opacity: .85;
+}
+.mv-img-bar .mv-sep {
+	width: 1px;
+	height: 16px;
+	margin: 0 4px;
+	background: var(--color-border, #ededed);
+}
+
+/* pasted / inserted images: a hint that they can be clicked */
+#rl-app .squire-wysiwyg img {
+	cursor: pointer;
+}

@@ -36,4 +36,16 @@
 		), '?');
 	});
 
+	// The pill floats over the reading pane toolbar's right end; the toolbar keeps that much room
+	// free (--mv-account-width in css/toolbar.css), measured since the pill's width varies.
+	NcModernView.onBuild('SystemDropDown', (view, dom) => {
+		const app = document.getElementById('rl-app');
+		dom && app && new ResizeObserver(NcModernView.safe('account width', () => {
+			if (dom.offsetWidth) {
+				const right = (dom.offsetParent || app).getBoundingClientRect().right;
+				app.style.setProperty('--mv-account-width', Math.ceil(right - dom.getBoundingClientRect().left) + 'px');
+			}
+		})).observe(dom);
+	});
+
 })(window.rl);

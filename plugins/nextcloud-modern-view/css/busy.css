@@ -19,7 +19,8 @@
 	position: relative;
 }
 #rl-app .mv-toolbar.mv-busy::after,
-#rl-app .mv-list-toolbar.mv-busy::after {
+#rl-app .mv-list-toolbar.mv-busy::after,
+#rl-app #mv-onebar.mv-busy::after {
 	content: "";
 	position: absolute;
 	left: 0;
@@ -44,18 +45,22 @@
 @keyframes mv-spin {
 	to { transform: rotate(360deg); }
 }
-#rl-app .mv-list-toolbar.mv-busy .mv-reload .mi {
+#rl-app .mv-list-toolbar.mv-busy .mv-reload .mi,
+#rl-app #mv-onebar.mv-busy .mv-reload .mi {
 	animation: mv-spin .9s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
 	#rl-app .mv-toolbar.mv-busy::after,
 	#rl-app .mv-list-toolbar.mv-busy::after,
-	#rl-app .mv-list-toolbar.mv-busy .mv-reload .mi {
+	#rl-app #mv-onebar.mv-busy::after,
+	#rl-app .mv-list-toolbar.mv-busy .mv-reload .mi,
+	#rl-app #mv-onebar.mv-busy .mv-reload .mi {
 		animation: none;
 	}
 	#rl-app .mv-toolbar.mv-busy::after,
-	#rl-app .mv-list-toolbar.mv-busy::after {
+	#rl-app .mv-list-toolbar.mv-busy::after,
+	#rl-app #mv-onebar.mv-busy::after {
 		background: var(--color-primary-element, #00679e);
 		opacity: .5;
 	}

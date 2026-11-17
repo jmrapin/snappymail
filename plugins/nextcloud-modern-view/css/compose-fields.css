@@ -1,0 +1,102 @@
+/*
+ * Nextcloud Modern View: compose window fields (js/compose-fields.js). Plain rows with a line
+ * between them instead of boxed inputs; recipients stay chips (theme), Cc / Bcc are links.
+ */
+
+#rl-app #V-PopupsCompose .b-header.mv-cp-fields {
+	padding: 0 16px;
+	background: transparent;
+}
+#rl-app #V-PopupsCompose .mv-cp-fields table {
+	border-collapse: collapse;
+}
+#rl-app #V-PopupsCompose .mv-cp-fields tr {
+	border-bottom: 1px solid var(--color-border, #ededed);
+}
+#rl-app #V-PopupsCompose .mv-cp-fields td,
+#rl-app #V-PopupsCompose .mv-cp-fields td label {
+	vertical-align: middle;
+	margin: 0;
+	padding: 2px 0;
+}
+#rl-app #V-PopupsCompose .mv-cp-fields td:first-child {
+	width: 64px;
+	padding-right: 10px;
+	text-align: start;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+}
+
+/* inputs without their own box: the row line is the frame */
+#rl-app #V-PopupsCompose .mv-cp-fields input[type="text"],
+#rl-app #V-PopupsCompose .mv-cp-fields .emailaddresses,
+#rl-app #V-PopupsCompose .mv-cp-fields .emailaddresses.emailaddresses-focused {
+	border: 0;
+	box-shadow: none;
+	background: transparent;
+	outline: none;
+}
+#rl-app #V-PopupsCompose .mv-cp-fields input[name="subject"] {
+	font-weight: 600;
+}
+
+/* To row: recipients, then the Cc / Bcc links */
+#rl-app #V-PopupsCompose .mv-cp-to {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+#rl-app #V-PopupsCompose .mv-cp-to > :first-child {
+	flex: 1;
+	min-width: 0;
+}
+#rl-app #V-PopupsCompose .mv-cp-links {
+	display: flex;
+	flex: none;
+	gap: 2px;
+}
+#rl-app #V-PopupsCompose .mv-cp-link {
+	padding: 4px 8px;
+	border-radius: 6px;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+	cursor: pointer;
+	text-decoration: none;
+}
+#rl-app #V-PopupsCompose .mv-cp-link:hover {
+	background: var(--color-background-hover, #f5f5f5);
+	color: var(--color-main-text, #222);
+}
+
+/* identity menu caret */
+#rl-app #V-PopupsCompose #identity-toggle::after {
+	content: none;
+}
+#rl-app #V-PopupsCompose #identity-toggle {
+	color: var(--color-main-text, #222);
+}
+
+/* no recipient: the To label in clear red, and core's error tip readable (the theme draws it in
+   the error colour on a dark grey box, and the field rows must not clip it) */
+#rl-app #V-PopupsCompose .mv-cp-fields .error-to {
+	color: var(--color-error-text, #c42b1c) !important;
+	font-weight: 600;
+	opacity: 1;
+}
+#rl-app #V-PopupsCompose .mv-cp-fields,
+#rl-app #V-PopupsCompose .mv-cp-fields table,
+#rl-app #V-PopupsCompose .mv-cp-fields td {
+	overflow: visible;
+}
+#rl-app #V-PopupsCompose .mv-cp-fields [data-rainloopErrorTip]::before {
+	left: 0;
+	margin: 6px 0 0;
+	padding: 6px 10px;
+	border: 1px solid var(--color-error, #db0606);
+	border-radius: var(--border-radius-element, 8px);
+	background: var(--color-main-background, #fff);
+	color: var(--color-error-text, #c42b1c);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+	font-size: 13px;
+	font-weight: 600;
+	white-space: nowrap;
+	z-index: 2001;
+}

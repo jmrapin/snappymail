@@ -20,16 +20,16 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 		NAME     = 'Nextcloud Modern View',
 		AUTHOR   = 'jmrapin',
 		URL      = 'https://github.com/jmrapin/snappymail',
-		VERSION  = '0.2',
-		RELEASE  = '2026-11-13',
+		VERSION  = '0.4',
+		RELEASE  = '2026-11-17',
 		REQUIRED = '3.0.1',
 		CATEGORY = 'General',
 		LICENSE  = 'MIT',
 		DESCRIPTION = 'Compact modern reading pane: actions in the toolbar, sender verification shield, one-line attachments, outline icons';
 
 	const
-		CSS = ['symbols', 'folders', 'toolbar', 'messagelist-toolbar', 'account', 'header', 'shield', 'attachments', 'attachments-select', 'busy'],
-		JS  = ['util', 'header', 'account', 'shield', 'attachments', 'attachments-layout', 'attachments-actions', 'messagelist-toolbar', 'busy'];
+		CSS = ['symbols', 'folders', 'toolbar', 'messagelist-toolbar', 'account', 'header', 'shield', 'attachments', 'attachments-select', 'busy', 'toolbar-merge', 'overflow', 'move-menu', 'onebar', 'compose', 'compose-fields', 'compose-attachments', 'editor-toolbar', 'editor-colors', 'editor-images'],
+		JS  = ['util', 'header', 'account', 'shield', 'attachments', 'attachments-layout', 'attachments-actions', 'messagelist-toolbar', 'busy', 'overflow', 'move-menu', 'onebar-model', 'onebar', 'compose', 'compose-fields', 'compose-attachments', 'editor-toolbar', 'editor-fixes', 'compose-close', 'editor-colors', 'editor-images'];
 
 	public function Init() : void
 	{
@@ -42,5 +42,18 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 		// Replaces the built-in template with the same name
 		$this->addTemplate('templates/MailMessageView.html');
+		// The single action bar (js/onebar.js)
+		$this->addTemplate('templates/NcModernViewBar.html');
+	}
+
+	protected function configMapping() : array
+	{
+		return [
+			\RainLoop\Plugins\Property::NewInstance('one_bar')->SetLabel('One action bar')
+				->SetType(\RainLoop\Enumerations\PluginPropertyType::BOOL)
+				->SetDescription('One toolbar over the message list and the message, instead of one per panel')
+				->SetAllowedInJs(true)
+				->SetDefaultValue(true)
+		];
 	}
 }

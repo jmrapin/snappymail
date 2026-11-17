@@ -1,0 +1,114 @@
+/*
+ * Nextcloud Modern View: compose window toolbar (js/compose.js), same height, buttons and lines
+ * as the one action bar. Button looks (.mv-btn, .mv-sep, .mv-on) come from toolbar.css / onebar.css.
+ */
+
+#rl-app #V-PopupsCompose header.mv-cp-bar {
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	gap: 2px;
+	height: var(--mv-toolbar-height, 49px);
+	box-sizing: border-box;
+	padding: 4px 8px 4px 12px;
+	background: var(--color-main-background, #fff);
+	color: var(--color-main-text, #222);
+	border-bottom: 1px solid var(--mv-line, #dbdbdb);
+	white-space: nowrap;
+}
+#rl-app #V-PopupsCompose header.mv-cp-bar > *,
+#rl-app #V-PopupsCompose .mv-cp-right > * {
+	margin: 0;
+	flex: none;
+}
+
+/* Send: the one filled button, in the Nextcloud colour */
+#rl-app #V-PopupsCompose .mv-cp-send {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 36px;
+	margin-right: 6px;
+	padding: 0 16px 0 12px;
+	border: 0;
+	border-radius: 18px;
+	background: var(--color-primary-element, #00679e);
+	color: var(--color-primary-element-text, #fff);
+	font-weight: 600;
+	text-shadow: none;
+	box-shadow: none;
+}
+#rl-app #V-PopupsCompose .mv-cp-send:hover {
+	background: var(--color-primary-element-hover, #005a8a);
+}
+/* core's error states stay readable: failed (red), sent but not saved (amber); its
+   btn-success is on whenever there is no error, so it keeps the primary colour */
+#rl-app #V-PopupsCompose .mv-cp-send.btn-danger { background: var(--color-error, #db0606); }
+#rl-app #V-PopupsCompose .mv-cp-send.btn-warning { background: var(--color-warning, #a37200); }
+#rl-app #V-PopupsCompose .mv-cp-send.disabled {
+	opacity: .5;
+}
+
+#rl-app #V-PopupsCompose header .mv-btn.btn-danger {
+	color: var(--color-error-text, #c42b1c);
+	background: transparent;
+}
+#rl-app #V-PopupsCompose header .mv-on {
+	background: var(--color-primary-element-light, #e5eff4);
+	color: var(--color-primary-element, #00679e);
+}
+
+#rl-app #V-PopupsCompose .saved-text {
+	margin-left: 8px;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+	font-size: 13px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	flex: 0 1 auto;
+}
+
+/* ☰ … minimise · close at the right end */
+/* header.mv-cp-bar > * resets margins, so this has to be at least as specific */
+#rl-app #V-PopupsCompose header.mv-cp-bar > .mv-cp-right {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	float: none;
+	margin-left: auto;
+}
+#rl-app #V-PopupsCompose .mv-cp-right .dropdown-menu {
+	right: 0;
+	left: auto;
+}
+#rl-app #V-PopupsCompose .mv-cp-right .dropdown-menu a {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+#rl-app #V-PopupsCompose .mv-cp-right .dropdown-menu .mi {
+	width: 18px;
+	height: 18px;
+	opacity: .75;
+}
+
+/* the ai-reply-suggest plugin adds its 🤖 button next to ☰: flat like the others */
+#rl-app #V-PopupsCompose .mv-cp-right .ai-reply-suggest-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 40px;
+	min-width: 40px;
+	padding: 0 9px;
+	border: 0 !important;
+	border-radius: var(--border-radius-element, 8px);
+	background: transparent !important;
+	box-shadow: none !important;
+}
+#rl-app #V-PopupsCompose .mv-cp-right .ai-reply-suggest-btn:hover {
+	background: var(--color-background-hover, #f5f5f5);
+}
+
+/* Discard only exists once the draft is saved: core hides it with visibility, which keeps its gap */
+#rl-app #V-PopupsCompose header .button-delete.disabled {
+	display: none;
+}
