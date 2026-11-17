@@ -60,12 +60,23 @@
 				closeMenu();
 				return false;
 			}
-			const r = event.currentTarget.getBoundingClientRect();
-			view.mvAttMenuPos({
-				top: Math.round(r.bottom + 4),
-				left: Math.round(Math.max(8, Math.min(r.right - MENU_WIDTH, innerWidth - MENU_WIDTH - 8)))
-			});
+			// under the card, starting at its left edge, kept inside the reading pane (which clips it)
+			const r = event.currentTarget.getBoundingClientRect(),
+				card = event.currentTarget.closest('.mv-att')?.getBoundingClientRect() || r,
+				pane = document.getElementById('V-MailMessageView')?.getBoundingClientRect() || { left: 0, right: innerWidth },
+				want = {
+					top: Math.round(r.bottom + 4),
+					left: Math.round(Math.max(pane.left + 8, Math.min(card.left, pane.right - MENU_WIDTH - 8)))
+				};
+			view.mvAttMenuPos(want);
 			view.mvAttMenu(att);
+			// position:fixed is relative to the window only if no ancestor has a transform, filter or
+			// backdrop-filter (Nextcloud's page can add one): measure where it landed and shift it
+			requestAnimationFrame(() => {
+				const m = document.querySelector('#V-MailMessageView .mv-att-menu')?.getBoundingClientRect();
+				m?.width && (Math.abs(m.top - want.top) > 1 || Math.abs(m.left - want.left) > 1)
+					&& view.mvAttMenuPos({ top: want.top * 2 - Math.round(m.top), left: want.left * 2 - Math.round(m.left) });
+			});
 			return false;
 		};
 
