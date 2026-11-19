@@ -56,20 +56,24 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 	public function DoFolderUids() : array
 	{
 		$sFolder = (string) $this->jsonParam('folder', '');
-		if (!strlen($sFolder)) {
-			throw new RainLoopExceptionsClientException(RainLoopNotifications::CantGetMessageList);
+		if (!\strlen($sFolder)) {
+			throw new \RainLoop\Exceptions\ClientException(\RainLoop\Notifications::CantGetMessageList);
 		}
-		$oActions = RainLoopApi::Actions();
+		$oActions = \RainLoop\Api::Actions();
 		$oImap = $oActions->ImapClient();
 		if (!$oImap->IsLoggined()) {
 			$oActions->getAccountFromToken()->ImapConnectAndLogin($oActions->Plugins(), $oImap, $oActions->Config());
 		}
 		$oImap->FolderExamine($sFolder);
 		$bUseCache = false;
-		$oCriterias = MailSoImapSearchCriterias::fromString(
-			$oImap, $sFolder, (string) $this->jsonParam('search', ''), !empty($this->jsonParam('hideDeleted', 1)), $bUseCache
+		$oCriterias = \MailSo\Imap\SearchCriterias::fromString(
+			$oImap,
+			$sFolder,
+			(string) $this->jsonParam('search', ''),
+			!empty($this->jsonParam('hideDeleted', 1)),
+			$bUseCache
 		);
-		$aUids = array_map('intval', $oImap->MessageSearch((string) $oCriterias, true));
+		$aUids = \array_map('intval', $oImap->MessageSearch((string) $oCriterias, true));
 		return $this->jsonResponse(__FUNCTION__, $aUids);
 	}
 
