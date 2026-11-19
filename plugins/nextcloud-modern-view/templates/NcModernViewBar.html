@@ -4,11 +4,28 @@
 	It acts on the ticked messages, or on the open message when nothing is ticked; "one"-message
 	actions are disabled while messages are ticked. data-mv-ovf = overflow order (highest leaves
 	first, js/overflow.js); data-mv-sub = the ▾ menu whose items go into ☰ with it.
+	Order follows Outlook on the web: Delete / Archive / Spam / Move first (the triage actions
+	used most), then Reply / Forward, which so sit nearer the reading pane.
 -->
 <a class="mv-btn mv-mobile-only" data-bind="click: toggleLeft" data-i18n="[title]SETTINGS_LABELS/FOLDERS"><i class="mi mi-folder"></i></a>
 <a class="mv-btn mv-mobile-only mv-primary" data-bind="click: compose" data-i18n="[title]FOLDER_LIST/BUTTON_NEW_MESSAGE"><i class="mi mi-edit"></i></a>
 <a class="mv-btn buttonClose" data-bind="visible: hasMessage, click: closeMessage" data-i18n="[title]GLOBAL/CLOSE"><i class="mi mi-close"></i></a>
 <a class="mv-btn mv-reload" data-bind="click: reload" data-i18n="[title]MESSAGE_LIST/BUTTON_RELOAD"><i class="mi mi-refresh"></i></a>
+
+<span class="mv-sep"></span>
+<a class="mv-btn mv-danger" data-mv-ovf="6" data-mv-sub="#mv-bar-del" data-bind="command: L.deleteCommand" data-i18n="[title]GLOBAL/DELETE"><i class="mi mi-delete"></i></a>
+<div class="btn-group mv-split-dd" data-bind="registerBootstrapDropdown: true">
+	<a class="mv-btn mv-caret dropdown-toggle" id="mv-bar-del-toggle" data-bind="css: { disabled: delMenuOff }" href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"><i class="mi mi-arrow-drop-down"></i></a>
+	<menu class="dropdown-menu mv-menu" id="mv-bar-del" role="menu" aria-labelledby="mv-bar-del-toggle">
+		<li role="presentation"><a href="#" tabindex="-1" data-bind="command: L.deleteCommand"><i class="mi mi-delete"></i><span data-i18n="GLOBAL/DELETE"></span></a></li>
+		<li role="presentation" class="mv-danger-item"><a href="#" tabindex="-1" data-bind="command: L.deleteWithoutMoveCommand"><i class="mi mi-delete-forever"></i><span data-i18n="MESSAGE_LIST/BUTTON_DELETE_WITHOUT_MOVE"></span></a></li>
+		<li role="presentation" data-bind="visible: !L.hideDeleted()"><a href="#" tabindex="-1" data-bind="command: L.undeleteCommand"><i class="mi mi-delete mv-rotate"></i><span data-i18n="GLOBAL/UNDELETE"></span></a></li>
+	</menu>
+</div>
+<a class="mv-btn" data-mv-ovf="7" data-bind="visible: L.archiveAllowed, command: L.archiveCommand" data-i18n="[title]GLOBAL/TO_ARCHIVE"><i class="mi mi-archive"></i></a>
+<a class="mv-btn" data-mv-ovf="8" data-bind="visible: L.canMarkAsSpam, command: L.spamCommand" data-i18n="[title]GLOBAL/TO_SPAM"><i class="mi mi-report"></i></a>
+<a class="mv-btn" data-mv-ovf="8" data-bind="visible: L.isSpamFolder, command: L.notSpamCommand" data-i18n="[title]GLOBAL/NOT_SPAM"><i class="mi mi-mark-email-read"></i></a>
+<a class="mv-btn mv-move-btn" data-mv-ovf="9" data-bind="command: L.moveCommand" data-i18n="[title]GLOBAL/MOVE_TO"><i class="mi mi-drive-file-move"></i><i class="mi mi-arrow-drop-down mv-dd-caret"></i></a>
 
 <span class="mv-sep"></span>
 <a class="mv-btn mv-rep" data-mv-ovf="2" data-bind="visible: !isDraft(), command: reply" data-i18n="[title]MESSAGE/BUTTON_REPLY"><i class="mi mi-reply"></i></a>
@@ -22,21 +39,6 @@
 	</menu>
 </div>
 <a class="mv-btn mv-rep" data-mv-ovf="2" data-bind="visible: isDraft, command: edit" data-i18n="[title]MESSAGE/BUTTON_EDIT"><i class="mi mi-edit"></i></a>
-
-<span class="mv-sep"></span>
-<a class="mv-btn" data-mv-ovf="7" data-bind="visible: L.archiveAllowed, command: L.archiveCommand" data-i18n="[title]GLOBAL/TO_ARCHIVE"><i class="mi mi-archive"></i></a>
-<a class="mv-btn" data-mv-ovf="8" data-bind="visible: L.canMarkAsSpam, command: L.spamCommand" data-i18n="[title]GLOBAL/TO_SPAM"><i class="mi mi-report"></i></a>
-<a class="mv-btn" data-mv-ovf="8" data-bind="visible: L.isSpamFolder, command: L.notSpamCommand" data-i18n="[title]GLOBAL/NOT_SPAM"><i class="mi mi-mark-email-read"></i></a>
-<a class="mv-btn mv-danger" data-mv-ovf="6" data-mv-sub="#mv-bar-del" data-bind="command: L.deleteCommand" data-i18n="[title]GLOBAL/DELETE"><i class="mi mi-delete"></i></a>
-<div class="btn-group mv-split-dd" data-bind="registerBootstrapDropdown: true">
-	<a class="mv-btn mv-caret dropdown-toggle" id="mv-bar-del-toggle" data-bind="css: { disabled: delMenuOff }" href="#" tabindex="-1" data-i18n="[title]GLOBAL/MORE"><i class="mi mi-arrow-drop-down"></i></a>
-	<menu class="dropdown-menu mv-menu" id="mv-bar-del" role="menu" aria-labelledby="mv-bar-del-toggle">
-		<li role="presentation"><a href="#" tabindex="-1" data-bind="command: L.deleteCommand"><i class="mi mi-delete"></i><span data-i18n="GLOBAL/DELETE"></span></a></li>
-		<li role="presentation" class="mv-danger-item"><a href="#" tabindex="-1" data-bind="command: L.deleteWithoutMoveCommand"><i class="mi mi-delete-forever"></i><span data-i18n="MESSAGE_LIST/BUTTON_DELETE_WITHOUT_MOVE"></span></a></li>
-		<li role="presentation" data-bind="visible: !L.hideDeleted()"><a href="#" tabindex="-1" data-bind="command: L.undeleteCommand"><i class="mi mi-delete mv-rotate"></i><span data-i18n="GLOBAL/UNDELETE"></span></a></li>
-	</menu>
-</div>
-<a class="mv-btn mv-move-btn" data-mv-ovf="9" data-bind="command: L.moveCommand" data-i18n="[title]GLOBAL/MOVE_TO"><i class="mi mi-drive-file-move"></i><i class="mi mi-arrow-drop-down mv-dd-caret"></i></a>
 
 <span class="mv-sep"></span>
 <a class="mv-btn" data-mv-ovf="11" data-bind="css: { disabled: !hasTarget() }, click: toggleSeen, attr: { title: seenTitle }"><i class="mi" data-bind="css: seenIcon"></i></a>
