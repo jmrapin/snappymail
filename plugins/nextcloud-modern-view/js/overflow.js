@@ -50,42 +50,29 @@
 			return li;
 		});
 
-	// a ▾ menu becomes one ☰ row with a side panel (like Outlook's overflow), so a long tag list
-	// doesn't stretch ☰. The ☰ menu scrolls, which would clip a nested panel: it is fixed instead.
+	// a ▾ menu becomes one ☰ row whose items unfold under it (an accordion), so a long tag list
+	// doesn't stretch ☰ and nothing can open outside the window. Its items are built on unfolding,
+	// so tag ticks are current.
 	const subEntry = (button, sub) => {
 		const li = entry(button, button, button.title || button.textContent.trim()),
 			a = li.firstElementChild,
-			panel = Element.fromHTML('<menu class="dropdown-menu mv-menu mv-ovf-sub" role="menu"></menu>'),
-			show = on => {
-				if (on) {
-					panel.replaceChildren(...subItems(sub));
-					panel.classList.add('show');
-					const r = li.getBoundingClientRect(), w = panel.offsetWidth, h = panel.offsetHeight;
-					// opens to the left of ☰ (which sits at the right edge), else to its right
-					// overlapping the row by 2px, so the mouse never leaves it on the way to the panel
-					panel.style.left = (r.left - w + 2 >= 8 ? r.left - w + 2 : Math.min(r.right - 2, innerWidth - w - 8)) + 'px';
-					panel.style.top = Math.max(8, Math.min(r.top, innerHeight - h - 8)) + 'px';
-				} else {
-					panel.classList.remove('show');
-				}
-			};
+			panel = Element.fromHTML('<ul class="mv-ovf-sub" role="menu" hidden></ul>'),
+			// usable while either the button or its ▾ caret is
+			caret = document.getElementById(sub.getAttribute('aria-labelledby'));
 		li.classList.add('mv-ovf-has-sub');
-		// usable while either the button or its ▾ caret is
-		const caret = document.getElementById(sub.getAttribute('aria-labelledby'));
 		li.mvDisabled = () => button.classList.contains('disabled') && (!caret || caret.classList.contains('disabled'));
 		a.append(Element.fromHTML('<i class="mi mi-chevron-right mv-ovf-chevron"></i>'));
 		li.append(panel);
-		li.addEventListener('mouseenter', () => show(true));
-		li.addEventListener('mouseleave', () => show(false));
-		// a dropdown-only button (Tags) and the chevron open the panel; on a split button the row
-		// itself still runs the main action (Delete, Forward, …). Stopping the click keeps ☰ open.
+		// a dropdown-only button (Tags) and the chevron unfold the items; on a split button the
+		// row itself still runs the main action (Delete, Forward, …). Stopping the click keeps ☰ open.
 		a.addEventListener('click', e => {
 			if (button.classList.contains('dropdown-toggle') || e.target.closest('.mv-ovf-chevron')) {
 				e.preventDefault();
 				e.stopImmediatePropagation();
 				e.stopPropagation();
-				// open, never toggle: a tap or a hover already fired mouseenter, which opened it
-				show(true);
+				panel.hidden && panel.replaceChildren(...subItems(sub));
+				panel.hidden = !panel.hidden;
+				li.classList.toggle('mv-ovf-open', !panel.hidden);
 			}
 		}, true);
 		return li;

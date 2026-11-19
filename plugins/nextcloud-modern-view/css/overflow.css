@@ -17,16 +17,21 @@
 	pointer-events: none;
 }
 
-/* a ▾ menu moved into ☰: one row with a side panel (js/overflow.js positions it, fixed) */
+/* a ▾ menu moved into ☰: one row whose items unfold under it (js/overflow.js) */
 #rl-app .mv-ovf-has-sub > a .mv-ovf-chevron {
 	margin-left: auto;
 	padding-left: 12px;
 	box-sizing: content-box;
+	transition: transform .15s;
+}
+#rl-app .mv-ovf-open > a .mv-ovf-chevron {
+	transform: rotate(90deg);
 }
 #rl-app .mv-ovf-sub {
-	position: fixed;
-	right: auto;
-	bottom: auto;
-	margin: 0;
-	z-index: 1000;
+	margin: 0 0 4px;
+	padding: 0 0 0 22px;
+	list-style: none;
+}
+#rl-app .mv-ovf-sub[hidden] {
+	display: none;
 }
