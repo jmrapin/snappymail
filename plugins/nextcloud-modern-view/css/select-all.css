@@ -1,0 +1,26 @@
+/*
+ * Nextcloud Modern View: "Select all in this folder" banner at the top of the message list
+ * (js/select-all.js).
+ */
+#rl-app .mv-selall {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 4px 10px;
+	padding: 8px 12px;
+	background: var(--color-primary-element-light, #e5eff4);
+	color: var(--color-main-text, #222);
+	font-size: 13px;
+	text-align: center;
+}
+#rl-app .mv-selall[hidden] {
+	display: none;
+}
+#rl-app .mv-selall a {
+	color: var(--color-primary-element, #00679e);
+	font-weight: 600;
+	text-decoration: none;
+}
+#rl-app .mv-selall a:hover {
+	text-decoration: underline;
+}

@@ -32,7 +32,9 @@
 		m.single = C('bar single', () => !m.checkedCount() && m.hasMessage(), false);
 		m.hasTarget = C('bar target', () => m.checkedCount() > 0 || m.hasMessage(), false);
 		m.isDraft = C('bar draft', () => !!V.isDraftFolder?.(), false);
-		m.checkedText = C('bar checked text', () => NcModernView.t('N_SELECTED', { N: m.checkedCount() }), '');
+		// "select all in this folder" (js/select-all.js) counts the whole folder
+		m.checkedText = C('bar checked text', () => NcModernView.t('N_SELECTED',
+			{ N: (NcModernView.selectAll?.size() || m.checkedCount()).toLocaleString() }), '');
 		m.busy = C('bar busy', () => !!(store.isLoading?.() || V.messageListOrViewLoading?.()), false);
 
 		// one-message actions
@@ -62,8 +64,14 @@
 		m.seenTitle = C('bar seen title', () => rl.i18n(m.allUnseen() ? 'MESSAGE_LIST/MENU_SET_SEEN' : 'MESSAGE_LIST/MENU_UNSET_SEEN'), '');
 		m.flagTitle = C('bar flag title', () => rl.i18n(m.allFlagged() ? 'MESSAGE_LIST/MENU_UNSET_FLAG' : 'MESSAGE_LIST/MENU_SET_FLAG'), '');
 		m.tagsTitle = C('bar tags title', () => NcModernView.t('TAGS'), '');
-		m.toggleSeen = () => m.hasTarget() && (m.allUnseen() ? L.listSetSeen() : L.listUnsetSeen());
-		m.toggleFlag = () => m.hasTarget() && (m.allFlagged() ? L.listUnsetFlags() : L.listSetFlags());
+		// with the whole folder selected, the page's state decides the direction for all of it
+		const folderWide = () => NcModernView.selectAll?.size() > 0;
+		m.toggleSeen = () => m.hasTarget() && (folderWide()
+			? NcModernView.selectAll.setFlag('Seen', m.allUnseen())
+			: (m.allUnseen() ? L.listSetSeen() : L.listUnsetSeen()));
+		m.toggleFlag = () => m.hasTarget() && (folderWide()
+			? NcModernView.selectAll.setFlag('Flagged', !m.allFlagged())
+			: (m.allFlagged() ? L.listUnsetFlags() : L.listSetFlags()));
 
 		// open-message helpers (links and menu items)
 		m.emlLink = C('bar eml', () => message()?.downloadLink?.() || '#', '#');

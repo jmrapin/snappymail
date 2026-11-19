@@ -28,6 +28,12 @@
 		"IMG_LARGE": "Large",
 		"IMG_ORIGINAL": "Original size",
 		"IMG_REMOVE": "Delete",
-		"ATT_REMOVE": "Remove"
+		"ATT_REMOVE": "Remove",
+		"PAGE_ALL_SELECTED": "All %N% on this page are selected.",
+		"SELECT_ALL_IN": "Select all %N% in %FOLDER%",
+		"ALL_IN_SELECTED": "All %N% in %FOLDER% are selected.",
+		"CLEAR_SELECTION": "Clear selection",
+		"SELECTING": "Selecting…",
+		"THIS_SEARCH": "this search"
 	}
 }
