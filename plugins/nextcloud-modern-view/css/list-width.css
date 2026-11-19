@@ -1,0 +1,13 @@
+/*
+ * Nextcloud Modern View: in the side-by-side layout the message list keeps its width when the
+ * window is resized; the reading pane takes the change (like Outlook on the web). Core sizes the
+ * list at 35vw (MessageList.less). A width set by dragging the divider is an inline style
+ * (setLayoutResizer), so it still wins over this default. core's max-width: 50vw stays, so a
+ * wide list still gives way in a narrow window. Not in the one-pane mode (narrow.css).
+ */
+html.sm-msgView-side:not(.rl-mobile):not(.mv-single-pane) #rl-app #V-MailMessageList {
+	flex: none;
+}
+html.sm-msgView-side:not(.rl-mobile):not(.mv-single-pane) #rl-app #V-MailMessageList .messageList {
+	width: 420px;
+}
