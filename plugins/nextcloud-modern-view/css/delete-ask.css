@@ -1,7 +1,7 @@
 /*
  * Nextcloud Modern View: the "delete permanently?" popup (js/delete-ask.js marks core's Ask popup
  * with .mv-ask-delete for that question only). A title with the count, one line of explanation,
- * and Cancel / Delete in the plugin's button style, Delete in the error colour.
+ * and Cancel / Delete in the plugin's button style, Delete in the Nextcloud brand colour.
  */
 #rl-app #V-PopupsAsk.mv-ask-delete {
 	max-width: 420px;
@@ -52,18 +52,19 @@
 #rl-app #V-PopupsAsk.mv-ask-delete footer .buttonNo:hover {
 	background: var(--color-background-hover, #f5f5f5);
 }
-/* solid red in every state: Nextcloud's --color-error-hover is a pale tint (white text on it was
-   unreadable, and the button has focus as soon as the dialog opens), so hover only darkens */
+/* the Nextcloud brand colour, as on New message (the theme's .btn-success): Nextcloud's error
+   red is too light here for white text, and its --color-error-hover is a pale tint. Solid in every
+   state (the button has focus as soon as the dialog opens); hover only darkens */
 #rl-app #V-PopupsAsk.mv-ask-delete footer .buttonYes,
 #rl-app #V-PopupsAsk.mv-ask-delete footer .buttonYes:hover,
 #rl-app #V-PopupsAsk.mv-ask-delete footer .buttonYes:focus {
-	border-color: var(--color-error, #e9322d) !important;
-	background: var(--color-error, #e9322d);
-	color: #fff;
+	border-color: var(--nc-color-primary-element, #00679e) !important;
+	background: var(--nc-color-primary-element, #00679e);
+	color: var(--nc-color-primary-element-text, #fff);
 	opacity: 1;
 }
 #rl-app #V-PopupsAsk.mv-ask-delete footer .buttonYes:hover {
-	filter: brightness(.9);
+	filter: brightness(.88);
 }
 #rl-app #V-PopupsAsk.mv-ask-delete footer .buttonYes:focus-visible {
 	outline: 2px solid var(--color-main-text, #222);
