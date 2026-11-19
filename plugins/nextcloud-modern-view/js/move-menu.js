@@ -21,8 +21,7 @@
 		t = key => NcModernView.t(key),
 		store = () => rl.app?.messageList,
 		el = html => Element.fromHTML(html),
-		ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' },
-		esc = s => String(s).replace(/[&<>"]/g, c => ESC[c]);
+		esc = NcModernView.esc;
 
 	// every folder you can move into, depth-first, with its depth for the tree
 	const allFolders = () => {

@@ -1,0 +1,63 @@
+/*
+ * Nextcloud Modern View: the "delete permanently?" popup (js/delete-ask.js marks core's Ask popup
+ * with .mv-ask-delete for that question only). A title with the count, one line of explanation,
+ * and Cancel / Delete in the plugin's button style, Delete in the error colour.
+ */
+#rl-app #V-PopupsAsk.mv-ask-delete {
+	max-width: 420px;
+	border-radius: var(--border-radius-large, 10px);
+}
+#rl-app #V-PopupsAsk.mv-ask-delete .modal-body {
+	padding: 20px 24px 8px;
+}
+#rl-app #V-PopupsAsk .mv-ask-title {
+	margin-bottom: 8px;
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--color-main-text, #222);
+}
+#rl-app #V-PopupsAsk .mv-ask-text {
+	font-size: 14px;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+}
+
+/* Cancel first, Delete last (on the right), as in Nextcloud and Outlook */
+#rl-app #V-PopupsAsk.mv-ask-delete footer {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: flex-start;
+	gap: 8px;
+	padding: 12px 24px 20px;
+	border: 0;
+	background: transparent;
+}
+#rl-app #V-PopupsAsk.mv-ask-delete footer .btn {
+	height: 34px;
+	margin: 0;
+	padding: 0 16px;
+	border: 1px solid var(--color-border, #ededed);
+	border-radius: var(--border-radius-element, 8px);
+	background: var(--color-main-background, #fff);
+	color: var(--color-main-text, #222);
+	font-size: 14px;
+	text-shadow: none;
+	box-shadow: none;
+}
+/* core's ✔ / ✖ glyphs */
+#rl-app #V-PopupsAsk.mv-ask-delete footer .btn::before {
+	content: none;
+}
+#rl-app #V-PopupsAsk.mv-ask-delete footer .btn:hover {
+	background: var(--color-background-hover, #f5f5f5);
+}
+#rl-app #V-PopupsAsk.mv-ask-delete footer .buttonYes {
+	border-color: var(--color-error, #db0606);
+	background: var(--color-error, #db0606);
+	color: #fff;
+	font-weight: 600;
+}
+#rl-app #V-PopupsAsk.mv-ask-delete footer .buttonYes:hover,
+#rl-app #V-PopupsAsk.mv-ask-delete footer .buttonYes:focus-visible {
+	border-color: var(--color-error-hover, #df2525);
+	background: var(--color-error-hover, #df2525);
+}

@@ -10,7 +10,8 @@
 		return;
 	}
 
-	const hooks = [], buildHooks = [];
+	const hooks = [], buildHooks = [],
+		ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
 
 	/**
 	 * Errors thrown by our computeds or bindings while SnappyMail processes a request (folder
@@ -73,6 +74,9 @@
 
 		// Plugin strings live under MODERN_VIEW in langs/*.json
 		t: (key, values) => rl.i18n('MODERN_VIEW/' + key, values),
+
+		// for the few places that must build HTML from text (core's html: bindings)
+		esc: s => String(s).replace(/[&<>"]/g, c => ESC[c]),
 
 		friendlySize: bytes => {
 			const units = ['B', 'KiB', 'MiB', 'GiB'];

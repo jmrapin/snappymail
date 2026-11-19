@@ -34,6 +34,10 @@
 		"ALL_IN_SELECTED": "All %N% in %FOLDER% are selected.",
 		"CLEAR_SELECTION": "Clear selection",
 		"SELECTING": "Selecting…",
-		"THIS_SEARCH": "this search"
+		"THIS_SEARCH": "this search",
+		"DELETE_ONE_TITLE": "Delete this message?",
+		"DELETE_N_TITLE": "Delete %N% messages?",
+		"DELETE_ONE_TEXT": "It will be deleted permanently. This can't be undone.",
+		"DELETE_N_TEXT": "They will be deleted permanently. This can't be undone."
 	}
 }
