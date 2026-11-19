@@ -42,8 +42,8 @@
 	const recent = () => {
 		try {
 			return JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
-		} catch (e) {
-			return [];
+		} catch {
+			return []; // unreadable list: start a new one
 		}
 	};
 	const remember = fullName => localStorage.setItem(RECENT_KEY,
