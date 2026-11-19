@@ -132,8 +132,12 @@
 			section?.replaceChildren(...hidden.flatMap(button => entries(button, bar)));
 		});
 		new ResizeObserver(run).observe(bar);
-		// knockout's visible binding writes style="display: none"; our own hiding only uses a class
-		new MutationObserver(() => queued || (queued = true, queueMicrotask(run)))
+		// knockout's visible binding writes style="display: none"; our own hiding only uses a class.
+		// Changes inside the ☰ entries are ours (a side panel being placed): rebuilding the entries
+		// then would remove the panel the moment it opens.
+		new MutationObserver(records => queued
+			|| !records.some(r => !section?.contains(r.target))
+			|| (queued = true, queueMicrotask(run)))
 			.observe(bar, { attributes: true, attributeFilter: ['style'], subtree: true });
 		// copy the enabled state when the menu opens
 		toggle?.addEventListener('click', () => section?.querySelectorAll('li').forEach(li =>
