@@ -1,0 +1,45 @@
+<!--
+	Nextcloud Modern View: Settings → Filters (replaces core's SettingsFilters).
+	One card per Sieve script with a radio for the active one; "Off" runs none. Core opens a script
+	when .script-name inside .script-item is clicked (Settings/User/Filters.js onBuild), so the
+	name and the edit button carry that class. Helpers: js/filters.js, styles: css/filters.css.
+-->
+<div class="mv-flt">
+	<div class="mv-flt-head">
+		<h2 data-i18n="SETTINGS_LABELS/FILTERS"></h2>
+		<i class="icon-spinner" data-bind="visible: loading"></i>
+	</div>
+	<p class="mv-flt-intro" data-bind="text: mvT('MODERN_VIEW/FILTERS_INTRO')"></p>
+
+	<div class="alert alert-error g-ui-user-select-none" data-bind="visible: serverError, text: serverErrorDesc" data-icon="⚠"></div>
+
+	<div class="mv-flt-list g-ui-user-select-none">
+		<div class="mv-flt-card" data-bind="css: { 'mv-on': mvNoneActive }">
+			<a href="#" class="mv-radio" data-bind="click: mvDisableAll, css: { on: mvNoneActive }, attr: { title: mvT('MODERN_VIEW/FILTERS_OFF') }"></a>
+			<div class="mv-flt-main">
+				<div class="mv-flt-name" data-bind="text: mvT('MODERN_VIEW/FILTERS_OFF')"></div>
+				<div class="mv-flt-sub" data-bind="text: mvT('MODERN_VIEW/FILTERS_OFF_DESC')"></div>
+			</div>
+		</div>
+
+		<!-- ko foreach: scripts -->
+		<div class="mv-flt-card script-item" data-bind="css: { 'mv-on': active }">
+			<a href="#" class="mv-radio" data-bind="visible: body, click: $root.mvEnable, css: { on: active }, attr: { title: $root.mvT('MODERN_VIEW/FILTERS_USE') }"></a>
+			<div class="mv-flt-main script-name" data-bind="attr: { title: name }">
+				<div class="mv-flt-name">
+					<span data-bind="text: $root.mvScriptName($data)"></span>
+					<span class="mv-flt-badge" data-bind="visible: active, text: $root.mvT('MODERN_VIEW/FILTERS_ACTIVE')"></span>
+				</div>
+				<div class="mv-flt-sub" data-bind="text: $root.mvScriptSub($data)"></div>
+			</div>
+			<a href="#" class="mv-btn script-name" data-bind="attr: { title: $root.mvT('MODERN_VIEW/FILTERS_EDIT') }"><i class="mi mi-edit"></i></a>
+			<!-- ko ifnot: allowFilters -->
+			<a href="#" class="mv-btn mv-danger" data-bind="visible: !askDelete(), click: $root.mvAskDelete, attr: { title: $root.mvT('GLOBAL/DELETE') }"><i class="mi mi-delete"></i></a>
+			<a href="#" class="mv-sbtn mv-sbtn-danger" data-bind="visible: askDelete, click: $root.mvDelete, text: $root.mvT('GLOBAL/ARE_YOU_SURE')"></a>
+			<!-- /ko -->
+		</div>
+		<!-- /ko -->
+	</div>
+
+	<a href="#" class="mv-sbtn mv-flt-add" data-bind="click: addScript"><span class="mv-plus">+</span><span data-bind="text: mvT('MODERN_VIEW/FILTERS_ADD_SCRIPT')"></span></a>
+</div>

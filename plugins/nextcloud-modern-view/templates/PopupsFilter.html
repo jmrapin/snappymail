@@ -1,0 +1,51 @@
+<!--
+	Nextcloud Modern View: one rule (replaces core's PopupsFilter).
+	"When a message arrives" (the conditions) and "Do this" (the action), as Outlook words it.
+	The condition and action rows are still core's SettingsFiltersCondition* / SettingsFiltersAction*
+	templates; css/filters.css lays them out. Helpers: js/filters.js.
+-->
+<header>
+	<a href="#" class="close" data-bind="click: close">×</a>
+	<h3>
+		<span data-i18n="POPUPS_FILTER/TITLE_CREATE_FILTER" data-bind="visible: isNew"></span>
+		<span data-i18n="POPUPS_FILTER/TITLE_EDIT_FILTER" data-bind="visible: !isNew()"></span>
+	</h3>
+</header>
+<form id="sieve-script-filter" class="modal-body mv-flt-rule" spellcheck="false" data-bind="submit: saveFilter, with: filter">
+	<label class="mv-flt-label" data-bind="text: $root.mvT('MODERN_VIEW/FILTERS_RULE_NAME')"></label>
+	<div class="control-group mv-flt-field" data-bind="css: { 'error': nameError }">
+		<input type="text" data-bind="value: name" autofocus="" autocorrect="off" autocapitalize="off"
+			data-i18n="[placeholder]GLOBAL/NAME">
+	</div>
+
+	<div class="mv-flt-section">
+		<div class="mv-flt-section-head" data-bind="text: $root.mvT('MODERN_VIEW/FILTERS_WHEN')"></div>
+		<div class="mv-flt-match" data-bind="visible: $root.mvManyConditions">
+			<select data-bind="value: conditionsType">
+				<option value="Any" data-i18n="POPUPS_FILTER/SELECT_MATCH_ANY"></option>
+				<option value="All" data-i18n="POPUPS_FILTER/SELECT_MATCH_ALL"></option>
+			</select>
+		</div>
+		<div class="mv-flt-empty" data-bind="visible: $root.mvNoConditions" data-i18n="POPUPS_FILTER/ALL_INCOMING_MESSAGES_DESC"></div>
+		<div data-bind="foreach: conditions">
+			<div class="mv-flt-cond" data-bind="css: { 'error': valueError }">
+				<div class="mv-flt-cond-fields" data-bind="template: { name: template(), data: $data }"></div>
+				<a href="#" class="mv-btn mv-danger" data-bind="click: $root.mvRemoveCondition, attr: { title: $root.mvT('GLOBAL/DELETE') }"><i class="mi mi-delete"></i></a>
+			</div>
+		</div>
+		<a href="#" class="mv-sbtn mv-sbtn-ghost mv-flt-add" data-bind="click: addCondition"><span class="mv-plus">+</span><span data-i18n="POPUPS_FILTER/BUTTON_ADD_CONDITION"></span></a>
+	</div>
+
+	<div class="mv-flt-section">
+		<div class="mv-flt-section-head" data-bind="text: $root.mvT('MODERN_VIEW/FILTERS_DO')"></div>
+		<div class="mv-flt-action">
+			<select data-bind="options: $root.actionTypeOptions, value: actionType, optionsText: 'name', optionsValue: 'id'"></select>
+			<div class="mv-flt-action-fields" data-bind="template: { name: actionTemplate() }, i18nUpdate: actionTemplate"></div>
+		</div>
+	</div>
+</form>
+<footer class="mv-flt-footer">
+	<span class="mv-spacer"></span>
+	<a href="#" class="mv-sbtn" data-bind="click: close, text: mvT('GLOBAL/CANCEL')"></a>
+	<button class="mv-sbtn mv-sbtn-primary" form="sieve-script-filter" data-i18n="GLOBAL/DONE"></button>
+</footer>

@@ -28,8 +28,8 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 		DESCRIPTION = 'Outlook-like mail view: one action bar, compact reading pane, sender verification shield, attachment cards, modern compose window, narrow-window layouts, select all in a folder';
 
 	const
-		CSS = ['symbols', 'folders', 'toolbar', 'messagelist-toolbar', 'account', 'header', 'shield', 'attachments', 'attachments-select', 'busy', 'toolbar-merge', 'overflow', 'move-menu', 'onebar', 'narrow', 'list-width', 'fullscreen', 'select-all', 'delete-ask', 'compose', 'compose-fields', 'compose-attachments', 'compose-suggest', 'editor-toolbar', 'editor-colors', 'editor-images'],
-		JS  = ['util', 'attachments-common', 'header', 'account', 'shield', 'attachments', 'attachments-layout', 'attachments-actions', 'messagelist-toolbar', 'busy', 'overflow', 'move-menu', 'select-all', 'delete-ask', 'onebar-model', 'onebar', 'narrow', 'compose', 'compose-fields', 'compose-attachments', 'compose-attachments-layout', 'editor-toolbar', 'editor-fixes', 'compose-close', 'editor-colors', 'editor-images', 'compose-suggest'];
+		CSS = ['symbols', 'folders', 'toolbar', 'messagelist-toolbar', 'account', 'header', 'shield', 'attachments', 'attachments-select', 'busy', 'toolbar-merge', 'overflow', 'move-menu', 'onebar', 'narrow', 'list-width', 'fullscreen', 'select-all', 'delete-ask', 'filters', 'compose', 'compose-fields', 'compose-attachments', 'compose-suggest', 'editor-toolbar', 'editor-colors', 'editor-images'],
+		JS  = ['util', 'attachments-common', 'header', 'account', 'shield', 'attachments', 'attachments-layout', 'attachments-actions', 'messagelist-toolbar', 'busy', 'overflow', 'move-menu', 'select-all', 'delete-ask', 'onebar-model', 'onebar', 'narrow', 'filters', 'compose', 'compose-fields', 'compose-attachments', 'compose-attachments-layout', 'editor-toolbar', 'editor-fixes', 'compose-close', 'editor-colors', 'editor-images', 'compose-suggest'];
 
 	public function Init() : void
 	{
@@ -44,6 +44,10 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 		$this->addTemplate('templates/MailMessageView.html');
 		// The single action bar (js/onebar.js)
 		$this->addTemplate('templates/NcModernViewBar.html');
+		// Settings → Filters and its two popups (js/filters.js)
+		$this->addTemplate('templates/SettingsFilters.html');
+		$this->addTemplate('templates/PopupsSieveScript.html');
+		$this->addTemplate('templates/PopupsFilter.html');
 		// "Select all in this folder" (js/select-all.js)
 		$this->addJsonHook('NcmvFolderUids', 'DoFolderUids');
 	}

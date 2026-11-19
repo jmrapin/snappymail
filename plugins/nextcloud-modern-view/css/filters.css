@@ -1,0 +1,297 @@
+/*
+ * Nextcloud Modern View: Settings → Filters, the script popup and the rule editor
+ * (templates/SettingsFilters.html, PopupsSieveScript.html, PopupsFilter.html; js/filters.js).
+ * Cards with a radio (which script runs), rule rows with an on/off switch and a drag grip, and
+ * the rule editor in two sections. Buttons are the plugin's .mv-btn / .mv-sbtn.
+ */
+
+/* ── shared ─────────────────────────────────────────────────────────── */
+#rl-app .mv-flt-intro {
+	margin: 0 0 16px;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+	font-size: 14px;
+}
+#rl-app .mv-flt-name {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--color-main-text, #222);
+}
+#rl-app .mv-flt-sub {
+	margin-top: 2px;
+	font-size: 13px;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+#rl-app .mv-flt-empty {
+	padding: 14px 16px;
+	border: 1px dashed var(--color-border-dark, #dbdbdb);
+	border-radius: var(--border-radius-large, 10px);
+	color: var(--color-text-maxcontrast, #6b6b6b);
+	font-size: 14px;
+	text-align: center;
+}
+#rl-app .mv-flt-add {
+	margin-top: 12px;
+}
+#rl-app .mv-plus {
+	font-size: 18px;
+	font-weight: 400;
+	line-height: 1;
+}
+#rl-app .mv-sbtn.mv-sbtn-danger {
+	border-color: var(--nc-color-primary-element, #00679e) !important;
+	background: var(--nc-color-primary-element, #00679e) !important;
+	color: var(--nc-color-primary-element-text, #fff) !important;
+}
+#rl-app .mv-sbtn.mv-sbtn-error {
+	outline: 2px solid var(--color-error, #e9322d);
+}
+#rl-app .mv-sbtn.mv-on {
+	background: var(--color-primary-element-light, #e5eff4) !important;
+}
+
+/* radio: which script runs */
+#rl-app .mv-radio {
+	flex: none;
+	width: 20px;
+	height: 20px;
+	box-sizing: border-box;
+	border: 2px solid var(--color-border-dark, #949494);
+	border-radius: 50%;
+	background: var(--color-main-background, #fff);
+}
+#rl-app .mv-radio.on {
+	border: 6px solid var(--nc-color-primary-element, #00679e);
+}
+
+/* switch: rule on / off */
+#rl-app .mv-switch {
+	position: relative;
+	display: inline-block;
+	width: 36px;
+	height: 20px;
+	border-radius: 10px;
+	background: var(--color-border-dark, #b8b8b8);
+	transition: background-color .15s;
+}
+#rl-app .mv-switch::after {
+	content: "";
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .3);
+	transition: transform .15s;
+}
+#rl-app .mv-switch.on {
+	background: var(--nc-color-primary-element, #00679e);
+}
+#rl-app .mv-switch.on::after {
+	transform: translateX(16px);
+}
+
+/* ── settings page: one card per script ─────────────────────────────── */
+#rl-app .mv-flt {
+	max-width: 720px;
+}
+#rl-app .mv-flt-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+#rl-app .mv-flt-head h2 {
+	margin: 0 0 6px;
+	font-size: 22px;
+	font-weight: 600;
+}
+#rl-app .mv-flt-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+#rl-app .mv-flt-card {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 12px 12px 12px 16px;
+	border: 1px solid var(--color-border, #ededed);
+	border-radius: var(--border-radius-large, 10px);
+	background: var(--color-main-background, #fff);
+}
+#rl-app .mv-flt-card.mv-on {
+	border-color: var(--nc-color-primary-element, #00679e);
+	box-shadow: 0 0 0 1px var(--nc-color-primary-element, #00679e);
+}
+#rl-app .mv-flt-main {
+	flex: 1;
+	min-width: 0;
+}
+#rl-app .mv-flt-card .script-name {
+	cursor: pointer;
+}
+#rl-app .mv-flt-badge {
+	padding: 1px 8px;
+	border-radius: 10px;
+	background: var(--color-primary-element-light, #e5eff4);
+	color: var(--nc-color-primary-element, #00679e);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+/* ── script popup: the rules ────────────────────────────────────────── */
+#rl-app #V-PopupsSieveScript,
+#rl-app #V-PopupsFilter {
+	width: min(680px, 96vw);
+	border-radius: var(--border-radius-large, 10px);
+}
+#rl-app #V-PopupsSieveScript .modal-body,
+#rl-app #V-PopupsFilter .modal-body {
+	padding: 8px 24px 16px;
+}
+#rl-app .mv-flt-alert {
+	margin-bottom: 12px;
+	padding: 8px 12px;
+	border-radius: var(--border-radius-element, 8px);
+	background: var(--color-primary-element-light, #e5eff4);
+	font-size: 13px;
+}
+#rl-app table.mv-rules {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0 6px;
+}
+#rl-app table.mv-rules td {
+	padding: 10px 6px;
+	border-top: 1px solid var(--color-border, #ededed);
+	border-bottom: 1px solid var(--color-border, #ededed);
+	background: var(--color-main-background, #fff);
+	vertical-align: middle;
+}
+#rl-app table.mv-rules td:first-child {
+	width: 22px;
+	padding-left: 8px;
+	border-left: 1px solid var(--color-border, #ededed);
+	border-radius: var(--border-radius-large, 10px) 0 0 var(--border-radius-large, 10px);
+}
+#rl-app table.mv-rules td:last-child {
+	padding-right: 8px;
+	border-right: 1px solid var(--color-border, #ededed);
+	border-radius: 0 var(--border-radius-large, 10px) var(--border-radius-large, 10px) 0;
+	white-space: nowrap;
+	text-align: right;
+}
+#rl-app table.mv-rules tr:hover td {
+	background: var(--color-background-hover, #f5f5f5);
+}
+#rl-app table.mv-rules .mv-rule-sw {
+	width: 44px;
+}
+#rl-app table.mv-rules .mv-rule-main {
+	max-width: 0; /* lets the summary ellipsis inside the auto-sized column */
+	width: 100%;
+	cursor: pointer;
+}
+#rl-app table.mv-rules tr.mv-off .mv-rule-main {
+	opacity: .55;
+}
+/* six-dot grip */
+#rl-app .mv-grip {
+	display: block;
+	width: 10px;
+	height: 16px;
+	background-image: radial-gradient(circle, var(--color-text-maxcontrast, #8a8a8a) 1.5px, transparent 1.6px);
+	background-size: 5px 5px;
+	cursor: grab;
+	opacity: .7;
+}
+#rl-app .mv-flt-raw {
+	width: 100%;
+	height: 50vh;
+	box-sizing: border-box;
+	font-family: var(--font-face-monospace, monospace);
+	font-size: 13px;
+}
+#rl-app .mv-flt-footer {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 24px 18px;
+	border: 0;
+	background: transparent;
+}
+
+/* ── rule editor ────────────────────────────────────────────────────── */
+#rl-app .mv-flt-label {
+	display: block;
+	margin: 4px 0 4px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+}
+#rl-app .mv-flt-field input {
+	width: 100%;
+	box-sizing: border-box;
+}
+#rl-app .mv-flt-section {
+	margin-top: 16px;
+	padding: 14px 16px;
+	border: 1px solid var(--color-border, #ededed);
+	border-radius: var(--border-radius-large, 10px);
+}
+#rl-app .mv-flt-section-head {
+	margin-bottom: 10px;
+	font-size: 15px;
+	font-weight: 600;
+}
+#rl-app .mv-flt-match {
+	margin-bottom: 10px;
+}
+#rl-app .mv-flt-match select {
+	width: 100%;
+}
+/* one condition: core's selects and input side by side, then the delete button */
+#rl-app .mv-flt-cond {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+#rl-app .mv-flt-cond-fields {
+	display: flex;
+	flex: 1;
+	flex-wrap: wrap;
+	gap: 6px;
+	min-width: 0;
+}
+#rl-app .mv-flt-cond-fields select,
+#rl-app .mv-flt-cond-fields input {
+	flex: 1 1 140px;
+	width: auto;
+	min-width: 0;
+	margin: 0;
+}
+#rl-app .mv-flt-cond.error input {
+	border-color: var(--color-error, #e9322d) !important;
+}
+/* the action: its select, then core's fields for that action */
+#rl-app .mv-flt-action > select {
+	width: 100%;
+	margin-bottom: 10px;
+}
+#rl-app .mv-flt-action-fields .control-group {
+	margin-bottom: 8px;
+}
+#rl-app .mv-flt-action-fields select,
+#rl-app .mv-flt-action-fields input[type="text"],
+#rl-app .mv-flt-action-fields textarea {
+	width: 100%;
+	box-sizing: border-box;
+}

@@ -40,6 +40,27 @@
 		"DELETE_ONE_TEXT": "It will be deleted permanently. This can't be undone.",
 		"DELETE_N_TEXT": "They will be deleted permanently. This can't be undone.",
 		"DELETE_PAGE_ONLY": "Only the %N% on this page. The other %M% in this folder are not included.",
-		"SELECT_ALL_FAILED": "Could not select them all. Try again"
+		"SELECT_ALL_FAILED": "Could not select them all. Try again",
+		"FILTERS_INTRO": "Filters run on the mail server, so they sort incoming mail even when SnappyMail is closed. One set of filters is active at a time.",
+		"FILTERS_OFF": "Off",
+		"FILTERS_OFF_DESC": "No filters run on incoming mail",
+		"FILTERS_USE": "Use these filters",
+		"FILTERS_MAIN": "My filters",
+		"FILTERS_SIEVE_SCRIPT": "Custom Sieve script",
+		"FILTERS_ONE_RULE": "1 rule",
+		"FILTERS_N_RULES": "%N% rules",
+		"FILTERS_ACTIVE": "Active",
+		"FILTERS_EDIT": "Edit",
+		"FILTERS_ADD_SCRIPT": "New Sieve script",
+		"FILTERS_RULES_TITLE": "My filters",
+		"FILTERS_RULES_INTRO": "Rules run from top to bottom. Drag a rule to change the order.",
+		"FILTERS_NO_RULES": "No rules yet.",
+		"FILTERS_DRAG": "Drag to change the order",
+		"FILTERS_ON_OFF": "Turn this rule on or off",
+		"FILTERS_ADD_RULE": "New rule",
+		"FILTERS_RAW": "Edit as Sieve",
+		"FILTERS_RULE_NAME": "Rule name",
+		"FILTERS_WHEN": "When a message arrives",
+		"FILTERS_DO": "Do this"
 	}
 }
