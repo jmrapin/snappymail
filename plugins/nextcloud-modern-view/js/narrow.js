@@ -14,7 +14,7 @@
 	}
 
 	const
-		FOLD = 1400,
+		FOLD = 1200,
 		SINGLE = 1000,
 		AUTO_KEY = 'mvAutoFoldedLeft',
 		html = document.documentElement,
@@ -28,6 +28,8 @@
 
 	const update = NcModernView.safe('narrow', () => {
 		html.classList.toggle('mv-single-pane', single.matches);
+		// css/list-width.css keeps the list at its minimum while the folders are folded
+		html.classList.toggle('mv-fold-width', fold.matches);
 		if (!toggle || mobile.matches) {
 			return;
 		}

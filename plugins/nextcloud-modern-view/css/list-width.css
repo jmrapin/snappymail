@@ -9,5 +9,10 @@ html.sm-msgView-side:not(.rl-mobile):not(.mv-single-pane) #rl-app #V-MailMessage
 	flex: none;
 }
 html.sm-msgView-side:not(.rl-mobile):not(.mv-single-pane) #rl-app #V-MailMessageList .messageList {
-	width: 420px;
+	width: 370px; /* the theme's min-width: as much room as possible for the message */
+}
+/* while the folders are folded for width (js/narrow.js), the list stays at its minimum, even if
+   it was dragged wider: the reading pane needs the room */
+html.mv-fold-width.sm-msgView-side:not(.rl-mobile):not(.mv-single-pane) #rl-app #V-MailMessageList .messageList {
+	width: 370px !important;
 }
