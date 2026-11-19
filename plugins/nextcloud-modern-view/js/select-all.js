@@ -80,11 +80,25 @@
 		s.listCheckedOrSelectedUidsWithSubMails.mvWrapped = true;
 	};
 
+	// Read / flag keep the messages where they are, so the folder-wide selection should outlive the
+	// list reload that shows the new flags. While that reload runs the page is empty or unticked,
+	// which would otherwise end the selection; once it is done the page is ticked again.
+	let keepThroughReload = false;
+	const restoreAfterReload = NcModernView.safe('select all restore', () => {
+		const s = store(), list = s?.() || [];
+		if (!keepThroughReload || s?.isLoading?.() || !list.length) {
+			return;
+		}
+		keepThroughReload = false;
+		all() && list.forEach(item => item.checked?.(true));
+	});
+
 	NcModernView.selectAll = {
 		size: NcModernView.computed('select all size', () => current()?.uids.size || 0, 0),
 		// kind: 'Seen' or 'Flagged'; core's MessageSetSeen / MessageSetFlagged with every UID
 		setFlag: (kind, on) => {
 			const sel = current();
+			sel && (keepThroughReload = true);
 			sel && rl.app.Remote.request('MessageSet' + kind, () => store()?.reload(false, true), {
 				folder: sel.folder,
 				uids: [...sel.uids].join(','),
@@ -136,10 +150,17 @@
 		});
 		content.prepend(banner);
 		NcModernView.computed('select all banner', () => render(banner, mode(), loading(), failed()));
-		// forget the folder-wide selection once it no longer applies
+		// forget the folder-wide selection once it no longer applies (not during our own reload)
 		mode.subscribe(m => {
-			'all' === m || all(null);
+			'all' === m || keepThroughReload || all(null);
 			'offer' === m || failed(false);
+		});
+		// the list is back after that reload: tick the page again
+		NcModernView.computed('select all reload', () => {
+			const s = store();
+			s?.isLoading?.();
+			s?.();
+			restoreAfterReload();
 		});
 	});
 
