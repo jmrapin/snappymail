@@ -15,7 +15,7 @@
 
 	const
 		FOLD = 1400,
-		SINGLE = 1200,
+		SINGLE = 1000,
 		AUTO_KEY = 'mvAutoFoldedLeft',
 		html = document.documentElement,
 		fold = matchMedia(`(max-width: ${FOLD - 1}px)`),
