@@ -53,7 +53,6 @@
 			() => view.mvAttCollapsed() && view.mvAttFit() < view.mvAttCount(), false);
 		view.mvAttShowZipLink = NcModernView.computed('mvAttShowZipLink',
 			() => view.mvAttCollapsed() && view.mvAttCanZip(), false);
-		view.mvAttAnySelected = NcModernView.computed('mvAttAnySelected', () => view.mvAttSelectedCount() > 0, false);
 		view.mvAttMenuHasPreview = NcModernView.computed('mvAttMenuHasPreview',
 			() => !!view.mvAttMenu()?.hasPreview(), false);
 
@@ -78,6 +77,8 @@
 			() => list().filter(a => a.checked()).length, 0);
 		view.mvAttAllChecked = NcModernView.computed('mvAttAllChecked',
 			() => list().length > 0 && list().every(a => a.checked()), false);
+		// computeds run at once: this must come after mvAttSelectedCount
+		view.mvAttAnySelected = NcModernView.computed('mvAttAnySelected', () => view.mvAttSelectedCount() > 0, false);
 		view.mvAttSelectedText = NcModernView.computed('mvAttSelectedText', () => NcModernView.t('N_OF_M_SELECTED', {
 			N: view.mvAttSelectedCount(),
 			M: list().length

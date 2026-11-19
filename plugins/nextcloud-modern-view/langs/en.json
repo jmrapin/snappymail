@@ -39,6 +39,7 @@
 		"DELETE_N_TITLE": "Delete %N% messages?",
 		"DELETE_ONE_TEXT": "It will be deleted permanently. This can't be undone.",
 		"DELETE_N_TEXT": "They will be deleted permanently. This can't be undone.",
-		"DELETE_PAGE_ONLY": "Only the %N% on this page. The other %M% in this folder are not included."
+		"DELETE_PAGE_ONLY": "Only the %N% on this page. The other %M% in this folder are not included.",
+		"SELECT_ALL_FAILED": "Could not select them all. Try again"
 	}
 }

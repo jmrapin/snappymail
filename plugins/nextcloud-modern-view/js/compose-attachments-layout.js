@@ -13,6 +13,9 @@
 
 		view.mvCpAttExpanded = ko.observable(false);
 		view.mvCpAttFit = ko.observable(1000);
+		// "Show all (N)" chip: only while collapsed and some cards don't fit
+		view.mvCpAttShowChip = NcModernView.computed('mvCpAttShowChip',
+			() => !view.mvCpAttExpanded() && view.mvCpAttFit() < (view.attachments?.() || []).length, false);
 
 		const fit = () => {
 			// hidden (window closed) or expanded: nothing to fit; the observer runs again on show

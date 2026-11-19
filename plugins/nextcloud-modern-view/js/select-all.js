@@ -18,7 +18,8 @@
 		t = (key, values) => NcModernView.t(key, values),
 		store = () => rl.app?.messageList,
 		all = ko.observable(null), // { folder, search, uids: Set }
-		loading = ko.observable(false);
+		loading = ko.observable(false),
+		failed = ko.observable(false);
 	let listView;
 
 	const pageAllChecked = () => {
@@ -45,10 +46,15 @@
 			return;
 		}
 		loading(true);
+		failed(false);
 		rl.pluginRemoteRequest(NcModernView.safe('select all', (error, data) => {
 			loading(false);
 			const uids = Array.isArray(data?.Result) ? data.Result : null;
-			if (!error && uids && folder === store()?.().folder) {
+			if (error || !uids) {
+				// plugin JS keeps its console output (core's is stripped): say why it failed
+				console.error('[modern-view] select all failed:', error, data?.message || '', data);
+				failed(true);
+			} else if (folder === store()?.().folder) {
 				all({ folder, search, uids: new Set(uids) });
 			}
 		}), 'NcmvFolderUids', { folder, search, hideDeleted: listView?.hideDeleted?.() ? 1 : 0 });
@@ -111,6 +117,7 @@
 			text.textContent = t('PAGE_ALL_SELECTED', { N: s().length.toLocaleString() });
 			link.textContent = loading()
 				? t('SELECTING')
+				: failed() ? t('SELECT_ALL_FAILED')
 				: t('SELECT_ALL_IN', { N: s.count().toLocaleString(), FOLDER: where });
 		}
 	});
@@ -128,9 +135,12 @@
 			'all' === mode() ? (all(null), view.checkAll?.(false)) : selectAll();
 		});
 		content.prepend(banner);
-		NcModernView.computed('select all banner', () => render(banner, mode(), loading()));
+		NcModernView.computed('select all banner', () => render(banner, mode(), loading(), failed()));
 		// forget the folder-wide selection once it no longer applies
-		mode.subscribe(m => 'all' === m || all(null));
+		mode.subscribe(m => {
+			'all' === m || all(null);
+			'offer' === m || failed(false);
+		});
 	});
 
 })(window.rl);

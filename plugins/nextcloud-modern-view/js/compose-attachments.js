@@ -79,8 +79,6 @@
 		});
 		view.mvCpAttShowAll = NcModernView.computed('mvCpAttShowAll',
 			() => NcModernView.t('SHOW_ALL', { N: list().length }), '');
-		view.mvCpAttShowChip = NcModernView.computed('mvCpAttShowChip',
-			() => !view.mvCpAttExpanded() && view.mvCpAttFit() < list().length, false);
 		view.mvCpAttSummary = NcModernView.computed('mvCpAttSummary', () => NcModernView.t('ATTACHMENTS_SUMMARY', {
 			N: list().length,
 			SIZE: NcModernView.friendlySize(list().reduce((total, a) => total + (+a.size?.() || 0), 0))
