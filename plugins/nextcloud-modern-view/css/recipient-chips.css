@@ -1,0 +1,39 @@
+/*
+ * Nextcloud Modern View: recipient chips (core's EmailAddresses component: To, Cc, Bcc, Reply-To).
+ *
+ * Since upstream 3.1 the chip's ✖ is <a class="fontastic"> placed absolutely in the corner
+ * (Styles/User/EmailAddresses.less). The NextcloudV25+ theme still styles the old a.ficon and
+ * removes core's room for it (padding 0 .5em), so the ✖ landed on top of the name. Here it sits
+ * after the name again, as a small round button, in a pill-shaped chip.
+ */
+#rl-app ul.emailaddresses li[draggable] {
+	gap: 4px;
+	min-height: 32px;
+	padding: 0 4px 0 12px;
+	border-radius: 16px;
+	background-color: var(--color-background-dark, #ededed);
+}
+#rl-app ul.emailaddresses li[draggable]:hover {
+	background-color: var(--color-background-darker, #dbdbdb);
+}
+#rl-app ul.emailaddresses li[draggable] > a.fontastic {
+	position: static;
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	padding: 0;
+	border-radius: 50%;
+	color: var(--color-text-maxcontrast, #6b6b6b);
+	font-size: 10px;
+	line-height: 1;
+	text-decoration: none;
+	opacity: .8;
+}
+#rl-app ul.emailaddresses li[draggable] > a.fontastic:hover {
+	background-color: var(--color-main-background, #fff);
+	color: var(--color-main-text, #222);
+	opacity: 1;
+}
