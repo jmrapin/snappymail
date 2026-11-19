@@ -34,6 +34,28 @@
 			('function' === typeof view.accountName ? view.accountName() : '')
 			|| ko.unwrap(view.accountEmail)
 		), '?');
+
+		// The browser tab names the account as the drop-down does. Core's titles (Screen/User
+		// MailBox.js and Settings.js) put the account's email in; it is swapped for accountName().
+		const setTitle = rl.setTitle;
+		if (setTitle && !setTitle.mvWrapped) {
+			let last = null; // the last title core asked for, redone when the name changes
+			const name = () => ('function' === typeof view.accountName ? view.accountName() : '') || '',
+				swap = NcModernView.safe('title name', title => {
+					const email = ko.unwrap(view.accountEmail), n = name();
+					return title && email && n && n !== email ? String(title).split(email).join(n) : title;
+				}, null);
+			rl.setTitle = title => {
+				last = title;
+				return setTitle(swap(title) ?? title);
+			};
+			rl.setTitle.mvWrapped = true;
+			// identities may load after the first title is set
+			NcModernView.computed('title refresh', () => {
+				name();
+				null !== last && setTitle(swap(last) ?? last);
+			});
+		}
 	});
 
 	// The pill floats over the reading pane toolbar's right end; the toolbar keeps that much room
