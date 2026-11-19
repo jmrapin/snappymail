@@ -28,3 +28,24 @@ html.mv-single-pane.sm-msgView-side:not(.rl-mobile) #rl-app #mv-onebar .buttonCl
 html.mv-single-pane.sm-msgView-side:not(.rl-mobile) #rl-app .mv-toolbar .buttonClose:not([style*="none"]) {
 	display: inline-flex !important;
 }
+
+/*
+ * 650–799px: core's phone layout (rl-mobile, below 800px) hides the folded folder panel
+ * completely (Layout.less, and the theme sets its width to 0). There is room for the folded icon
+ * strip (folders.css) here, so it stays in the page. Unfolded, it is still core's overlay.
+ * "body" outranks the theme's rule of the same shape.
+ */
+@media screen and (min-width: 650px) and (max-width: 799px) {
+	html.rl-mobile.rl-left-panel-disabled body #rl-app #rl-left {
+		display: block;
+		position: relative;
+		top: auto;
+		bottom: auto;
+		width: 65px !important;
+		z-index: auto;
+	}
+	/* the strip has Folders (❯) and Compose, so the bar doesn't need its phone copies */
+	html.rl-mobile.rl-left-panel-disabled #rl-app #mv-onebar .mv-mobile-only {
+		display: none;
+	}
+}
