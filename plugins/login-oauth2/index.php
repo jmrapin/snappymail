@@ -4,8 +4,8 @@ class LoginOAuth2Plugin extends \RainLoop\Plugins\AbstractPlugin
 {
 	const
 		NAME     = 'OAuth2',
-		VERSION  = '1.3',
-		RELEASE  = '2024-03-27',
+		VERSION  = '1.4',
+		RELEASE  = '2026-11-12',
 		REQUIRED = '2.36.1',
 		CATEGORY = 'Login',
 		DESCRIPTION = 'IMAP, Sieve & SMTP login using RFC 7628 OAuth2';

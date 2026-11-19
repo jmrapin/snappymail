@@ -53,7 +53,7 @@ export class Selector {
 			itemSelected = item => {
 				if (koList.hasChecked()) {
 					item || this.oCallbacks.ItemSelect?.(null);
-				} else if (item) {
+				} else {
 					this.oCallbacks.ItemSelect?.(item);
 				}
 			},
@@ -69,13 +69,16 @@ export class Selector {
 		});
 
 		let selectedItemUseCallback = true;
-
+		let prevSelected;
 		koSelectedItem.subscribe(item => {
-			if (item) {
-//				koList.forEach(subItem => subItem.checked(false));
-				selectedItemUseCallback && itemSelectedThrottle(item);
-			} else {
-				selectedItemUseCallback && itemSelected();
+			if (prevSelected != item) {
+				if (item) {
+//					koList.forEach(subItem => subItem.checked(false));
+					selectedItemUseCallback && itemSelectedThrottle(item);
+				} else {
+					selectedItemUseCallback && itemSelected();
+				}
+				prevSelected = item;
 			}
 		});
 
@@ -278,7 +281,7 @@ export class Selector {
 							: ((up ? shiftStart < i : shiftStart > i) && focused.checked(false));
 					}
 					if (up) {
-						i > 0 && (result = list[--i]);
+						i > 0 && (result = list[i - 1]);
 					} else if (++i < listLen) {
 						result = list[i];
 					}

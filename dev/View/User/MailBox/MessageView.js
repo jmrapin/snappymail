@@ -13,6 +13,7 @@ import {
 } from 'Common/EnumsUser';
 import { RFC822 } from 'Common/File';
 import {
+	mailRoute,
 	elementById,
 	keyScopeReal,
 	Settings,
@@ -24,6 +25,7 @@ import {
 	formFieldFocused
 } from 'Common/Globals';
 import { encodeHtml } from 'Common/Html';
+import { mailBox } from 'Common/Links';
 import { arrayLength } from 'Common/Utils';
 import { download, downloadZip, mailToHelper, showMessageComposer, moveAction } from 'Common/UtilsUser';
 import { isFullscreen, exitFullscreen, toggleFullscreen } from 'Common/Fullscreen';
@@ -67,7 +69,17 @@ const
 		message && MessagelistUserStore.setAction(message.folder, action, [message]);
 	},
 
-	fetchRaw = url => rl.fetch(url).then(response => response.ok && response.text());
+	fetchRaw = url => rl.fetch(url).then(response => response.ok && response.text()),
+
+	/*
+	 * The smime.p7m is the envelope the message arrived in rather than something
+	 * somebody attached, so listing it is noise, and before decryption it is the
+	 * only thing in the list. Conditional on the message being encrypted, so a
+	 * .p7m genuinely attached to ordinary mail is still shown.
+	 */
+	attachmentListed = item =>
+		(SettingsUserStore.listInlineAttachments() || !item.isLinked())
+		&& !(currentMessage()?.smimeEncrypted() && (item.mimeType || '').toLowerCase().includes('pkcs7'));
 
 export class MailMessageView extends AbstractViewRight {
 	constructor() {
@@ -185,11 +197,9 @@ export class MailMessageView extends AbstractViewRight {
 				&& !currentMessage()?.flags().includes('$mdnsent')
 				&& !currentMessage()?.flags().includes('\\answered'),
 
-			listAttachments: () => currentMessage()?.attachments()
-				.filter(item => SettingsUserStore.listInlineAttachments() || !item.isLinked()),
+			listAttachments: () => currentMessage()?.attachments().filter(attachmentListed),
 //			hasAttachments: () => currentMessage()?.attachments()?.length,
-			hasAttachments: () => currentMessage()?.attachments()
-				.some(item => SettingsUserStore.listInlineAttachments() || !item.isLinked()),
+			hasAttachments: () => currentMessage()?.attachments().some(attachmentListed),
 //			listInline: () => currentMessage()?.attachments().filter(item => item.isLinked()),
 //			hasInline: () => currentMessage()?.attachments().some(item => item.isLinked()),
 
@@ -270,8 +280,6 @@ export class MailMessageView extends AbstractViewRight {
 					this.localDelivery(message.headers().isLocalDelivery());
 					this.nowTracking(false);
 				} else {
-					MessagelistUserStore.selectedMessage(null);
-
 					this.viewHash = '';
 
 					this.scrollMessageToTop();
@@ -313,6 +321,17 @@ export class MailMessageView extends AbstractViewRight {
 
 	closeMessage() {
 		currentMessage(null);
+		// The address bar still named the message that just closed, so a reload
+		// or a shared link would have reopened it. Replace rather than push: the
+		// entry this is undoing was pushed when the message opened, so Back still
+		// goes back to wherever the reader came from.
+		const folder = FolderUserStore.currentFolder();
+		folder && hasher.replaceHash(mailBox(
+			folder.fullNameHash,
+			mailRoute.page(),
+			mailRoute.search(),
+			mailRoute.threadUid()
+		));
 	}
 
 	editCommand() {

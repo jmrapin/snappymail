@@ -1,5 +1,5 @@
 	<label data-bind="text: label, visible: 5 !== type"></label>
-	<!-- ko if: 0 === type -->
+	<!-- ko if: !type -->
 		<input type="text" autocomplete="off" autocorrect="off" autocapitalize="off"
 			data-bind="value: value, attr: {placeholder: placeholder}">
 	<!-- /ko -->
@@ -31,6 +31,6 @@
 	<!-- ko if: 8 === type -->
 		<select data-bind="options: options, optionsText: 'name', optionsValue: 'id', value: value"></select>
 	<!-- /ko -->
-	<!-- ko if: '' !== desc -->
+	<!-- ko if: desc -->
 	<span tabindex="0" class="help-block"><span data-bind="text: desc"></span></span>
 	<!-- /ko -->

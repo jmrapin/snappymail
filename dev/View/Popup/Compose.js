@@ -195,7 +195,7 @@ export class ComposePopupView extends AbstractViewPopup {
 
 		const fEmailOutInHelper = (context, identity, name, isIn) => {
 			const identityEmail = context && identity?.[name]();
-			if (identityEmail && (isIn ? true : context[name]())) {
+			if (identityEmail && (isIn || context[name]())) {
 				let list = context[name]().trim().split(',');
 
 				list = list.filter(email => {
@@ -872,16 +872,22 @@ export class ComposePopupView extends AbstractViewPopup {
 				// no default
 //				case ComposeType.Empty:
 			}
-		}
-		// Set from custom email
-		if (!identity
-			&& oLastMessage && (ComposeType.Reply === options.mode || ComposeType.ReplyAll === options.mode)
-			&& 1 === oLastMessage.to.length
-//			&& mEmail.includes(oLastMessage.to[0].domain)
-		) {
-			identity = new IdentityModel;
-			identity.name = oLastMessage.to[0].name;
-			identity.email = oLastMessage.to[0].email;
+			// Set from custom email
+			// https://github.com/the-djmaze/snappymail/issues/1805
+			if (!identity && (ComposeType.Reply === options.mode || ComposeType.ReplyAll === options.mode)) {
+				const received = oLastMessage.headers().getReceivedFor(),
+				to = received.findLast(email =>
+						mEmail.includes(email.domain) && email.email !== oLastMessage.deliveredTo?.email)
+					|| received.find(email =>
+						email.email !== oLastMessage.deliveredTo?.email)
+					|| oLastMessage.to.find(email => mEmail.includes(email.domain))
+					|| oLastMessage.cc.find(email => mEmail.includes(email.domain));
+				if (to) {
+					identity = new IdentityModel;
+					identity.name = to.name;
+					identity.email = to.email;
+				}
+			}
 		}
 		identity = identity || IdentityUserStore()[0];
 		if (identity) {
@@ -903,7 +909,7 @@ export class ComposePopupView extends AbstractViewPopup {
 
 		if (options.mode && oLastMessage) {
 			let usePlain,
-				sCc = '',
+				sCc,
 				sDate = timestampToString(oLastMessage.dateTimestamp(), 'FULL'),
 				sSubject = oLastMessage.subject(),
 				sText = '',

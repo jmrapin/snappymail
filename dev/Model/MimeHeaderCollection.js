@@ -1,5 +1,7 @@
 import { AbstractCollectionModel } from 'Model/AbstractCollection';
 import { MimeHeaderModel } from 'Model/MimeHeader';
+import { EmailModel } from 'Model/Email';
+import { addressparser } from 'Mime/Address';
 
 'use strict';
 
@@ -85,5 +87,18 @@ export class MimeHeaderCollectionModel extends AbstractCollectionModel
 				&& /^from\s+\S+\s+\((?:\S+\s+)?\[(?:127\.\d+\.\d+\.\d+|IPv6:::1|::1)\]\)/i.test(hop))
 			// generated on this server (pickup / sendmail), no "from" clause
 			|| /^by\s+([^\s]+)\s+\(Postfix?/i.test(hop);
+	}
+
+	getReceivedFor()
+	{
+		const aFor = [], re = /for\s+(<[^\s>]+>)/;
+		this.valuesByName('Received').forEach(header => {
+			if (header = header.match(re)) {
+				addressparser(header[1]).forEach(item =>
+					aFor.push(new EmailModel(item.email, item.name))
+				);
+			}
+		});
+		return aFor;
 	}
 }

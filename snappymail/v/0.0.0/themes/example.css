@@ -28,6 +28,9 @@
 	--info-bg-clr: #d9edf7;
 	--info-border-clr: #bce8f1;
 
+	--clr-red: red;
+	--clr-green: green;
+
 	/* LOADING */
 	--loading-color: #000;
 	--loading-text-shadow: none; /* 0px 1px 0px rgba(0, 0, 0, 0.5); */
@@ -85,7 +88,9 @@
 	--btn-bg-clr: #fff;
 	--btn-border-clr: #fff;
 	--btn-border-radius: 3px;
+	--btn-success-clr: #fff;
 	--btn-success-bg-clr: #84AB04;
+	--btn-danger-clr: #fff;
 	--btn-danger-bg-clr: #ee5f5b;
 
 	--input-clr: #555;
@@ -115,6 +120,9 @@
 	--link-color: light-dark(#369, #19F);
 	--border-color: light-dark(#ddd, #222);
 	--hr-color: light-dark(#eee, #111);
+
+	--clr-red: light-dark(red, #F33);
+	--clr-green: light-dark(green, #0B0);
 
 	--panel-bg-clr: light-dark(#fff, #000);
 
@@ -184,7 +192,9 @@
 	--btn-clr: light-dark(#333, #fff);
 	--btn-bg-clr: light-dark(#fff, #333);
 	--btn-border-clr: light-dark(#fff, #000);
+	--btn-success-clr: light-dark(#fff, #fff);
 	--btn-success-bg-clr: light-dark(#84AB04, #ac1);
+	--btn-danger-clr: light-dark(#fff, #fff);
 	--btn-danger-bg-clr: light-dark(#ee5f5b, #f76);
 
 	--input-clr: light-dark(#555, #fff);

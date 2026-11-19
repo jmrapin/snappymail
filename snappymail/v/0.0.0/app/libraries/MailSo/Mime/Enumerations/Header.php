@@ -24,13 +24,22 @@ abstract class Header
 
 		SUBJECT = 'Subject',
 
-		TO_ = 'To',
+		// @depracated
 		FROM_ = 'From',
+		TO_ = 'To',
+
+		TO = 'To',
+		FROM = 'From',
 		CC = 'Cc',
 		BCC = 'Bcc',
 		REPLY_TO = 'Reply-To',
 		SENDER = 'Sender',
 		RETURN_PATH = 'Return-Path',
+
+		// RFC 9057
+		AUTHOR = 'Author',
+
+		// RFC 9228
 		DELIVERED_TO = 'Delivered-To',
 
 		MESSAGE_ID = 'Message-ID',

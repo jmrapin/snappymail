@@ -12,7 +12,7 @@ class MainAccount extends Account
 {
 	private ?SensitiveString $sCryptKey = null;
 
-	public function resealCryptKey(SensitiveString $oOldPass) : bool
+	public function resealCryptKey(SensitiveString $oOldPass): bool
 	{
 		$oStorage = \RainLoop\Api::Actions()->StorageProvider();
 		$sKey = $oStorage->Get($this, StorageType::ROOT, '.cryptkey');
@@ -35,7 +35,7 @@ class MainAccount extends Account
 		return false;
 	}
 
-	public function CryptKey() : string
+	public function CryptKey(): string
 	{
 		if (!$this->sCryptKey) {
 			// Seal the cryptkey so that people who change their login password
@@ -52,26 +52,26 @@ class MainAccount extends Account
 				);
 				$oStorage->Put($this, StorageType::ROOT, '.cryptkey', $sKey);
 			}
-			$sKey = \SnappyMail\Crypt::DecryptFromJSON($sKey, $sPass);
-			if (!$sKey) {
-				$sKey = \SnappyMail\Crypt::DecryptFromJSON($sKey, $sPass, false);
-				if (!$sKey) {
+			$sKeyDecrypted = \SnappyMail\Crypt::DecryptFromJSON($sKey, $sPass);
+			if (!$sKeyDecrypted) {
+				$sKeyDecrypted = \SnappyMail\Crypt::DecryptFromJSON($sKey, $sPass, false);
+				if (!$sKeyDecrypted) {
 					throw new ClientException(Notifications::CryptKeyError);
 				}
-				$sResealedKey = \SnappyMail\Crypt::EncryptToJSON($sKey, $sPass);
+				$sResealedKey = \SnappyMail\Crypt::EncryptToJSON($sKeyDecrypted, $sPass);
 				if (!$sResealedKey) {
 					throw new ClientException(Notifications::CryptKeyError);
 				}
 				$oStorage->Put($this, StorageType::ROOT, '.cryptkey', $sResealedKey);
 			}
-			$this->sCryptKey = new SensitiveString(\hex2bin($sKey));
+			$this->sCryptKey = new SensitiveString(\hex2bin($sKeyDecrypted));
 		}
-		return $this->sCryptKey;
+		return $this->sCryptKey->getValue();
 	}
 
 /*
 	// Stores settings in MainAccount
-	public function settings() : \RainLoop\Settings
+	public function settings(): \RainLoop\Settings
 	{
 		return \RainLoop\Api::Actions()->SettingsProvider()->Load($this);
 	}

@@ -73,13 +73,16 @@ class Message implements \JsonSerializable
 	private ?array $smimeEncrypted = null;
 
 	private ?\MailSo\Mime\EmailCollection
+//		$oAuthor = null,
 		$oFrom = null,
 		$oSender = null,
 		$oReplyTo = null,
-		$oDeliveredTo = null,
 		$oTo = null,
 		$oCc = null,
 		$oBcc = null;
+
+	private ?\MailSo\Mime\Email
+		$oDeliveredTo = null;
 
 	private ?AttachmentCollection
 		$Attachments = null;
@@ -187,14 +190,22 @@ class Message implements \JsonSerializable
 			$oMessage->sMessageId = $oHeaders->ValueByName(MimeHeader::MESSAGE_ID);
 			$oMessage->sContentType = $oHeaders->ValueByName(MimeHeader::CONTENT_TYPE);
 
-			$oMessage->oFrom = $oHeaders->GetAsEmailCollection(MimeHeader::FROM_);
-			$oMessage->oTo = $oHeaders->GetAsEmailCollection(MimeHeader::TO_);
+			$oMessage->oFrom = $oHeaders->GetAsEmailCollection(MimeHeader::FROM);
+			$oMessage->oTo = $oHeaders->GetAsEmailCollection(MimeHeader::TO);
 			$oMessage->oCc = $oHeaders->GetAsEmailCollection(MimeHeader::CC);
 			$oMessage->oBcc = $oHeaders->GetAsEmailCollection(MimeHeader::BCC);
 
 			$oMessage->oSender = $oHeaders->GetAsEmailCollection(MimeHeader::SENDER);
 			$oMessage->oReplyTo = $oHeaders->GetAsEmailCollection(MimeHeader::REPLY_TO);
-			$oMessage->oDeliveredTo = $oHeaders->GetAsEmailCollection(MimeHeader::DELIVERED_TO);
+
+//			$oMessage->oAuthor = $oHeaders->GetAsEmailCollection(MimeHeader::AUTHOR);
+
+			$oMessage->oDeliveredTo = ($oHeaders->GetAsEmailCollection(MimeHeader::DELIVERED_TO)->getArrayCopy())[0] ?? null;
+/*
+			if ($oHeader = $this->GetByName($sHeaderName)) {
+				$oMessage->oDeliveredTo = Email::Parse($oHeader->EncodedValue())
+			}
+*/
 
 			$oMessage->InReplyTo = $oHeaders->ValueByName(MimeHeader::IN_REPLY_TO);
 			$oMessage->References = Utils::StripSpaces(
@@ -513,12 +524,14 @@ class Message implements \JsonSerializable
 			'dateTimestampSource' => $this->iHeaderTimeStampInUTC ? 'header' : 'internal',
 
 			// \MailSo\Mime\EmailCollection
+//			'author' => $this->oAuthor,
 			'from' => $this->oFrom,
 			'replyTo' => $this->oReplyTo,
 			'to' => $this->oTo,
 			'cc' => $this->oCc,
 			'bcc' => $this->oBcc,
 			'sender' => $this->oSender,
+
 			'deliveredTo' => $this->oDeliveredTo,
 
 			'readReceipt' => $this->ReadReceipt,

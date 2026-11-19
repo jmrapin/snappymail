@@ -18,7 +18,7 @@ const
 		"'": '&#x27;'
 	},
 
-	keepTagContent = 'form,button,data', // font
+	keepTagContent = ['FORM','BUTTON','DATA'], // FONT
 
 	allowedTags = [
 		// Structural Elements:
@@ -329,7 +329,7 @@ export const
 			// https://github.com/the-djmaze/snappymail/issues/1415
 			.replace(/<br>\s*<\/p>/gi,'</p>')
 			.trim();
-		html = '';
+		html = ''; // eslint-disable-line no-useless-assignment
 
 		// Strip all comments
 		const nodeIterator = document.createNodeIterator(tmpl.content, NodeFilter.SHOW_COMMENT);
@@ -352,8 +352,18 @@ export const
 			}
 		});
 
-		// https://github.com/the-djmaze/snappymail/issues/1125
-		tmpl.content.querySelectorAll(keepTagContent).forEach(oElement => replaceWithChildren(oElement));
+		tmpl.content.querySelectorAll('*').forEach(oElement =>
+			oElement instanceof HTMLElement
+			// https://github.com/the-djmaze/snappymail/issues/1125
+			&& (keepTagContent.includes(oElement.tagName)
+				// An element the parser does not know, like <root> or <my-tag>, is inert,
+				// so drop only the tag: removing it took everything inside it along.
+				// https://github.com/kimusan/Tachyon/issues/191
+				|| oElement instanceof HTMLUnknownElement || oElement.tagName.includes('-'))
+			// <xml> is Outlook's settings block, whose content is noise.
+			&& 'XML' !== oElement.tagName
+			&& replaceWithChildren(oElement)
+		);
 
 		tmpl.content.querySelectorAll(
 			':not('+allowedTags+'),a:empty,span:empty'
@@ -799,7 +809,7 @@ export const
 			aNextText = [],
 			aText = plain.split('\n');
 
-		do {
+		while (bDo) {
 			bDo = false;
 			aNextText = [];
 			aText.forEach(sLine => {
@@ -830,16 +840,22 @@ export const
 			}
 
 			aText = aNextText;
-		} while (bDo);
+		}
 
 		tmpl.innerHTML = aText.join('\n')
 			// .replace(/~~~\/blockquote~~~\n~~~blockquote~~~/g, '\n')
 			.replace(/&/g, '&amp;')
 			.replace(/>/g, '&gt;')
 			.replace(/</g, '&lt;')
-			.replace(urlRegExp, (...m) => {
-				m[0] = stripTracking(m[0]);
-				return `<a href="${m[0]}" target="_blank">${m[0]}</a>`;
+			.replace(urlRegExp, url => {
+				// Strip trailing unmatched closing brackets (e.g. URL wrapped in parentheses)
+				for (const [open, close] of [['(', ')'], ['[', ']'], ['<', '>']]) {
+					while (url.endsWith(close) && (url.split(open).length - 1) < (url.split(close).length - 1)) {
+						url = url.slice(0, -1);
+					}
+				}
+				url = stripTracking(url);
+				return `<a href="${url}" target="_blank">${url}</a>`;
 			})
 			.replace(email, '$1<a href="mailto:$2">$2</a>')
 			.replace(tel, '<a href="$1">$1</a>')
