@@ -18,11 +18,25 @@
 
 	const count = () => rl.app?.messageList?.listCheckedOrSelectedUidsWithSubMails?.()?.size || 1;
 
+	// the whole page is ticked but the folder has more: say that the rest is not included
+	// (selecting all of them is a separate click on the list's banner, js/select-all.js)
+	const notIncluded = n => {
+		const store = rl.app?.messageList, page = store?.() || [];
+		if (NcModernView.selectAll?.size() || n !== page.length || !page.every(item => item.checked?.())) {
+			return 0;
+		}
+		return Math.max(0, (store.count?.() || 0) - n);
+	};
+
 	// core binds askDesc with html:, so the two lines are escaped markup
-	const question = n => `<div class="mv-ask-title">${esc(1 < n
+	const question = (n, rest) => `<div class="mv-ask-title">${esc(1 < n
 		? t('DELETE_N_TITLE', { N: n.toLocaleString() })
 		: t('DELETE_ONE_TITLE'))}</div>`
-		+ `<div class="mv-ask-text">${esc(t(1 < n ? 'DELETE_N_TEXT' : 'DELETE_ONE_TEXT'))}</div>`;
+		+ `<div class="mv-ask-text">${esc(t(1 < n ? 'DELETE_N_TEXT' : 'DELETE_ONE_TEXT'))}</div>`
+		+ (rest ? `<div class="mv-ask-note">${esc(t('DELETE_PAGE_ONLY', {
+			N: n.toLocaleString(),
+			M: rest.toLocaleString()
+		}))}</div>` : '');
 
 	NcModernView.onBuild('PopupsAsk', (view, dom) => {
 		const onShow = view.onShow;
@@ -35,8 +49,9 @@
 			if (!isDelete) {
 				return onShow.apply(this, arguments);
 			}
-			const n = NcModernView.safe('delete count', count, 1)();
-			onShow.call(this, question(n), yes, no, focus, ask, 'GLOBAL/DELETE');
+			const n = NcModernView.safe('delete count', count, 1)(),
+				rest = NcModernView.safe('delete rest', notIncluded, 0)(n);
+			onShow.call(this, question(n, rest), yes, no, focus, ask, 'GLOBAL/DELETE');
 			view.noButton?.(rl.i18n('GLOBAL/CANCEL'));
 		};
 		view.onShow.mvWrapped = true;
