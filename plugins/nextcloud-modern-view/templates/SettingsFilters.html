@@ -32,7 +32,8 @@
 				</div>
 				<div class="mv-flt-sub" data-bind="text: $root.mvScriptSub($data)"></div>
 			</div>
-			<a href="#" class="mv-btn script-name" data-bind="attr: { title: $root.mvT('MODERN_VIEW/FILTERS_EDIT') }"><i class="mi mi-edit"></i></a>
+			<!-- its own handler, which also cancels href="#" (that is the route back to the mailbox) -->
+			<a href="#" class="mv-btn" data-bind="click: $root.mvEdit, attr: { title: $root.mvT('MODERN_VIEW/FILTERS_EDIT') }"><i class="mi mi-edit"></i></a>
 			<!-- ko ifnot: allowFilters -->
 			<a href="#" class="mv-btn mv-danger" data-bind="visible: !askDelete(), click: $root.mvAskDelete, attr: { title: $root.mvT('GLOBAL/DELETE') }"><i class="mi mi-delete"></i></a>
 			<a href="#" class="mv-sbtn mv-sbtn-danger" data-bind="visible: askDelete, click: $root.mvDelete, text: $root.mvT('GLOBAL/ARE_YOU_SURE')"></a>
