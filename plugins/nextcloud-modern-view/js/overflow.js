@@ -84,7 +84,8 @@
 				e.preventDefault();
 				e.stopImmediatePropagation();
 				e.stopPropagation();
-				show(!panel.classList.contains('show'));
+				// open, never toggle: a tap or a hover already fired mouseenter, which opened it
+				show(true);
 			}
 		}, true);
 		return li;
