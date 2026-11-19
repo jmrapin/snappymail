@@ -144,3 +144,9 @@ html.mv-onebar.sm-msgView-bottom:not(.rl-mobile) #rl-app #rl-right.mv-onebar-on 
 	right: 0;
 	left: auto;
 }
+
+/* core's list resizer has the bar's z-index (102) and comes later in the page, so it was drawn
+   through the bar's menus */
+html.mv-onebar #rl-app #rl-right.mv-onebar-on #V-MailMessageList .resizer {
+	z-index: 101;
+}

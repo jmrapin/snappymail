@@ -16,3 +16,17 @@
 	opacity: .45;
 	pointer-events: none;
 }
+
+/* a ▾ menu moved into ☰: one row with a side panel (js/overflow.js positions it, fixed) */
+#rl-app .mv-ovf-has-sub > a .mv-ovf-chevron {
+	margin-left: auto;
+	padding-left: 12px;
+	box-sizing: content-box;
+}
+#rl-app .mv-ovf-sub {
+	position: fixed;
+	right: auto;
+	bottom: auto;
+	margin: 0;
+	z-index: 1000;
+}

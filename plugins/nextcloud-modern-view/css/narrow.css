@@ -1,0 +1,30 @@
+/*
+ * Nextcloud Modern View: one pane at a time in narrow windows (js/narrow.js sets
+ * html.mv-single-pane). Side-by-side layout only; the bottom layout and mobile are left alone.
+ * Core sets #rl-right.message-selected while a message is open.
+ */
+
+html.mv-single-pane.sm-msgView-side:not(.rl-mobile) #rl-right.message-selected #V-MailMessageList,
+html.mv-single-pane.sm-msgView-side:not(.rl-mobile) #rl-right:not(.message-selected) #V-MailMessageView {
+	display: none !important;
+}
+
+/* the list takes the whole width; its resizer and saved width (inline style) don't apply */
+html.mv-single-pane.sm-msgView-side:not(.rl-mobile) #V-MailMessageList {
+	flex-grow: 1;
+}
+html.mv-single-pane.sm-msgView-side:not(.rl-mobile) #V-MailMessageList .messageList {
+	width: 100% !important;
+	max-width: none;
+	resize: none;
+}
+html.mv-single-pane.sm-msgView-side:not(.rl-mobile) #V-MailMessageList .resizer {
+	display: none !important;
+}
+
+/* Close is the way back to the list (toolbar.css and onebar.css hide it in this layout);
+   [style] = knockout's visible binding hiding it while no message is open */
+html.mv-single-pane.sm-msgView-side:not(.rl-mobile) #rl-app #mv-onebar .buttonClose:not([style*="none"]),
+html.mv-single-pane.sm-msgView-side:not(.rl-mobile) #rl-app .mv-toolbar .buttonClose:not([style*="none"]) {
+	display: inline-flex !important;
+}
