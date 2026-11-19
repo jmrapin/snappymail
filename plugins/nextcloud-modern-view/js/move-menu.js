@@ -68,7 +68,8 @@
 
 	const row = (folder, text, depth) => {
 		const p = esc(path(folder)),
-			a = el(`<a href="#" class="mv-move-item" title="${p}"${depth ? ` style="padding-left:${10 + 18 * depth}px"` : ''}>`
+			indent = depth ? ` style="padding-left:${10 + 18 * depth}px"` : '',
+			a = el(`<a href="#" class="mv-move-item" title="${p}"${indent}>`
 				+ `<i class="mi mi-${TYPE_ICON[folder.type()] || 'folder'}"></i><span>${esc(text)}</span>`
 				+ `<b class="mv-move-act" data-act="move"><i class="mi mi-drive-file-move"></i></b>`
 				+ `<b class="mv-move-act" data-act="copy"><i class="mi mi-content-copy"></i></b></a>`);
@@ -122,7 +123,8 @@
 		input.placeholder = t('MOVE_SEARCH');
 		input.addEventListener('input', render);
 		input.addEventListener('keydown', onKey);
-		document.addEventListener('mousedown', e => menu.contains(e.target) || e.target.closest?.('.mv-move-btn') || close());
+		document.addEventListener('mousedown', e =>
+			menu.contains(e.target) || e.target.closest?.('.mv-move-btn') || close());
 		addEventListener('resize', close);
 		(document.getElementById('rl-app') || document.body).append(menu);
 	};

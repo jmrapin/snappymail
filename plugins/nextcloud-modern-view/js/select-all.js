@@ -33,7 +33,8 @@
 
 	const folderName = fullName => {
 		let found;
-		const walk = list => (list || []).forEach(f => found || (f.fullName === fullName ? found = f : walk(f.subFolders?.())));
+		const walk = list => (list || []).forEach(f =>
+			found || (f.fullName === fullName ? found = f : walk(f.subFolders?.())));
 		walk(rl.app?.folderList?.());
 		return found ? (found.localName?.() || found.name()) : fullName;
 	};
@@ -59,19 +60,17 @@
 		if (!orig || orig.mvWrapped) {
 			return;
 		}
-		s.listCheckedOrSelectedUidsWithSubMails = (...args) => {
-			try {
-				const sel = current();
-				if (sel) {
-					const result = new Set(sel.uids);
-					result.folder = sel.folder;
-					return result;
-				}
-			} catch (e) {
-				console.error('NcModernView select all', e);
+		// null (core's own answer) when no folder-wide selection applies, or on any error
+		const folderWide = NcModernView.safe('select all uids', () => {
+			const sel = current();
+			if (!sel) {
+				return null;
 			}
-			return orig.apply(s, args);
-		};
+			const result = new Set(sel.uids);
+			result.folder = sel.folder;
+			return result;
+		}, null);
+		s.listCheckedOrSelectedUidsWithSubMails = (...args) => folderWide() || orig.apply(s, args);
 		s.listCheckedOrSelectedUidsWithSubMails.mvWrapped = true;
 	};
 
@@ -110,7 +109,9 @@
 			link.textContent = t('CLEAR_SELECTION');
 		} else {
 			text.textContent = t('PAGE_ALL_SELECTED', { N: s().length.toLocaleString() });
-			link.textContent = loading() ? t('SELECTING') : t('SELECT_ALL_IN', { N: s.count().toLocaleString(), FOLDER: where });
+			link.textContent = loading()
+				? t('SELECTING')
+				: t('SELECT_ALL_IN', { N: s.count().toLocaleString(), FOLDER: where });
 		}
 	});
 
@@ -127,7 +128,7 @@
 			'all' === mode() ? (all(null), view.checkAll?.(false)) : selectAll();
 		});
 		content.prepend(banner);
-		ko.computed(() => render(banner, mode(), loading()));
+		NcModernView.computed('select all banner', () => render(banner, mode(), loading()));
 		// forget the folder-wide selection once it no longer applies
 		mode.subscribe(m => 'all' === m || all(null));
 	});

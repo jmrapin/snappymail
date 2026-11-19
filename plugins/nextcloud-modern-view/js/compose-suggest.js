@@ -80,7 +80,8 @@
 		}
 		menu.replaceChildren(...items.map((line, i) => {
 			const who = parse(line),
-				row = el(`<div class="mv-sug-item" role="option"><span class="mv-sug-av"></span><span class="mv-sug-tx"><span class="mv-sug-nm"></span><span class="mv-sug-em"></span></span></div>`);
+				row = el('<div class="mv-sug-item" role="option"><span class="mv-sug-av"></span>'
+					+ '<span class="mv-sug-tx"><span class="mv-sug-nm"></span><span class="mv-sug-em"></span></span></div>');
 			row.dataset.i = i;
 			row.querySelector('.mv-sug-av').textContent = initials(who);
 			row.querySelector('.mv-sug-av').style.background = color(who.email);

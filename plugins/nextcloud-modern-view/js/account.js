@@ -1,5 +1,5 @@
 /**
- * Nextcloud Modern View: compact account switcher (step 4).
+ * Nextcloud Modern View: compact account switcher.
  * Initials in a pill instead of the full address; the address moves to the tooltip.
  */
 (rl => {

@@ -1,5 +1,5 @@
 /**
- * Nextcloud Modern View: attachment clicks, the per-card ▾ menu and selection mode (step 6).
+ * Nextcloud Modern View: attachment clicks, the per-card ▾ menu and selection mode.
  * Uses core's attachment model (checked(), linkPreviewMain(), linkDownload(), ...) and core's
  * downloadAsZip() (downloads the checked ones); Save to Nextcloud / Add to calendar call the
  * nextcloud plugin's saveNextcloud() / nextcloudSaveICS() on the same view.
@@ -80,12 +80,13 @@
 			return false;
 		};
 
-		view.mvAttAction = kind => {
+		// one click handler per ▾ menu entry: click: mvAttDo.preview
+		view.mvAttDo = Object.fromEntries(Object.keys(ACTIONS).map(kind => [kind, () => {
 			const att = view.mvAttMenu();
 			closeMenu();
-			att && ACTIONS[kind]?.(att);
+			att && ACTIONS[kind](att);
 			return false;
-		};
+		}]));
 
 		view.mvAttDownloadAll = () => {
 			view.mvAttSetAllChecked(true);

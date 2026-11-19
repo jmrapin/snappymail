@@ -1,5 +1,5 @@
 /**
- * Nextcloud Modern View: message header helpers (step 5).
+ * Nextcloud Modern View: message header helpers.
  * Runs first among the MailMessageView hooks: mvT is used by the other files and the template.
  */
 (rl => {
@@ -15,7 +15,10 @@
 
 		view.mvFromName = NcModernView.computed('mvFromName', () => from()?.name || from()?.email || '', '');
 		view.mvOpenInWindow = () => (view.message()?.popupMessage(), false);
-		view.mvFromAddr = NcModernView.computed('mvFromAddr', () => from()?.name && from()?.email ? '<' + from().email + '>' : '', '');
+		view.mvStarIcon = NcModernView.computed('mvStarIcon',
+			() => view.message()?.isFlagged() ? 'mi-star-fill' : 'mi-star', 'mi-star');
+		view.mvFromAddr = NcModernView.computed('mvFromAddr',
+			() => from()?.name && from()?.email ? '<' + from().email + '>' : '', '');
 
 		// Tag options for the ☰ menu. Core's message.tagOptions() reads
 		// FolderUserStore.currentFolder().optionalTags() without a null check, which can throw while

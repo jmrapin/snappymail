@@ -1,5 +1,5 @@
 /**
- * Nextcloud Modern View: message list toolbar (step 7).
+ * Nextcloud Modern View: message list toolbar.
  *
  * Core's MailMessageList template is NOT replaced (the nextcloud plugin hooks its ☰ menu and the
  * avatars plugin its rows). Instead, while plugin scripts load and the template is still unbound,

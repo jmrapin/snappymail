@@ -104,7 +104,8 @@
 			current && size && setWidth(+size.dataset.width);
 			current && e.target.closest('.mv-img-del') && remove();
 		});
-		document.addEventListener('mousedown', e => current && !bar.contains(e.target) && !frame.contains(e.target) && e.target !== current.img && hide());
+		document.addEventListener('mousedown', e => current && !bar.contains(e.target) && !frame.contains(e.target)
+			&& e.target !== current.img && hide());
 		document.addEventListener('keydown', e => current && !bar.contains(e.target) && hide());
 		document.addEventListener('scroll', () => current && place(), true);
 		addEventListener('resize', () => current && place());
@@ -122,7 +123,13 @@
 			r = img.getBoundingClientRect(),
 			pos = host === document.body ? 'fixed' : 'absolute';
 		frame.parentElement !== host && host.append(frame, bar);
-		Object.assign(frame.style, { position: pos, top: (r.top - h.top) + 'px', left: (r.left - h.left) + 'px', width: r.width + 'px', height: r.height + 'px' });
+		Object.assign(frame.style, {
+			position: pos,
+			top: (r.top - h.top) + 'px',
+			left: (r.left - h.left) + 'px',
+			width: r.width + 'px',
+			height: r.height + 'px'
+		});
 		frame.classList.add('show');
 		bar.classList.add('show');
 		bar.style.position = pos;

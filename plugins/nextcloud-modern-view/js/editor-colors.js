@@ -85,7 +85,8 @@
 		});
 		// the browser picker reports its choice when it closes
 		more.addEventListener('change', () => apply(more.value));
-		document.addEventListener('mousedown', e => menu.contains(e.target) || e.target.closest?.('[data-action="textColor"],[data-action="backgroundColor"]') || close());
+		document.addEventListener('mousedown', e => menu.contains(e.target)
+			|| e.target.closest?.('[data-action="textColor"],[data-action="backgroundColor"]') || close());
 		document.addEventListener('keydown', e => 'Escape' === e.key && menu.classList.contains('show') && close(), true);
 		addEventListener('resize', close);
 		document.body.append(menu);

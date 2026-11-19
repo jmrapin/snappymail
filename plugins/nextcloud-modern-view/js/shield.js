@@ -1,5 +1,5 @@
 /**
- * Nextcloud Modern View: sender verification shield (step 5).
+ * Nextcloud Modern View: sender verification shield.
  *
  * green  = SPF, DKIM and DMARC pass
  * yellow = SPF and DKIM pass, no DMARC result (DMARC is nice to have)
@@ -67,7 +67,8 @@
 		};
 
 	NcModernView.onView('MailMessageView', view => {
-		view.mvAuth = NcModernView.computed('mvAuth', () => status(view), { show: false, local: false, level: '', icon: '', head: '', rows: [] });
+		view.mvAuth = NcModernView.computed('mvAuth', () => status(view),
+			{ show: false, local: false, level: '', icon: '', head: '', rows: [] });
 	});
 
 })(window.rl);

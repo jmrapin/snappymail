@@ -61,8 +61,10 @@
 		m.allUnseen = C('bar unseen', () => m.hasTarget() && targets().every(msg => msg.isUnseen()), false);
 		m.allFlagged = C('bar flagged', () => m.hasTarget() && targets().every(msg => msg.isFlagged()), false);
 		m.seenIcon = C('bar seen icon', () => m.allUnseen() ? 'mi-mark-email-read' : 'mi-mark-email-unread', '');
-		m.seenTitle = C('bar seen title', () => rl.i18n(m.allUnseen() ? 'MESSAGE_LIST/MENU_SET_SEEN' : 'MESSAGE_LIST/MENU_UNSET_SEEN'), '');
-		m.flagTitle = C('bar flag title', () => rl.i18n(m.allFlagged() ? 'MESSAGE_LIST/MENU_UNSET_FLAG' : 'MESSAGE_LIST/MENU_SET_FLAG'), '');
+		m.seenTitle = C('bar seen title',
+			() => rl.i18n(m.allUnseen() ? 'MESSAGE_LIST/MENU_SET_SEEN' : 'MESSAGE_LIST/MENU_UNSET_SEEN'), '');
+		m.flagTitle = C('bar flag title',
+			() => rl.i18n(m.allFlagged() ? 'MESSAGE_LIST/MENU_UNSET_FLAG' : 'MESSAGE_LIST/MENU_SET_FLAG'), '');
 		m.tagsTitle = C('bar tags title', () => NcModernView.t('TAGS'), '');
 		// with the whole folder selected, the page's state decides the direction for all of it
 		const folderWide = () => NcModernView.selectAll?.size() > 0;

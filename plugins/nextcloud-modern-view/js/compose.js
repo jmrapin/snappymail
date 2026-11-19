@@ -45,7 +45,8 @@
 		}
 		const box = li.querySelector('i.fontastic'),
 			flag = (box?.getAttribute('data-bind') || '').match(/text: (\w+)\(\)/)?.[1];
-		flag && box.replaceWith(el(`<i class="mi" data-bind="css: { 'mi-check-box': ${flag}(), 'mi-check-box-outline-blank': !${flag}() }"></i>`));
+		flag && box.replaceWith(el(
+			`<i class="mi" data-bind="css: { 'mi-check-box': ${flag}(), 'mi-check-box-outline-blank': !${flag}() }"></i>`));
 	});
 
 	const patch = t => {
@@ -73,12 +74,14 @@
 			contacts = iconize(header.querySelector('[data-bind*="contactsCommand"]'), 'contacts');
 		const sign = iconize(bHeader?.querySelector('a.btn[data-bind*="toggle: doSign"]'), 'signature'),
 			encrypt = iconize(bHeader?.querySelector('a.btn[data-bind*="toggle: doEncrypt"]'), 'lock');
-		[sign, encrypt].forEach(b => b?.setAttribute('data-bind', b.getAttribute('data-bind').replace(/'btn-success'/, "'mv-on'")));
+		[sign, encrypt].forEach(b =>
+			b?.setAttribute('data-bind', b.getAttribute('data-bind').replace(/'btn-success'/, "'mv-on'")));
 		const important = el(`<a class="mv-btn" data-bind="toggle: markAsImportant, css: { 'mv-on': markAsImportant }"
 			data-i18n="[title]COMPOSE/BUTTON_MARK_AS_IMPORTANT"><i class="mi mi-priority-high"></i></a>`);
 
 		const saved = header.querySelector('.saved-text');
-		(saved || discard || save).after(...[sep(), upload, cloud, contacts, sep(), sign, encrypt, important].filter(Boolean));
+		(saved || discard || save).after(
+			...[sep(), upload, cloud, contacts, sep(), sign, encrypt, important].filter(Boolean));
 		(saved && important.after(saved));
 		// the sign / encrypt / attach row under the fields is empty now
 		bHeader?.querySelector(':scope > div[style*="display:flex"]')?.remove();

@@ -20,12 +20,12 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 		NAME     = 'Nextcloud Modern View',
 		AUTHOR   = 'jmrapin',
 		URL      = 'https://github.com/jmrapin/snappymail',
-		VERSION  = '0.4',
-		RELEASE  = '2026-11-17',
+		VERSION  = '0.5',
+		RELEASE  = '2026-11-19',
 		REQUIRED = '3.0.1',
 		CATEGORY = 'General',
 		LICENSE  = 'MIT',
-		DESCRIPTION = 'Compact modern reading pane: actions in the toolbar, sender verification shield, one-line attachments, outline icons';
+		DESCRIPTION = 'Outlook-like mail view: one action bar, compact reading pane, sender verification shield, attachment cards, modern compose window, narrow-window layouts, select all in a folder';
 
 	const
 		CSS = ['symbols', 'folders', 'toolbar', 'messagelist-toolbar', 'account', 'header', 'shield', 'attachments', 'attachments-select', 'busy', 'toolbar-merge', 'overflow', 'move-menu', 'onebar', 'narrow', 'list-width', 'fullscreen', 'select-all', 'compose', 'compose-fields', 'compose-attachments', 'compose-suggest', 'editor-toolbar', 'editor-colors', 'editor-images'],

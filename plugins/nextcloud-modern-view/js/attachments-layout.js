@@ -1,5 +1,5 @@
 /**
- * Nextcloud Modern View: attachments layout (step 6).
+ * Nextcloud Modern View: attachments layout.
  * How many cards fit on the collapsed line, Show all / Show less, and the edge fades while the
  * two expanded rows scroll sideways. Needs the state from attachments.js.
  */

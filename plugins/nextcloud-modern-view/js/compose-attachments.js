@@ -15,11 +15,13 @@
 		return;
 	}
 
-	const STRIP = `<div class="mv-cp-atts mv-atts" data-bind="visible: attachmentsCount, css: { 'mv-expanded': mvCpAttExpanded }">
+	const STRIP = `<div class="mv-cp-atts mv-atts"
+		data-bind="visible: attachmentsCount, css: { 'mv-expanded': mvCpAttExpanded }">
 		<div class="mv-att-head" data-bind="visible: mvCpAttExpanded">
 			<span data-bind="text: mvCpAttSummary"></span>
 			<span class="mv-spacer"></span>
-			<a href="#" class="mv-lnk" data-bind="click: mvCpAttCollapse"><i class="mi mi-keyboard-arrow-up"></i><span data-bind="text: mvCpT('SHOW_LESS')"></span></a>
+			<a href="#" class="mv-lnk" data-bind="click: mvCpAttCollapse"><i class="mi mi-keyboard-arrow-up"></i>
+				<span data-bind="text: mvCpT('SHOW_LESS')"></span></a>
 		</div>
 		<div class="mv-att-row">
 			<div class="mv-att-list" data-bind="initDom: mvCpAttListInit">
@@ -32,11 +34,13 @@
 								<span class="mv-att-sz" data-bind="text: $root.mvCpAttSize($data)"></span>
 							</span>
 						</span>
-						<a href="#" class="mv-att-dd" data-bind="click: $data.cancel, attr: { title: $root.mvCpT('ATT_REMOVE') }"><i class="mi mi-close"></i></a>
+						<a href="#" class="mv-att-dd" data-bind="click: $data.cancel, attr: { title: $root.mvCpT('ATT_REMOVE') }">
+							<i class="mi mi-close"></i></a>
 					</div>
 				</div>
 			</div>
-			<a href="#" class="mv-more-chip" data-bind="visible: !mvCpAttExpanded() && mvCpAttFit() < attachmentsCount(), click: mvCpAttExpand, text: mvCpAttShowAll"></a>
+			<a href="#" class="mv-more-chip"
+				data-bind="visible: mvCpAttShowChip, click: mvCpAttExpand, text: mvCpAttShowAll"></a>
 		</div>
 	</div>`;
 
@@ -73,7 +77,10 @@
 			'mv-att-err': !!att.error?.(),
 			'mv-att-busy': !!(att.uploading?.() || att.waiting?.())
 		});
-		view.mvCpAttShowAll = NcModernView.computed('mvCpAttShowAll', () => NcModernView.t('SHOW_ALL', { N: list().length }), '');
+		view.mvCpAttShowAll = NcModernView.computed('mvCpAttShowAll',
+			() => NcModernView.t('SHOW_ALL', { N: list().length }), '');
+		view.mvCpAttShowChip = NcModernView.computed('mvCpAttShowChip',
+			() => !view.mvCpAttExpanded() && view.mvCpAttFit() < list().length, false);
 		view.mvCpAttSummary = NcModernView.computed('mvCpAttSummary', () => NcModernView.t('ATTACHMENTS_SUMMARY', {
 			N: list().length,
 			SIZE: NcModernView.friendlySize(list().reduce((total, a) => total + (+a.size?.() || 0), 0))
