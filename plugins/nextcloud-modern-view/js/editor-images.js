@@ -2,20 +2,35 @@
  * Nextcloud Modern View: select an image in the HTML editor and size it, like Gmail.
  *
  * Clicking an image frames it (a thin border with four corner grab handles: drag one to resize,
- * keeping the proportions) and shows a bar: Small · Medium · Large · Original size · Delete.
- * The image is also selected in the editor, so Delete / Backspace remove it too.
- * Sizes are a width in px with max-width:100% (core inserts pasted images at width:100%, which
- * is why they come out huge). Nothing is added to the image's HTML except that style: the frame
- * and the bar are separate elements, inside the compose <dialog> (the browser draws a modal
- * dialog above everything outside it).
+ * keeping the proportions) and shows a bar: Small · Medium · Large · Best fit · Original size ·
+ * Delete. The image is also selected in the editor, so Delete / Backspace remove it too.
+ * Sizes are a width in px with max-width:100%. Best fit (Gmail's default) is the message width,
+ * but never larger than the image itself: width:100% with max-width = its own width. Core already
+ * pastes clipboard images that way (SquireUI.js); images dropped in as files or added by URL go
+ * through Squire's insertImage() with no size at all, so those get Best fit here too (only those:
+ * images in a quoted reply keep the size they had).
+ * Nothing is added to the image's HTML except that style: the frame and the bar are separate
+ * elements, inside the compose <dialog> (the browser draws a modal dialog above everything
+ * outside it).
  */
 (rl => {
 	if (!rl) {
 		return;
 	}
 
-	const SIZES = [['IMG_SMALL', 200], ['IMG_MEDIUM', 400], ['IMG_LARGE', 640], ['IMG_ORIGINAL', 0]],
+	const FIT = -1, // Best fit: not a width, see bestFit()
+		SIZES = [['IMG_SMALL', 200], ['IMG_MEDIUM', 400], ['IMG_LARGE', 640], ['IMG_FIT', FIT], ['IMG_ORIGINAL', 0]],
 		t = key => NcModernView.t(key);
+
+	// the message width, but never wider than the image itself
+	const bestFit = img => {
+		img.removeAttribute('width');
+		img.removeAttribute('height');
+		img.style.width = '100%';
+		img.style.height = 'auto';
+		img.style.maxWidth = img.naturalWidth ? img.naturalWidth + 'px' : '100%';
+	};
+	const isBestFit = img => '100%' === img.style.width;
 
 	let frame, bar, current; // current: { img, sq }
 
@@ -34,6 +49,10 @@
 	const setWidth = width => {
 		const { img, sq } = current;
 		changed(sq, () => {
+			if (FIT === width) {
+				bestFit(img);
+				return;
+			}
 			img.removeAttribute('width');
 			img.removeAttribute('height');
 			img.style.width = (width || img.naturalWidth) + 'px';
@@ -137,9 +156,11 @@
 		bar.style.top = (r.bottom + bar.offsetHeight + 12 > innerHeight && above > 0 ? above : below) + 'px';
 		bar.style.left = Math.max(8, Math.min(r.left - h.left, h.width - bar.offsetWidth - 8)) + 'px';
 		// the preset that matches the current width is highlighted
-		const w = Math.round(parseFloat(img.style.width) || 0);
-		bar.querySelectorAll('.mv-img-size').forEach(b =>
-			b.classList.toggle('mv-on', w > 0 && w === (+b.dataset.width || img.naturalWidth)));
+		const fit = isBestFit(img), w = fit ? 0 : Math.round(parseFloat(img.style.width) || 0);
+		bar.querySelectorAll('.mv-img-size').forEach(b => {
+			const preset = +b.dataset.width;
+			b.classList.toggle('mv-on', FIT === preset ? fit : w > 0 && w === (preset || img.naturalWidth));
+		});
 	};
 
 	const select = (img, sq) => {
@@ -159,6 +180,19 @@
 		});
 		// typing, undo or pasting may move or remove the image
 		sq?.addEventListener?.('input', () => current && requestAnimationFrame(place));
+		// images dropped in as files or added by URL start at Best fit (Gmail's default)
+		const insertImage = sq?.insertImage;
+		if (insertImage && !insertImage.mvWrapped) {
+			sq.insertImage = function(...args) {
+				const img = insertImage.apply(this, args);
+				NcModernView.safe('image best fit', () => {
+					const fit = () => img.isConnected && !img.style.width && bestFit(img);
+					img.complete ? fit() : img.addEventListener('load', fit, { once: true });
+				})();
+				return img;
+			};
+			sq.insertImage.mvWrapped = true;
+		}
 	});
 
 })(window.rl);

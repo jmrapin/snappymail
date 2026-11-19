@@ -26,6 +26,7 @@
 		"IMG_SMALL": "Small",
 		"IMG_MEDIUM": "Medium",
 		"IMG_LARGE": "Large",
+		"IMG_FIT": "Best fit",
 		"IMG_ORIGINAL": "Original size",
 		"IMG_REMOVE": "Delete",
 		"ATT_REMOVE": "Remove",
