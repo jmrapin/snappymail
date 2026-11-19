@@ -14,6 +14,7 @@
 		view.mvT = (key, values) => rl.i18n(key, values);
 
 		view.mvFromName = NcModernView.computed('mvFromName', () => from()?.name || from()?.email || '', '');
+		view.mvOpenInWindow = () => (view.message()?.popupMessage(), false);
 		view.mvFromAddr = NcModernView.computed('mvFromAddr', () => from()?.name && from()?.email ? '<' + from().email + '>' : '', '');
 
 		// Tag options for the ☰ menu. Core's message.tagOptions() reads

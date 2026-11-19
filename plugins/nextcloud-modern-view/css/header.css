@@ -67,6 +67,7 @@
 	font-weight: normal;
 }
 #rl-app .mv-star,
+#rl-app .mv-popout,
 #rl-app .mv-shield {
 	position: relative;
 	display: inline-grid;
@@ -79,6 +80,8 @@
 	cursor: pointer;
 }
 #rl-app .mv-star:hover,
+#rl-app .mv-popout:hover,
+#rl-app .mv-popout:focus-visible,
 #rl-app .mv-shield:hover,
 #rl-app .mv-shield:focus-visible {
 	background-color: var(--color-background-hover, #f5f5f5);
@@ -88,6 +91,14 @@
 #rl-app .mv-shield .mi {
 	width: 22px;
 	height: 22px;
+}
+#rl-app .mv-popout .mi {
+	width: 20px;
+	height: 20px;
+}
+#rl-app .mv-popout,
+#rl-app .mv-popout:hover {
+	text-decoration: none;
 }
 #rl-app .mv-star.flagOn {
 	color: #e0a800;

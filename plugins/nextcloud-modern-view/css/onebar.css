@@ -39,9 +39,6 @@ html.mv-onebar #rl-app #rl-right.mv-onebar-on > #mv-onebar {
 	text-align: start;
 	white-space: nowrap;
 }
-html.mv-onebar.rl-fullscreen #rl-app #mv-onebar {
-	padding-right: 12px;
-}
 
 /* while the bar is shown, the panels lose their own toolbars and take the full height below it.
    Scoped like the bar itself (more specific than toolbar.css's narrow-window display:flex

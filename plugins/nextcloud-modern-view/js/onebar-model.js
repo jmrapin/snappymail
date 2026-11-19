@@ -80,7 +80,6 @@
 			return false;
 		};
 		m.print = onOpen(msg => msg.printMessage());
-		m.openInWindow = onOpen(msg => msg.popupMessage());
 		m.swapColors = onOpen(msg => msg.swapColors());
 		m.viewHtml = onOpen(msg => msg.viewHtml());
 		m.viewPlain = onOpen(msg => msg.viewPlain());

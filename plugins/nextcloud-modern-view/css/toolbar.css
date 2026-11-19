@@ -122,10 +122,6 @@ html.sm-msgView-bottom:not(.rl-mobile) #rl-app .mv-toolbar .buttonClose {
 		display: flex !important;
 		visibility: visible;
 	}
-	/* full screen hides the account switcher, so no room needs to be kept for it */
-	html.rl-fullscreen #rl-app #V-MailMessageView .mv-toolbar {
-		padding-right: 12px;
-	}
 }
 
 /*
