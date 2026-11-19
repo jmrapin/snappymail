@@ -22,13 +22,6 @@
 	border-radius: 20px !important;
 	background: transparent;
 }
-/* core hides the switcher in full screen (Styles/User/MessageView.less); keep it, so accounts
-   can be switched and the menu reached there too. The toolbars keep its room in every mode */
-@media screen {
-	html.rl-fullscreen #rl-app #V-SystemDropDown {
-		display: block !important;
-	}
-}
 #rl-app #V-SystemDropDown .btn-toolbar {
 	border: 0;
 	padding: 0;

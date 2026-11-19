@@ -28,7 +28,7 @@ class NextcloudModernViewPlugin extends \RainLoop\Plugins\AbstractPlugin
 		DESCRIPTION = 'Compact modern reading pane: actions in the toolbar, sender verification shield, one-line attachments, outline icons';
 
 	const
-		CSS = ['symbols', 'folders', 'toolbar', 'messagelist-toolbar', 'account', 'header', 'shield', 'attachments', 'attachments-select', 'busy', 'toolbar-merge', 'overflow', 'move-menu', 'onebar', 'narrow', 'list-width', 'compose', 'compose-fields', 'compose-attachments', 'compose-suggest', 'editor-toolbar', 'editor-colors', 'editor-images'],
+		CSS = ['symbols', 'folders', 'toolbar', 'messagelist-toolbar', 'account', 'header', 'shield', 'attachments', 'attachments-select', 'busy', 'toolbar-merge', 'overflow', 'move-menu', 'onebar', 'narrow', 'list-width', 'fullscreen', 'compose', 'compose-fields', 'compose-attachments', 'compose-suggest', 'editor-toolbar', 'editor-colors', 'editor-images'],
 		JS  = ['util', 'attachments-common', 'header', 'account', 'shield', 'attachments', 'attachments-layout', 'attachments-actions', 'messagelist-toolbar', 'busy', 'overflow', 'move-menu', 'onebar-model', 'onebar', 'narrow', 'compose', 'compose-fields', 'compose-attachments', 'compose-attachments-layout', 'editor-toolbar', 'editor-fixes', 'compose-close', 'editor-colors', 'editor-images', 'compose-suggest'];
 
 	public function Init() : void

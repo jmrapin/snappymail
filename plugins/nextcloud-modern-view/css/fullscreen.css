@@ -1,0 +1,14 @@
+/*
+ * Nextcloud Modern View: full screen (core's ⛶, which puts #rl-app in the browser's full screen).
+ * Core then hides everything but the open message (Styles/User/MessageView.less: html.rl-fullscreen
+ * … display: none !important). Here full screen only drops the Nextcloud page around SnappyMail:
+ * the message list and the account switcher stay, so you can keep reading and switching mails.
+ * Core leaves full screen by itself when no message is open (Stores/User/Message.js).
+ * Printing still hides them: core's @media print rules are left alone.
+ */
+@media screen {
+	html.rl-fullscreen #rl-app #V-MailMessageList,
+	html.rl-fullscreen #rl-app #V-SystemDropDown {
+		display: block !important;
+	}
+}
